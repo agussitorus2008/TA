@@ -13,13 +13,14 @@
                 <div class="d-table-cell">
                     <div class="container">
                         <div class="banner-text">
-                            <span>Find Jobs, Employment & Career Opportunities</span>
-                            <h1>Get a Job that Perfect for You</h1>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                            <h2>Menuju PTN Impian</h2>
+                            <h2>Bersama KAWAL PTN-KU!</h2>
+                            <p>Uji kemampuanmu menghadapi UTBK dan bersaing dengan ratusan ribu siswa lainnya dengan mengikuti Tryout disini:</p>
+                            <p>Persiapan yang matang adalah modal utama kelulusan Anda!</p>
     
                             <div class="theme-btn">
-                                <a href="#" class="default-btn active">Upload your CV</a>
-                                <a href="contact.html" class="default-btn">Contact Us</a>
+                                <a href="#" class="default-btn active">DAFTAR</a>
+                                <a href="contact.html" class="default-btn">MASUK</a>
                             </div>
                         </div>
                     </div>
@@ -27,7 +28,7 @@
             </div>
 
             <div class="banner-img">
-                <img src="assets/img/banner/banner-img.png" alt="banner image">
+                <img src="{{asset('assets/images/image 1.png')}}" alt="banner image">
             </div>
         </div>
         <!-- Banner Section End -->
