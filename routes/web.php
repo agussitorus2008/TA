@@ -3,7 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
-use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
+use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\IndexController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +18,14 @@ use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 */
 
 Route::get('/auth', [AuthController::class, 'index'])->name('auth');
-
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/register', [AuthController::class, 'register'])->name('register');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+// Assuming you want to define routes related to 'siswa'
+Route::prefix('/siswa')->group(function () {
+    Route::get('/main', [SiswaController::class, 'index'])->name('siswa.main');
+    Route::get('/view', [SiswaController::class, 'view'])->name('siswa.view');
+});
+
+// Assuming you want to define routes related to 'register'
+Route::get('/index', [IndexController::class, 'index'])->name('index');

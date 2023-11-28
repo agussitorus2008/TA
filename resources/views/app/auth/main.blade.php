@@ -4,10 +4,9 @@
             <div class="card-body">
                 <div class="text-center mb-3">
                     <div class="d-inline-flex align-items-center justify-content-center mb-4 mt-2">
-                        <img src="../../../assets/images/logo_icon.svg" class="h-48px" alt="" />
+                        <img src="{{asset('assets/images/abu muda 2.png')}}" class="h-64px" alt="" />
                     </div>
-                    <h5 class="mb-0">Login to your account</h5>
-                    <span class="d-block text-muted">Enter your credentials below</span>
+                    <h5 class="mb-0" style="color: #0A407F">MASUK</h5>
                 </div>
 
                 <div class="mb-3">
@@ -31,11 +30,17 @@
                 </div>
 
                 <div class="mb-3">
-                    <button type="submit" class="btn btn-primary w-100">Sign in</button>
+                    <button type="submit" class="w-100" style="background-color:
+                    #09C211">Masuk</button>
                 </div>
 
                 <div class="text-center">
-                    <a href="login_password_recover.html">Forgot password?</a>
+                    <h6>BELUM PUNYA AKUN?</h6>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="w-100" style="background-color:
+                    #0A407F">Daftar</button>
                 </div>
             </div>
         </div>
