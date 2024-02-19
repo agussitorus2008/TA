@@ -1,68 +1,76 @@
-<!-- Sidebar header -->
-<div class="sidebar-section bg-opacity-10 border-bottom border-bottom-white border-opacity-10" style="background-color:#0A407F">
-    <div class="sidebar-logo d-flex justify-content-center align-items-center">
-        <a href="index.html" class="d-inline-flex align-items-center py-2">
-            <img src="{{asset('assets/images/abu muda 1.png')}}" class="sidebar-logo-icon" alt="">
-        </a>
+<div class="sidebar sidebar-dark sidebar-main sidebar-expand-lg" style="background-color:#0A407F">
 
-        <div class="sidebar-resize-hide ms-auto">
+    <!-- Sidebar content -->
+    <div class="sidebar-content">
 
-            <button type="button"
-                class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-mobile-main-toggle d-lg-none">
-                <i class="ph-x"></i>
-            </button>
+        <!-- Sidebar header -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-body d-flex justify-content-center">
+                <img src="{{ asset('assets/images/abu muda 1.png') }}" alt="" class="sidebar-resize-hide flex-grow-1 my-auto" style="width: 30px;">
+                <div>
+                    <button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-control sidebar-main-resize d-none d-lg-inline-flex">
+                        <i class="ph-arrows-left-right"></i>
+                    </button>
+
+                    <button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-mobile-main-toggle d-lg-none">
+                        <i class="ph-x"></i>
+                    </button>
+                </div>
+            </div>
         </div>
+        <!-- /sidebar header -->
+
+
+        <!-- Main navigation -->
+        <div class="sidebar-section">
+            <ul class="nav nav-sidebar" data-nav-type="accordion">
+
+                <!-- Main -->
+                <li class="nav-item-header pt-0">
+                    <div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Main</div>
+                    <i class="ph-dots-three sidebar-resize-show"></i>
+                </li>
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">
+                        <i class="ph-house"></i>
+                        <span>
+                            Dashboard
+                        </span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="ph-article"></i>
+                        <span>Data Siswa</span>
+                    </a>
+                </li>
+                <li class="nav-item nav-item-submenu">
+                    <a href="#" class="nav-link">
+                        <i class="ph-layout"></i>
+                        <span>Tryout</span>
+                    </a>
+                    <ul class="nav-group-sub collapse">
+                        <li class="nav-item"><a href="index.html" class="nav-link">Tryout saya</a></li>
+                        <li class="nav-item"><a href="../../layout_2/full/index.html" class="nav-link">Hasil tryout</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="ph-swatches"></i>
+                        <span>Simulasi</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="ph-globe"></i>
+                        <span>Lalu Lintas</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <!-- /main navigation -->
+
     </div>
+    <!-- /sidebar content -->
+    
 </div>
-<!-- /sidebar header -->
-
-
-<!-- Sidebar content -->
-<div class="sidebar-content" style="background-color:#0A407F">
-    <!-- Main navigation -->
-    <div class="sidebar-section">
-        <ul class="nav nav-sidebar" data-nav-type="accordion">
-
-            <!-- Main -->
-            <li class="nav-item">
-                <a href="index.html" class="nav-link active">
-                    <i class="ph-house"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="index.html" class="nav-link">
-                    <i class="ph-article"></i>
-                    <span>Data Siswa</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="ph-layout"></i>
-                    <span>Try Out</span>
-                </a>
-                <ul class="nav-group-sub collapse">
-                    <li class="nav-item"><a href="../../layout_1/full/index.html" class="nav-link">Default
-                            layout</a></li>
-                    <li class="nav-item"><a href="index.html" class="nav-link active">Layout 2</a></li>
-                    <li class="nav-item"><a href="../../layout_3/full/index.html" class="nav-link">Layout
-                            3</a></li>
-                    <li class="nav-item"><a href="../../layout_4/full/index.html" class="nav-link">Layout
-                            4</a></li>
-                    <li class="nav-item"><a href="../../layout_5/full/index.html" class="nav-link">Layout
-                            5</a></li>
-                    <li class="nav-item"><a href="../../layout_6/full/index.html" class="nav-link">Layout
-                            6</a></li>
-                    <li class="nav-item"><a href="../../layout_7/full/index.html" class="nav-link disabled">Layout 7
-                            <span class="badge align-self-center ms-auto">Coming soon</span></a></li>
-                </ul>
-            </li>
-
-            <!-- /layout -->
-
-        </ul>
-    </div>
-    <!-- /main navigation -->
-
-</div>
-<!-- /sidebar content -->

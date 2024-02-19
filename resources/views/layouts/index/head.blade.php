@@ -21,7 +21,6 @@
 <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
 <!-- Responsive CSS -->
 <link rel="stylesheet" href="{{ asset('assets/css/responsive.css') }}">
-<!-- Title CSS -->
+
 <title>Kawal PTNKu</title>
-<!-- Favicon -->
 <link rel="icon" type="image/png" href="{{ asset('assets/img/favicon.png') }}">

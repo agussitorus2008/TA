@@ -1,60 +1,72 @@
 @extends('layouts.main')
 
 @section('title')
-    Home - <span class="fw-normal">Siswa</span>
+<h6 style="color:#0A407F;font-size:25px" class="d-none d-sm-inline-block h-16px ms-3">SELAMAT DATANG DI KAWALPTN-KU!</h6>
 @endsection
 
 @section('content')
-    <div class="card">
-        <div class="card-body pb-0">
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="nama" class="form-label">Nama Lengkap</label>
-                    <input type="text" class="form-control form-control-lg" id="nama" name="nama">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="kelompok" class="form-label">Kelompok</label>
-                    <input type="text" class="form-control form-control-lg" id="kelompok" name="kelompok">
-                </div>
-            </div>
+<!-- Page header -->
+<div class="page-header page-header-light shadow" style="background-color: #67AED4;">
+    <div class="page-header-content d-lg-flex">
+        <div class="d-flex">
+            <h4 class="page-title" style="font-size: 30px; color: #0A407F; margin:20px;">
+                Ayo, bersiap dari sekarang<br>untuk mengejar PTN Impian!
+            </h4>   
+        </div>
+    </div>
+</div>
+<!-- /page header -->
 
-            <div class="row justify-content-center mb-3">
-                <div class="col-md-6 text-center">
-                    <h4 class="text-center font-weight-bold">Pilih Jurusan </h5>
-                        <!-- Tambahkan opsi jurusan menggunakan dropdown atau radio button sesuai kebutuhan -->
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <h3 class="text-center font-weight-bold">Judul Pilihan 1</h5>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <h3 class="text-center font-weight-bold">Judul Pilihan 2</h5>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="kampus1" class="form-label">Pilih Kampus 1</label>
-                    <input type="text" class="form-control form-control-lg" id="kampus1" name="kampus1">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="kampus2" class="form-label">Pilih Kampus 2</label>
-                    <input type="text" class="form-control form-control-lg" id="kampus2" name="kampus2">
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="jurusan1" class="form-label">Pilih Jurusan 1</label>
-                    <input type="text" class="form-control form-control-lg" id="jurusan1" name="jurusan1">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="jurusan2" class="form-label">Pilih Jurusan 2</label>
-                    <input type="text" class="form-control form-contro  l-lg" id="jurusan2" name="jurusan2">
+<!-- Content area -->
+<div class="content">
+    <div class="row justify-content-center">
+        <div class="col-lg-4">
+            <div class="card blog-horizontal text-center">
+                <div class="card-body">
+                    <div class=" mx-auto mb-3">
+                        <img src="{{ asset('assets/images/Group 50.png') }}" alt="" class="img-fluid">
+                    </div>
+                    <h5 class="my-1"><p>Pendaftar 14.717</p></h5>
                 </div>
             </div>
         </div>
+
+        <div class="col-lg-4">
+            <div class="card blog-horizontal text-center">
+                <div class="card-body">
+                    <div class=" mx-auto mb-3">
+                        <img src="{{ asset('assets/images/Vector.png') }}" alt="" class="img-fluid">
+                    </div>
+                    <h5 class="my-1"><p>Nilai rata-rata Tryout Pendaftar saat ini 653.47</p></h5>
+                </div>
+            </div>
+        </div>  
+        
     </div>
-@endsection
+    <div class="row justify-content-center">
+        <div class="col-lg-4">
+            <div class="card blog-horizontal text-center">
+                <div class="card-body">
+                    <div class=" mx-auto mb-3">
+                        <img src="{{ asset('assets/images/Vector (1).png') }}" alt="" class="img-fluid">
+                    </div>
+                    <h5 class="my-1"><p>1.835 Sekolah </p></h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 ml-4">
+            <div class="card blog-horizontal text-center">
+                <div class="card-body">
+                    <div class=" mx-auto mb-3">
+                        <img src="{{ asset('assets/images/Vector.png') }}" alt="" class="img-fluid">
+                    </div>
+                    <h5 class="my-1"><p>985.24 Nilai Maksimum Tryout saat ini</p></h5>
+                </div>
+            </div>
+        </div>  
+        
+    </div>
+</div>
+<!-- /content area -->
+@endsection   
