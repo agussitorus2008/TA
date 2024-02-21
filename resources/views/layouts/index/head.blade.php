@@ -23,4 +23,4 @@
 <link rel="stylesheet" href="{{ asset('assets/css/responsive.css') }}">
 
 <title>Kawal PTNKu</title>
-<link rel="icon" type="image/png" href="{{ asset('assets/img/favicon.png') }}">
+<link rel="icon" type="image/png" href="{{ asset('assets/images/abu muda 1.png') }}">

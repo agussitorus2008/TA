@@ -1338,24 +1338,10 @@ h3 {
 /* Blog CSS End */
 /* Footer CSS Start */
 .footer-area {
-  background: #060f24;
+  background: #0A407F;
   position: relative;
 }
 
-.footer-area::before {
-  position: absolute;
-  content: '';
-  background-image: url(../img/shape/footer.png);
-  background-position: center center;
-  background-size: cover;
-  width: 140px;
-  height: 138px;
-  right: 60px;
-  top: 70px;
-  opacity: .2;
-  -webkit-animation: rotate 30s infinite linear;
-          animation: rotate 30s infinite linear;
-}
 
 .footer-area .footer-widget {
   margin-bottom: 30px;
@@ -2278,10 +2264,6 @@ h3 {
 
 .banner-style-four::before {
   position: absolute;
-  content: '';
-  background-image: url(../img/shape/banner.png);
-  background-position: center center;
-  background-size: cover;
   height: 100%;
   width: 55%;
   top: 0;

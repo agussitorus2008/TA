@@ -22,5 +22,6 @@
     <script src="{{ asset('assets/js/app.js') }}"></script>
     <script src="{{ asset('assets/js/demo/pages/animations_css3.js') }}"></script>
     <!-- /theme JS files -->
+    <link rel="icon" type="image/png" href="{{ asset('assets/images/abu muda 1.png') }}">
 
 </head>
