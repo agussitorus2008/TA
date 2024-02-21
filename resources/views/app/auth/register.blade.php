@@ -25,7 +25,7 @@
                         </div>
     
                         <div class="mb-3">
-                            <label class="form-label">Nomor Hp</label>
+                            <label class="form-label">NOMOR HP (WA AKTIF)</label>
                             <div class="form-control-feedback form-control-feedback-start">
                                 <input type="number" class="form-control" placeholder="Masukkan Nomor Hp">
                                 <div class="form-control-feedback-icon">
@@ -35,7 +35,7 @@
                         </div>
     
                         <div class="mb-3">
-                            <label class="form-label">Email</label>
+                            <label class="form-label">EMAIL AKTIF</label>
                             <div class="form-control-feedback form-control-feedback-start">
                                 <input type="email" class="form-control" placeholder="Masukkan Email">
                                 <div class="form-control-feedback-icon">
@@ -47,7 +47,7 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="mb-3">
-                                    <label class="form-label">Create password</label>
+                                    <label class="form-label">PASSWORD</label>
                                     <div class="form-control-feedback form-control-feedback-start">
                                         <input type="password" class="form-control" placeholder="Masukkan Password">
                                         <div class="form-control-feedback-icon">
@@ -59,7 +59,7 @@
     
                             <div class="col-lg-6">
                                 <div class="mb-3">
-                                    <label class="form-label">Repeat password</label>
+                                    <label class="form-label">ULANGI PASSWORD</label>
                                     <div class="form-control-feedback form-control-feedback-start">
                                         <input type="password" class="form-control" placeholder="Masukkan Password">
                                         <div class="form-control-feedback-icon">
@@ -76,8 +76,8 @@
                     </div>
 
                     <div class="card-body text-center border-top mt-auto">
-                        <button type="submit" class="btn btn-teal w-75">
-                            Registrasi
+                        <button type="submit" class="btn w-35" style="background-color: #6CE670;color: #0A407F;font-weight:bold">
+                            SUBMIT
                         </button>
                     </div>
                 </div>

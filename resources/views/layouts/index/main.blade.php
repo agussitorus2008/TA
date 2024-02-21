@@ -117,7 +117,7 @@
         </div>
 
         <div class="pt-100 carousel" style="background-image: linear-gradient(to bottom, #0F5FAB, #FFFFFF);">
-            <div class="container">
+            <div class="container mb-5">
                 <div class="section-title text-center">
                     <h2><span>TESTIMONI</span></h2>
                     <p style="color: #000000">Jadilah bagian dari mereka yang sudah merasakan manfaat tryout di KAWALPTN-KU. Apa kata mereka yang lulus PTN Impian mereka?</p>

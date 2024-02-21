@@ -19,8 +19,13 @@ use App\Http\Controllers\HasilTryoutSiswaController;
 |
 */
 
-Route::get('/auth', [AuthController::class, 'index'])->name('auth');
-Route::get('/register', [AuthController::class, 'register'])->name('register');
+Route::prefix('/auth')->group(function () {
+    Route::get('/login', [AuthController::class, 'index'])->name('auth.login');
+    Route::get('/register', [AuthController::class, 'register'])->name('auth.register');
+    Route::get('/forget-password', [AuthController::class, 'forget'])->name('auth.forget-password');
+    Route::get('/change-password', [AuthController::class, 'change'])->name('auth.change-password');
+});
+
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 // Assuming you want to define routes related to 'siswa'

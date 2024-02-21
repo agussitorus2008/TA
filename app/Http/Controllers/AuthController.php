@@ -25,9 +25,14 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function forget()
     {
-        //
+        return view('app.auth.forget');
+    }
+
+    public function change()
+    {
+        return view('app.auth.change');
     }
 
     /**

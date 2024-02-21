@@ -21,7 +21,7 @@
                                 Phone:
                             </span>
                             <a href="tel:882569756">
-                                +101 984 754
+                                +628*******
                             </a>
                         </li>
 
@@ -31,7 +31,7 @@
                                 Email:
                             </span>
                             <a href="mailto:info@jovie.com">
-                                info@jovie.com
+                                kawalptnku@gmail.com
                             </a>
                         </li>
 
@@ -40,7 +40,7 @@
                                 <i class='bx bx-location-plus'></i>
                                 Address:
                             </span>
-                            123, Denver, USA
+                            Jakarta Selatan
                         </li>
                     </ul>
                 </div>
@@ -51,4 +51,5 @@
 <div class="copyright-text text-center">
     <p>Copyright @2023 KAWAL PTN-KU. All Rights Reserved</p>
 </div>
+
 <!-- Footer Section End -->
