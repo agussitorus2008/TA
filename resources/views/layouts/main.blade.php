@@ -26,7 +26,7 @@
                             <img src="../../../assets/images/demo/users/face11.jpg" class="w-32px h-32px rounded-pill" alt="">
                             <span class="status-indicator bg-success"></span>
                         </div>
-                        <span class="d-none d-lg-inline-block mx-lg-2">Users</span>
+                        <span class="d-none d-lg-inline-block mx-lg-2">{{ Auth::User()->email }}</span>
                     </a>
     
                     <div class="dropdown-menu dropdown-menu-end">
@@ -52,7 +52,7 @@
                             <i class="ph-gear me-2"></i>
                             Account settings
                         </a>
-                        <a href="#" class="dropdown-item">
+                        <a href="{{route('auth.dologout')}}" class="dropdown-item">
                             <i class="ph-sign-out me-2"></i>
                             Logout
                         </a>

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -17,6 +19,37 @@ class AuthController extends Controller
     {
         return view('app.auth.main');
     }
+    
+    public function dologin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required',
+            'password' => 'required',
+        ]);
+
+        $credentials = $request->only('email', 'password');
+        $user = User::where('email', $credentials['email'])->first();
+
+        if (!$user) {
+            return redirect()->back()->withInput($request->only('email'))->withErrors(['msg' => 'Akun belum terdaftar']);
+        }
+
+        if (!Hash::check($credentials['password'], $user->password)) {
+            return redirect()->back()->withInput($request->only('email'))->withErrors(['msg' => 'Username & Password salah']);
+        }
+
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+    
+            $user = Auth::user();
+            if ($user->role == 1) {
+                return redirect()->route('admin.main');
+            } else {
+                return redirect()->route('siswa.main');
+            }
+        }
+        return redirect()->back()->withErrors(['msg' => 'Login details are not valid']);
+    }
 
     public function register()
     {
@@ -25,7 +58,6 @@ class AuthController extends Controller
 
     public function doregister(Request $request)
     {
-
         $request->validate([
             'nama' => 'required',
             'no_handphone' => 'required',
@@ -42,12 +74,21 @@ class AuthController extends Controller
             'password.confirmed' => 'Password tidak sesuai.',
         ]);
 
-
         $data = $request->all();
-        $check =  User::create($data);
+        $data['password'] = Hash::make($request->input('password'));
+        $data['role'] = 0; 
+        $check = User::create($data);
 
-        return redirect("app.auth.main")->withSuccess('Silahkan Login');
+        return redirect()->route("auth.login")->withSuccess('Silahkan Login');
     }
+
+    public function dologout()
+    {
+        $user = Auth::user();
+        Auth::logout($user);
+        return redirect()->route("auth.login")->withSuccess('Anda telah logout');
+    }
+
     /**
      * Show the form for creating a new resource.
      *

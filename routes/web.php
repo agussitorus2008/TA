@@ -17,9 +17,12 @@ use App\Http\Controllers\AuthController;
 
 Route::prefix('/auth')->group(function () {
     Route::get('/login', [AuthController::class, 'index'])->name('auth.login');
+    Route::post('/login', [AuthController::class, 'dologin'])->name('auth.dologin');
 
     Route::get('/register', [AuthController::class, 'register'])->name('auth.register');
     Route::post('/register', [AuthController::class, 'doregister'])->name('auth.doregister');
+
+    Route::get('/logout', [AuthController::class, 'dologout'])->name('auth.dologout');
 
     Route::get('/forget-password', [AuthController::class, 'forget'])->name('auth.forget-password');
 
