@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Web;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
-class TryoutSiswaController extends Controller
+class DashboardController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -13,7 +14,7 @@ class TryoutSiswaController extends Controller
      */
     public function index()
     {
-        return view('app.siswa.tryoutSaya.main');
+        return view('app.dashboard.main');
     }
 
     /**
@@ -45,7 +46,7 @@ class TryoutSiswaController extends Controller
      */
     public function show($id)
     {
-        return view('app.siswa.tryoutSaya.detail');
+        //
     }
 
     /**
@@ -56,7 +57,7 @@ class TryoutSiswaController extends Controller
      */
     public function edit($id)
     {
-        return view('app.siswa.tryoutSaya.detail');
+        //
     }
 
     /**

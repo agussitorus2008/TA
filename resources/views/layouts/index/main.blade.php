@@ -4,7 +4,7 @@
     @include('layouts.index.head')
     <style>
         .navbar-area {
-        background-image: linear-gradient(to right, #0055A4, #FFFFFF);
+        background-image: linear-gradient(to right, #0055A4, #7CA7D0);
     }
 
     .banner-style-three, .banner-style-four {
@@ -14,7 +14,6 @@
     </style>
     </head>
     <body>  
-        <!-- Banner Section Start -->
             <div class="navbar-area">
                 @include('layouts.index.navbar')
             </div>

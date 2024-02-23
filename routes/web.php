@@ -2,11 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\SiswaController;
-use App\Http\Controllers\IndexController;
-use App\Http\Controllers\TryoutSiswaController;
-use App\Http\Controllers\HasilTryoutSiswaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,33 +14,21 @@ use App\Http\Controllers\HasilTryoutSiswaController;
 |
 */
 
+
 Route::prefix('/auth')->group(function () {
     Route::get('/login', [AuthController::class, 'index'])->name('auth.login');
+
     Route::get('/register', [AuthController::class, 'register'])->name('auth.register');
+    Route::post('/register', [AuthController::class, 'doregister'])->name('auth.doregister');
+
     Route::get('/forget-password', [AuthController::class, 'forget'])->name('auth.forget-password');
+
     Route::get('/change-password', [AuthController::class, 'change'])->name('auth.change-password');
 });
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-// Assuming you want to define routes related to 'siswa'
-Route::prefix('/siswa')->group(function () {
-    Route::get('/main', [SiswaController::class, 'index'])->name('siswa.main');
-    Route::get('/view', [SiswaController::class, 'index'])->name('siswa.view');
-
-    Route::prefix('/tryoutSaya')->group(function () {
-        Route::get('/main', [TryoutSiswaController::class, 'index'])->name('siswa.tryoutSaya.main');
-        Route::get('/detail', [TryoutSiswaController::class, 'index'])->name('siswa.tryoutSaya.main');
-    });
-
-    Route::prefix('/hasilTryoutSiswa')->group(function () {
-        Route::get('/main', [HasilTryoutSiswaController::class, 'index'])->name('siswa.hasilTryout.main');
-    });
-
-    Route::prefix('/profile')->group(function () {
-        Route::get('/main', [SiswaController::class, 'profile'])->name('siswa.profile.main');
-    });
-});
-
-// Assuming you want to define routes related to 'register'
 Route::get('/index', [IndexController::class, 'index'])->name('index');
+
+require_once __DIR__ . '/app/admin.php';
+
+require_once __DIR__ . '/app/siswa.php';

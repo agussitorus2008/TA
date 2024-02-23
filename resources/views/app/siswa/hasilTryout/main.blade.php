@@ -145,13 +145,16 @@
         yAxis: {
             allowDecimals: false,
         },
+        
 
         series: [{
             name: 'Pilihan 1',
-            data: [900, 510, 600, 750, 500, 800]
+            data: [900, 510, 600, 750, 500, 800],
+            color: '#3DA059'
         }, {
             name: 'Pilihan 2',
-            data: [800, 700, 600, 500, 648, 790]
+            data: [800, 700, 600, 500, 648, 790],
+            color: '#0A407F'
         }],
 
         responsive: {
