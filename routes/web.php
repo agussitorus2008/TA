@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\IndexController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,7 +31,8 @@ Route::prefix('/auth')->group(function () {
 });
 
 
-Route::get('/index', [IndexController::class, 'index'])->name('index');
+Route::get('/', [IndexController::class, 'index'])->name('index');
+
 
 require_once __DIR__ . '/app/admin.php';
 

@@ -28,8 +28,8 @@
                                 <p style="color:#F9F9F9">Persiapan yang matang adalah modal utama kelulusan Anda!</p>
         
                                 <div class="theme-btn">
-                                    <a href="#" class="btn" style="background-color: #030994;color:#F9F9F9">DAFTAR</a>
-                                    <a href="contact.html" class="btn" style="background-color: #F9F9F9;color:#241581">MASUK</a>
+                                    <a href="{{route('auth.register')}}" class="btn" style="background-color: #030994;color:#F9F9F9">DAFTAR</a>
+                                    <a href="{{route('auth.login')}}" class="btn" style="background-color: #F9F9F9;color:#241581">MASUK</a>
                                 </div>
                             </div>
                         </div>

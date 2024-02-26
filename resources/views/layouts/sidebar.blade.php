@@ -55,7 +55,7 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{{route('siswa.simulasi.main')}}" class="nav-link">
                         <i class="ph-swatches"></i>
                         <span>Simulasi</span>
                     </a>
