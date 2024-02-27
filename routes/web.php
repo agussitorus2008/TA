@@ -32,6 +32,7 @@ Route::prefix('/auth')->group(function () {
 
 
 Route::get('/', [IndexController::class, 'index'])->name('index');
+Route::get('/search_prodi', 'ProdiController@search')->name('search_prodi');
 
 
 require_once __DIR__ . '/app/admin.php';

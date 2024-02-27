@@ -12,7 +12,7 @@ Route::prefix('/siswa')->group(function () {
 
     Route::prefix('/tryoutSaya')->group(function () {
         Route::get('/main', [TryoutSiswaController::class, 'index'])->name('siswa.tryoutSaya.main');
-        Route::get('/detail', [TryoutSiswaController::class, 'index'])->name('siswa.tryoutSaya.main');
+        Route::get('/detail/{id}', [TryoutSiswaController::class, 'index'])->name('siswa.tryoutSaya.detail');
     });
 
     Route::prefix('/hasilTryoutSiswa')->group(function () {
@@ -25,5 +25,6 @@ Route::prefix('/siswa')->group(function () {
 
     Route::prefix('/simulasi')->group(function () {
         Route::get('/main', [SimulasiController::class, 'index'])->name('siswa.simulasi.main');
+        Route::post('/test', [SimulasiController::class, 'test'])->name('siswa.simulasi.test');
     });
 });

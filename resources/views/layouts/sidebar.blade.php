@@ -31,7 +31,7 @@
                     <i class="ph-dots-three sidebar-resize-show"></i>
                 </li>
                 <li class="nav-item">
-                    <a href="index.html" class="nav-link">
+                    <a href="{{route('siswa.main')}}" class="nav-link">
                         <i class="ph-house"></i>
                         <span>
                             Dashboard
@@ -39,7 +39,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{{route('siswa.profile.main')}}" class="nav-link">
                         <i class="ph-article"></i>
                         <span>Data Siswa</span>
                     </a>
@@ -50,8 +50,8 @@
                         <span>Tryout</span>
                     </a>
                     <ul class="nav-group-sub collapse">
-                        <li class="nav-item"><a href="index.html" class="nav-link">Tryout saya</a></li>
-                        <li class="nav-item"><a href="../../layout_2/full/index.html" class="nav-link">Hasil tryout</a></li>
+                        <li class="nav-item"><a href="{{route('siswa.tryoutSaya.main')}}" class="nav-link">Tryout saya</a></li>
+                        <li class="nav-item"><a href="{{route('siswa.hasilTryout.main')}}" class="nav-link">Hasil tryout</a></li>
                     </ul>
                 </li>
                 <li class="nav-item">
