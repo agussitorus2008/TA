@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -19,7 +22,7 @@ class AuthController extends Controller
     {
         return view('app.auth.main');
     }
-    
+
     public function dologin(Request $request)
     {
         $request->validate([
@@ -40,7 +43,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-    
+
             $user = Auth::user();
             if ($user->role == 1) {
                 return redirect()->route('admin.main');
@@ -76,7 +79,7 @@ class AuthController extends Controller
 
         $data = $request->all();
         $data['password'] = Hash::make($request->input('password'));
-        $data['role'] = 0; 
+        $data['role'] = 0;
         $check = User::create($data);
 
         return redirect()->route("auth.login")->withSuccess('Silahkan Login');
@@ -99,9 +102,68 @@ class AuthController extends Controller
         return view('app.auth.forget');
     }
 
-    public function change()
+    public function postForget(Request $request)
     {
-        return view('app.auth.change');
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+        ], [
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('auth.forget-password')
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $user = DB::table('users')->where('email', $request->email)->first();
+
+        if ($user) {
+            // Email terdaftar, arahkan ke form ganti password
+            return view('app.auth.change')->with('email', $request->email);
+        } else {
+            // Email tidak terdaftar, kembalikan ke form lupa password dengan pesan
+            return view('app.auth.forget')->with('error', 'Email tidak terdaftar.');
+        }
+    }
+
+
+    public function change(Request $request)
+    {
+        $email = $request->email;
+        return view('app.auth.change', compact('email'));
+    }
+
+    public function postChange(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:8',
+        ], [
+            'password.required' => 'Password wajib diisi.',
+            'password.confirmed' => 'Konfirmasi password tidak sesuai.',
+            'password.min' => 'Password minimal harus :min karakter.',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('auth.change-password')
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $user = DB::table('users')->where('email', $request->email)->first();
+
+        if ($user) {
+            // Update password
+            DB::table('users')->where('email', $request->email)->update([
+                'password' => Hash::make($request->password),
+            ]);
+
+            return redirect()->route('auth.login')->with('success', 'Password berhasil diubah. Silakan login.');
+        } else {
+            return redirect()->route('auth.change-password')->with('error', 'Terjadi kesalahan. Silakan coba lagi.');
+        }
     }
 
     /**

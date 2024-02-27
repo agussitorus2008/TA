@@ -26,8 +26,10 @@ Route::prefix('/auth')->group(function () {
     Route::get('/logout', [AuthController::class, 'dologout'])->name('auth.dologout');
 
     Route::get('/forget-password', [AuthController::class, 'forget'])->name('auth.forget-password');
+    Route::post('/forget-password', [AuthController::class, 'postForget'])->name('auth.post-forget-password');
 
     Route::get('/change-password', [AuthController::class, 'change'])->name('auth.change-password');
+    Route::post('/change-password', [AuthController::class, 'postChange'])->name('auth.post-change-password');
 });
 
 
