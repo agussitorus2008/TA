@@ -25,6 +25,6 @@ Route::prefix('/siswa')->group(function () {
 
     Route::prefix('/simulasi')->group(function () {
         Route::get('/main', [SimulasiController::class, 'index'])->name('siswa.simulasi.main');
-        Route::post('/test', [SimulasiController::class, 'test'])->name('siswa.simulasi.test');
+        Route::post('/test', [SimulasiController::class, 'prediksi'])->name('siswa.simulasi.test');
     });
 });

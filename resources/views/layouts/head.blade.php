@@ -23,5 +23,8 @@
     <script src="{{ asset('assets/js/demo/pages/animations_css3.js') }}"></script>
     <!-- /theme JS files -->
     <link rel="icon" type="image/png" href="{{ asset('assets/images/abu muda 1.png') }}">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 </head>
