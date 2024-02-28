@@ -11,7 +11,7 @@
                 </div>
 
                 <div class="row justify-content-center text-center">
-                    <input type="hidden" name="email" value="{{ $email }}" readonly />
+                    <input type="hidden" name="email" value="{{ $email }}"/>
                     <p>{{ $email }}</p>
                 </div>
 

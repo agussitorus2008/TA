@@ -23,7 +23,7 @@
                 <li class="nav-item nav-item-dropdown-lg dropdown ms-lg-2">
                     <a href="#" class="navbar-nav-link align-items-center rounded-pill p-1" data-bs-toggle="dropdown">
                         <div class="status-indicator-container">
-                            <img src="../../../assets/images/demo/users/face11.jpg" class="w-32px h-32px rounded-pill" alt="">
+                            <img src="{{asset('assets/images/user_847969.png')}}" class="w-32px h-32px rounded-pill" alt="">
                             <span class="status-indicator bg-success"></span>
                         </div>
                         <span class="d-none d-lg-inline-block mx-lg-2 text-dark">{{ Auth::User()->nama }}</span>
@@ -32,25 +32,7 @@
                     <div class="dropdown-menu dropdown-menu-end">
                         <a href="#" class="dropdown-item">
                             <i class="ph-user-circle me-2"></i>
-                            My profile
-                        </a>
-                        <a href="#" class="dropdown-item">
-                            <i class="ph-currency-circle-dollar me-2"></i>
-                            My subscription
-                        </a>
-                        <a href="#" class="dropdown-item">
-                            <i class="ph-shopping-cart me-2"></i>
-                            My orders
-                        </a>
-                        <a href="#" class="dropdown-item">
-                            <i class="ph-envelope-open me-2"></i>
-                            My inbox
-                            <span class="badge bg-primary rounded-pill ms-auto">26</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                            <i class="ph-gear me-2"></i>
-                            Account settings
+                            Profile
                         </a>
                         <a href="{{route('auth.dologout')}}" class="dropdown-item">
                             <i class="ph-sign-out me-2"></i>
