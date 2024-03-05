@@ -16,9 +16,16 @@ class SiswaController extends Controller
     public function profile()
     {
         $user = Auth::user();
-        $siswa = Siswa::where('username', $user->username)->first();
-        return view('app.siswa.profile.profile', compact('user', 'siswa'));
+        $siswa = Siswa::where('username', $user->email)->first();
+        if($siswa){
+            $propinsi = Sekolah::where('sekolah', $siswa->asal_sekolah)->value('propinsi');
+        }
+        if(empty($propinsi)){
+            $propinsi = "Tidak Diketahui";
+        }
+        return view('app.siswa.profile.profile', compact('user', 'siswa', 'propinsi'));
     }
+
 
     public function index()
     {
@@ -33,9 +40,16 @@ class SiswaController extends Controller
         return view('app.siswa.profile.add', compact('user', 'prodi', 'sekolah'));
     }
 
+    public function edit($email)
+    {
+        $user = Auth::user();
+        $prodi = Prodi::where('active', 2024)->get();
+        $sekolah = Sekolah::all();
+        return view('app.siswa.profile.edit', compact('user', 'prodi', 'sekolah'));
+    }
+
     public function add(Request $request, $email)
     {
-        // Validate the incoming data
         $request->validate([
             'asal_sekolah' => 'required',
             'kelompok_ujian' => 'required',
@@ -47,7 +61,7 @@ class SiswaController extends Controller
         
         $siswa = new Siswa();
         $siswa->username = $email;
-        $siswa->firstName = $request->nama;
+        $siswa->first_name = $request->nama;
         $siswa->asal_sekolah = $request->asal_sekolah;
         $siswa->kelompok_ujian = $request->kelompok_ujian;
         $siswa->pilihan1_utbk_aktual = $request->pilihan1_utbk_aktual;
@@ -56,7 +70,41 @@ class SiswaController extends Controller
     
         $siswa->save();
     
-        return redirect()->route('siswa.profile.profile')->withSuccess('Data Siswa Berhasil Ditambahkan');
+        return redirect()->route('siswa.profile.main')->withSuccess('Data Siswa Berhasil Ditambahkan');
     }
+
+    public function update(Request $request, $email)
+    {
+        $request->validate([
+            'asal_sekolah' => 'required',
+            'kelompok_ujian' => 'required',
+            'pilihan1_utbk_aktual' => 'required',
+            'pilihan2_utbk_aktual' => 'required|different:pilihan1_utbk_aktual',
+        ], [
+            'pilihan2_utbk_aktual.different' => 'Pilihan 1 dan Pilihan 2 tidak boleh sama',
+        ]);
+
+        // Retrieve the existing record based on the username (email)
+        $siswa = Siswa::where('username', $email)->first();
+
+        // Check if the record exists
+        if (!$siswa) {
+            return redirect()->route('siswa.profile.main')->withError('Siswa not found');
+        }
+
+        // Update the record's properties
+        $siswa->first_name = $request->nama;
+        $siswa->asal_sekolah = $request->asal_sekolah;
+        $siswa->kelompok_ujian = $request->kelompok_ujian;
+        $siswa->pilihan1_utbk_aktual = $request->pilihan1_utbk_aktual;
+        $siswa->pilihan2_utbk_aktual = $request->pilihan2_utbk_aktual;
+        $siswa->telp1 = auth()->user()->no_handphone;
+
+        // Save the updated record
+        $siswa->save();
+
+        return redirect()->route('siswa.profile.main')->withSuccess('Data Siswa Berhasil Diubah');
+    }
+
     
 }

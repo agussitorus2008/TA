@@ -11,9 +11,21 @@
 @section('content')
     <div class="card">
         <div class="card-body">
+            @if (session('success'))
+                <div class="alert alert-success" role="alert">
+                    {{ session('success') }}
+                </div>
+            @endif
+            
+            @if(empty($siswa))
             <div class="d-flex justify-content-end mb-3">
                 <a href="{{ route('siswa.profile.add', ['email' => $user->email]) }}" class="btn btn-primary">Tambah Data</a>
             </div>
+            @else
+            <div class="d-flex justify-content-end mb-3">
+                <a href="{{ route('siswa.profile.edit', ['email' => $user->email]) }}" class="btn btn-primary">Ubah Data</a>
+            </div>
+            @endif
 
             <div class="row">
                 <div class="col-md-6 mb-3 mt-3">
@@ -38,7 +50,7 @@
                     <input type="text" class="form-control form-control-lg" id="kelompok" name="kelompok" value="{{$siswa->kelompok_ujian}}" readonly>
 
                     <label for="nama" class="form-label mt-2">Provinsi Sekolah</label>
-                    <input type="text" class="form-control form-control-lg" id="nama" name="nama" value="{{$siswa->asal_sekolah}}" readonly>
+                    <input type="text" class="form-control form-control-lg" id="nama" name="nama" value="{{$propinsi}}" readonly>
                     @endif
                 </div>
             </div>
@@ -51,11 +63,11 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <h3 class="text-center font-weight-bold">Pilihan 1</h5>
-                    <input type="text" class="form-control form-control-lg" id="jurusan1" name="jurusan1" value="{{$siswa->pilihan1_utbk_aktual}}" readonly>>
+                    <input type="text" class="form-control form-control-lg" id="jurusan1" name="jurusan1" value="{{$siswa->pilihan1->nama_prodi_ptn}}" readonly>
                 </div>
                 <div class="col-md-6 mb-3">
                     <h3 class="text-center font-weight-bold">Pilihan 2</h5>
-                    <input type="text" class="form-control form-contro  l-lg" id="jurusan2" name="jurusan2" value="{{$siswa->pilihan1_utbk_aktual}}" readonly>
+                    <input type="text" class="form-control form-contro  l-lg" id="jurusan2" name="jurusan2" value="{{$siswa->pilihan2->nama_prodi_ptn}}" readonly>
                 </div>
             </div>
             @else
