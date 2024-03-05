@@ -10,16 +10,24 @@
 
 @section('content')
     <div class="card">
-        <div class="card-body">        
-            <form action="">
+        <div class="card-body">    
+            <div class="justifiy-content-center text-center">
+                @if(session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
+                </div>
+                @endif    
+            </div>    
+        <form action="{{ route('siswa.profile.add', ['email' => auth()->user()->email]) }}" method="POST">
+            @csrf
             <div class="row">
                 <div class="col-md-6 mb-3 mt-3">
                     <label for="nama" class="form-label">Nama Lengkap</label>
                     <input type="text" class="form-control form-control-lg" id="nama" name="nama" value="{{$user->nama}}" readonly>
                     <label for="nama" class="form-label mt-2">Asal Sekolah</label>
-                    <select name="asal_sekolah" class="form-control" id="select2">
+                    <select name="asal_sekolah" class="form-control" id="asal_sekolah">
                         @foreach($sekolah as $p)
-                        <option value="{{ $p->id }}">{{ $p->sekolah }}</option>
+                        <option value="{{ $p->sekolah }}">{{ $p->sekolah }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -31,9 +39,7 @@
                     </select>
 
                     <label for="nama" class="form-label mt-2">Provinsi Sekolah</label>
-                    <select name="provinsi_sekolah" class="form-control" id="provinsi_sekolah" readonly>
-
-                    </select>
+                    <input type="text" name="provinsi_sekolah" class="form-control" id="provinsi_sekolah" readonly>
                 </div>
             </div>
 
@@ -45,7 +51,7 @@
                 <div class="col-md-6 mb-3">
                     <h3 class="text-center font-weight-bold">Pilihan 1</h5>
                     <label for="kampus1" class="form-label">Pilih Prodi dan PTN 1</label>
-                    <select name="pilihan1_utbk_aktual" class="form-control" id="select2">
+                    <select name="pilihan1_utbk_aktual" class="form-control" id="pilihan1" required> 
                         @foreach($prodi as $p)
                         <option value="{{ $p->id_prodi }}">{{ $p->nama_prodi_ptn }}</option>
                         @endforeach
@@ -54,15 +60,17 @@
                 <div class="col-md-6 mb-3">
                     <h3 class="text-center font-weight-bold">Pilihan 2</h5>
                     <label for="kampus2" class="form-label">Pilih Prodi dan PTN 2</label>
-                    <select name="pilihan2_utbk_aktual" class="form-control" id="select2">
+                    <select name="pilihan2_utbk_aktual" class="form-control" id="pilihan2" required>
                         @foreach($prodi as $p)
                         <option value="{{ $p->id_prodi }}">{{ $p->nama_prodi_ptn }}</option>
                         @endforeach
                     </select>
                 </div>
             </div>
-            <div class="row justify-content-center">
-                <button class="btn" type="submit" style="background-color: #0A407F; color:#fff">Simpan</button>
+            <div class="row justify-content-center text-center">
+                <div class="col-xs-6">
+                    <button class="btn" type="submit" style="background-color: #0A407F; color:#fff">Simpan</button>
+                </div>
             </div>
             </form>
         </div>
@@ -70,30 +78,61 @@
 
     <script>
         $(document).ready(function() {
-         $("#select2").select2();
+        $("#asal_sekolah").select2({
+            tags: true,
+            createTag: function(params) {
+                // Don't allow creation of tags if input is empty
+                return params.term.trim() !== '' ? {
+                    id: params.term,
+                    text: params.term,
+                    newOption: true
+                } : null;
+            }
+        });
+
+        $("#asal_sekolah").on("select2:select", function(e) {
+            // Handle the case when a new option is selected
+            if (e.params.data.newOption) {
+                // Your custom logic to handle the newly added option
+                $('#provinsi_sekolah').removeAttr('readOnly');
+                console.log("New option added:", e.params.data.text);
+
+            }
+        });
+    });
+
+
+         $(document).ready(function() {
+         $("#pilihan1").select2();
+         });
+
+         $(document).ready(function() {
+         $("#pilihan2").select2();
          });
      </script>
      <script>
         $(document).ready(function() {
-            // Listen for changes in the "Asal Sekolah" dropdown
-            $('#asal_sekolah').change(function() {
-                var selectedAsalSekolah = $(this).val();
+        $('#asal_sekolah').change(function() {
+        var selectedAsalSekolah = $(this).val();
 
-                $.ajax({
-                    url: '/get-provinces/' + selectedAsalSekolah,
-                    method: 'GET',
-                    success: function(response) {
-                        $('#provinsi_sekolah').empty();
-    
-                        $('#provinsi_sekolah').append('<option value="' + response.provinces + '">' + response.provinces + '</option>');
-                    },
-                    error: function(error) {
-                        var errorMessage = error.responseJSON.error;
-                        // $('#provinsi_sekolah').append('<option value=" class="text-danger"'  + errorMessage + '">' + errorMessage + '</option>');;
-                        console.error('Error:', errorMessage);
-                    }
+        $.ajax({
+            url: '/get-provinces/' + selectedAsalSekolah,
+            method: 'GET',
+            success: function(response) {
+                $('#provinsi_sekolah').empty();
+
+                // Assuming 'provinces' property is an array
+                $.each(response.propinsi, function(index, province) {
+                    $('#provinsi_sekolah').val(province.propinsi);
                 });
-            });
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', status, error);
+                console.log(xhr.responseText); // Log the full response for more details
+            }
         });
-    </script>
+    });
+});
+
+ </script>
 @endsection

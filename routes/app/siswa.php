@@ -22,6 +22,7 @@ Route::prefix('/siswa')->group(function () {
     Route::prefix('/profile')->group(function () {
         Route::get('/main', [SiswaController::class, 'profile'])->name('siswa.profile.main');
         Route::get('/add/{email}', [SiswaController::class, 'view'])->name('siswa.profile.add');
+        Route::post('/add/{email}', [SiswaController::class, 'add'])->name('siswa.profile.add');
     });
 
     Route::prefix('/simulasi')->group(function () {

@@ -35,13 +35,28 @@ class SiswaController extends Controller
 
     public function add(Request $request, $email)
     {
+        // Validate the incoming data
+        $request->validate([
+            'asal_sekolah' => 'required',
+            'kelompok_ujian' => 'required',
+            'pilihan1_utbk_aktual' => 'required',
+            'pilihan2_utbk_aktual' => 'required|different:pilihan1_utbk_aktual',
+        ], [
+            'pilihan2_utbk_aktual.different' => 'Pilihan 1 dan Pilihan 2 tidak boleh sama',
+        ]);
+        
         $siswa = new Siswa();
         $siswa->username = $email;
-        $siswa->asal_sekolah = $request->asal_sekolah; 
+        $siswa->firstName = $request->nama;
+        $siswa->asal_sekolah = $request->asal_sekolah;
         $siswa->kelompok_ujian = $request->kelompok_ujian;
         $siswa->pilihan1_utbk_aktual = $request->pilihan1_utbk_aktual;
         $siswa->pilihan2_utbk_aktual = $request->pilihan2_utbk_aktual;
+        $siswa->telp1 = auth()->user()->no_handphone;
+    
         $siswa->save();
-        return view('app.siswa.profile.profile')->withSuccess('Data Siswa Berhasil Ditambahkan');
+    
+        return redirect()->route('siswa.profile.profile')->withSuccess('Data Siswa Berhasil Ditambahkan');
     }
+    
 }

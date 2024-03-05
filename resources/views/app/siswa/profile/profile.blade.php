@@ -51,18 +51,10 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <h3 class="text-center font-weight-bold">Pilihan 1</h5>
-                    <label for="kampus1" class="form-label">Pilih Kampus 1</label>
-                    <input type="text" class="form-control form-control-lg" id="kampus1" name="kampus1" value="{{$siswa->pilihan1_utbk_aktual}}" readonly>>
-
-                    <label for="jurusan1" class="form-label mt-2">Pilih Jurusan 1</label>
                     <input type="text" class="form-control form-control-lg" id="jurusan1" name="jurusan1" value="{{$siswa->pilihan1_utbk_aktual}}" readonly>>
                 </div>
                 <div class="col-md-6 mb-3">
                     <h3 class="text-center font-weight-bold">Pilihan 2</h5>
-                    <label for="kampus2" class="form-label">Pilih Kampus 2</label>
-                    <input type="text" class="form-control form-control-lg" id="kampus2" name="kampus2" value="{{$siswa->pilihan1_utbk_aktual}}" readonly>
-
-                    <label for="jurusan2" class="form-label mt-2">Pilih Jurusan 2</label>
                     <input type="text" class="form-control form-contro  l-lg" id="jurusan2" name="jurusan2" value="{{$siswa->pilihan1_utbk_aktual}}" readonly>
                 </div>
             </div>
@@ -70,18 +62,12 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <h3 class="text-center font-weight-bold">Pilihan 1</h5>
-                    <label for="kampus1" class="form-label">Pilih Kampus 1</label>
-                    <input type="text" class="form-control form-control-lg text-danger" id="kampus1" name="kampus1" value="Belum ada data siswa" readonly>
-
-                    <label for="jurusan1" class="form-label mt-2">Pilih Jurusan 1</label>
+                    
                     <input type="text" class="form-control form-control-lg text-danger" id="jurusan1" name="jurusan1" value="Belum ada data siswa" readonly>
                 </div>
                 <div class="col-md-6 mb-3">
                     <h3 class="text-center font-weight-bold">Pilihan 2</h5>
-                    <label for="kampus2" class="form-label">Pilih Kampus 2</label>
-                    <input type="text" class="form-control form-control-lg text-danger" id="kampus2" name="kampus2" value="Belum ada data siswa" readonly>
-
-                    <label for="jurusan2" class="form-label mt-2">Pilih Jurusan 2</label>
+                   
                     <input type="text" class="form-control form-control-lg text-danger" id="jurusan2" name="jurusan2" value="Belum ada data siswa" readonly>
                 </div>
             </div>
