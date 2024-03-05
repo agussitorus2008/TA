@@ -25,14 +25,6 @@
     <div class="login-form">
         <form method="post" action="{{ route('auth.dologin') }}">
             @csrf
-
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    @foreach ($errors->all() as $error)
-                        <p>{{ $error }}</p>
-                    @endforeach
-                </div>
-            @endif
             <div class="card mb-0">
                 <div class="card-body">
                     <div class="text-center mb-3">
@@ -46,6 +38,13 @@
                                     {{ session('success') }}
                                 </div>
                             @endif
+                            @if ($errors->any())
+                                <div class="alert alert-danger" role="alert">
+                                    @foreach ($errors->all() as $error)
+                                        <p>{{ $error }}</p>
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
                     </div>
 
@@ -57,7 +56,7 @@
                             <div class="form-control-feedback-icon">
                                 <i class="ph-user-circle text-muted"></i>
                             </div>
-                            @error('username')
+                            @error('email')
                                 <div class="text-danger">
                                     {{ $message }}
                                 </div>

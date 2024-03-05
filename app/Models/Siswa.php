@@ -13,11 +13,14 @@ class Siswa extends Model
 
     protected $fillable = [
         'username',
+        'telp1',
+        'telp2',
         'password',
-        'jurusan',
         'email',
-        'no_handphone',
-        'password',
-        'role'
+        'role',
+        'asal_sekolah',
+        'kelompok_ujian',
+        'pilihan1_utbk_aktual',
+        'pilihan2_utbk_aktual',
     ];
 }

@@ -36,6 +36,7 @@ Route::prefix('/auth')->group(function () {
 Route::get('/', [IndexController::class, 'index'])->name('index');
 Route::get('/search_prodi', 'ProdiController@search')->name('search_prodi');
 
+Route::get('/get-provinces/{asalSekolah}', [ApiController::class, 'getProvinces']);
 
 require_once __DIR__ . '/app/admin.php';
 

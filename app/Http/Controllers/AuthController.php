@@ -65,7 +65,8 @@ class AuthController extends Controller
             'nama' => 'required',
             'no_handphone' => 'required',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:6|confirmed',
+            'password' => 'required|min:6',
+            'password_confirmation' => 'required|same:password',
         ], [
             'nama.required' => 'Nama harus diisi.',
             'no_handphone.required' => 'Nomor handphone harus diisi.',
@@ -74,10 +75,12 @@ class AuthController extends Controller
             'email.unique' => 'Email sudah terdaftar.',
             'password.required' => 'Password harus diisi.',
             'password.min' => 'Password minimal 6 karakter.',
-            'password.confirmed' => 'Password tidak sesuai.',
+            'password' => 'Password tidak sesuai.',
+            'password_confirmation.required' => 'Konfirmasi password harus diisi.',
+            'password_confirmation.same' => 'Konfirmasi password tidak sesuai.',
         ]);
 
-        $data = $request->all();
+        $data = collect($request->all())->except('password_confirmation')->all();
         $data['password'] = Hash::make($request->input('password'));
         $data['role'] = 0;
         $check = User::create($data);

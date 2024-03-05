@@ -78,7 +78,7 @@
                                         <div class="form-control-feedback-icon">
                                             <i class="ph-lock text-muted"></i>
                                         </div>
-                                        @error('password')
+                                        @error('password_confirmation')
                                             <div class="text-danger">{{ $message }}</div>
                                         @enderror
                                     </div>
