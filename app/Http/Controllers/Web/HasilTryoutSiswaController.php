@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Web;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Siswa;
 
 class HasilTryoutSiswaController extends Controller
 {
@@ -13,7 +15,25 @@ class HasilTryoutSiswaController extends Controller
      */
     public function index()
     {
-        return view('app.siswa.hasilTryout.main');
+        $user = Auth::user();
+        $siswa = Siswa::where('username', $user->email)->first();
+        if(empty($siswa)){
+            $siswa = "Belum ada data siswa";
+        }
+        $totalPendaftar = Siswa::where('pilihan1_utbk_aktual', $siswa->pilihan1_utbk_aktual)
+            ->orWhere('pilihan2_utbk_aktual', $siswa->pilihan1_utbk_aktual)
+            ->orWhere('pilihan1_utbk_aktual', $siswa->pilihan2_utbk_aktual)
+            ->orWhere('pilihan2_utbk_aktual', $siswa->pilihan2_utbk_aktual)
+            ->join('mv_rekapitulasi_nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 't_siswa.username')
+            ->pluck('mv_rekapitulasi_nilai_to.username')
+            ->toArray();
+
+        $totalSekolah = Siswa::distinct()
+            ->select('pilihan1_utbk_aktual')
+            ->orWhere('pilihan2_utbk_aktual')
+            ->count();
+
+        return view('app.siswa.hasilTryout.main', compact('user', 'siswa', 'totalPendaftar', 'totalSekolah'));
     }
 
     /**

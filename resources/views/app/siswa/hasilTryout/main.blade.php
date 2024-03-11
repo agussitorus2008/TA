@@ -14,7 +14,7 @@
             <!-- Traffic sources -->
             <div class="card" style="background-color: #3DA059;">
                 <div class="card-header d-flex align-items-center">
-                    <h5 class="text-white m-2">12,345 Siswa Pendaftar Saat Ini</h5>
+                    <h5 class="text-white m-2">{{count($totalPendaftar)}} Siswa Pendaftar Saat Ini</h5>
                 </div>
             </div>
             <!-- /traffic sources -->
@@ -25,7 +25,7 @@
             <!-- Sales stats -->
             <div class="card" style="background-color: #0A407F;">
                 <div class="card-header d-sm-flex align-items-center">
-                    <h5 class="text-white m-2">1,234 Jumlah Sekolah Pendaftar</h5>
+                    <h5 class="text-white m-2">{{$totalSekolah}} Jumlah Sekolah Pendaftar</h5>
                 </div>
             </div>
             <!-- /sales stats -->
@@ -36,13 +36,13 @@
         <div class="row justify-content-center text-center">
             <hr>
             <div class="col-xl-4">
-                <h6>Lasroha M Panjaitan</h6>
+                <h6>{{$siswa->first_name}}</h6>
             </div>
             <div class="col-xl-4">
-                <h6>SMA ST. PETRUS SIDIKALANG</h6>
+                <h6>{{$siswa->asal_sekolah}}</h6>
             </div>
             <div class="col-xl-4">
-                <h6>SAINTEK</h6>
+                <h6>{{$siswa->kelompok_ujian}}</h6>
             </div>
             <hr>
         </div>
@@ -54,7 +54,7 @@
                 <h4>Pilihan 1</h4>
                 <div class="card" style="background-color: #3DA059;">
                     <div class="card-header d-flex align-items-center">
-                        <h5 class="text-white m-2">T. MESIN - ITB DAYA TAMPUNG:20</h5>
+                        <h5 class="text-white m-2">{{$siswa->pilihan1->nama_prodi_ptn}} DAYA TAMPUNG:20</h5>
                     </div>
                 </div>
             </div>
@@ -62,7 +62,7 @@
                 <h4>Pilihan 2</h4>
                 <div class="card" style="background-color: #0A407F;">
                     <div class="card-header d-sm-flex align-items-center">
-                        <h5 class="text-white m-2">KEDOKTERAN - UI DAYA TAMPUNG:75</h5>
+                        <h5 class="text-white m-2">{{$siswa->pilihan2->nama_prodi_ptn}} DAYA TAMPUNG:75</h5>
                     </div>
                 </div>
             </div>

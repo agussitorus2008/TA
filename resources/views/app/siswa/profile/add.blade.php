@@ -25,7 +25,7 @@
             <div class="row">
                 <div class="col-md-6 mb-3 mt-3">
                     <label for="nama" class="form-label">Nama Lengkap</label>
-                    <input type="text" class="form-control form-control-lg" id="nama" name="nama" value="{{$user->nama}}" readonly>
+                    <input type="text" class="form-control form-control-lg" id="nama" name="nama" value="{{$user->nama}}">
                     <label for="nama" class="form-label mt-2">Asal Sekolah</label>
                     <select name="asal_sekolah" class="form-control" id="asal_sekolah">
                         @foreach($sekolah as $p)
@@ -91,14 +91,30 @@
             }
         });
 
-        $("#asal_sekolah").on("select2:select", function(e) {
-            if (e.params.data.newOption) {
-                $('#provinsi_sekolah').removeAttr('readOnly');
-                console.log("New option added:", e.params.data.text);
-
-            }
-        });
+    $("#asal_sekolah").on("select2:select", function(e) {
+        if (e.params.data.newOption) {
+            $('#provinsi_sekolah').removeAttr('readOnly');
+            console.log("New option added:", e.params.data.text);
+        }
     });
+
+    $.ajax({
+        url: '/add-sekolah/',
+        method: 'POST',
+        data: {
+            asal_sekolah: $('#asal_sekolah').val(), 
+            provinsi_sekolah: $('#provinsi_sekolah').val() 
+        },
+        success: function(response) {
+            console.log('Data added successfully:', response);
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX Error:', status, error);
+            console.log(xhr.responseText);
+        }
+    });
+});
+
 
 
          $(document).ready(function() {

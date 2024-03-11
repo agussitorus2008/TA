@@ -25,19 +25,21 @@
             <div class="row">
                 <div class="col-md-6 mb-3 mt-3">
                     <label for="nama" class="form-label">Nama Lengkap</label>
-                    <input type="text" class="form-control form-control-lg" id="nama" name="nama" value="{{$user->nama}}" readonly>
+                    <input type="text" class="form-control form-control-lg" id="nama" name="nama" value="{{$user->nama}}">
                     <label for="nama" class="form-label mt-2">Asal Sekolah</label>
                     <select name="asal_sekolah" class="form-control" id="asal_sekolah">
                         @foreach($sekolah as $p)
-                        <option value="{{ $p->sekolah }}">{{ $p->sekolah }}</option>
+                        <option value="{{ $p->sekolah }}" {{ ($selectedProdi->asal_sekolah == $p->sekolah) ? 'selected' : '' }}>
+                            {{ $p->sekolah }}
+                        </option>     
                         @endforeach
                     </select>
                 </div>
                 <div class="col-md-6 mb-3 mt-3">
                     <label for="kelompok" class="form-label">Kelompok</label>
                     <select name="kelompok_ujian" class="form-control" id="select2">
-                        <option value="SAINTEK">SAINTEK</option>
-                        <option value="SOSHUM">SOSHUM</option>
+                        <option value="SAINTEK" {{ ($selectedProdi->kelompok_ujian == "SAINTEK") ? 'selected' : '' }}>SAINTEK</option>
+                        <option value="SOSHUM" {{ ($selectedProdi->kelompok_ujian == "SOSHUM") ? 'selected' : '' }}>SOSHUM</option>
                     </select>
 
                     <label for="nama" class="form-label mt-2">Provinsi Sekolah</label>
@@ -55,7 +57,9 @@
                     <label for="kampus1" class="form-label">Pilih Prodi dan PTN 1</label>
                     <select name="pilihan1_utbk_aktual" class="form-control" id="pilihan1" required> 
                         @foreach($prodi as $p)
-                        <option value="{{ $p->id_prodi }}">{{ $p->nama_prodi_ptn }}</option>
+                        <option value="{{ $p->id_prodi }}" {{ ($selectedProdi->pilihan1_utbk_aktual == $p->id_prodi) ? 'selected' : '' }}>
+                            {{ $p->nama_prodi_ptn }}
+                        </option>                        
                         @endforeach
                     </select>
                 </div>
@@ -64,7 +68,9 @@
                     <label for="kampus2" class="form-label">Pilih Prodi dan PTN 2</label>
                     <select name="pilihan2_utbk_aktual" class="form-control" id="pilihan2" required>
                         @foreach($prodi as $p)
-                        <option value="{{ $p->id_prodi }}">{{ $p->nama_prodi_ptn }}</option>
+                        <option value="{{ $p->id_prodi }}" {{ ($selectedProdi->pilihan2_utbk_aktual == $p->id_prodi) ? 'selected' : '' }}>
+                            {{ $p->nama_prodi_ptn }}
+                        </option>                        
                         @endforeach
                     </select>
                 </div>
@@ -80,26 +86,40 @@
 
     <script>
         $(document).ready(function() {
-        $("#asal_sekolah").select2({
-            tags: true,
-            createTag: function(params) {
-                return params.term.trim() !== '' ? {
-                    id: params.term,
-                    text: params.term,
-                    newOption: true
-                } : null;
-            }
-        });
-
-        $("#asal_sekolah").on("select2:select", function(e) {
-            if (e.params.data.newOption) {
-                $('#provinsi_sekolah').removeAttr('readOnly');
-                console.log("New option added:", e.params.data.text);
-
-            }
-        });
+    $("#asal_sekolah").select2({
+        tags: true,
+        createTag: function(params) {
+            return params.term.trim() !== '' ? {
+                id: params.term,
+                text: params.term,
+                newOption: true
+            } : null;
+        }
     });
 
+    $("#asal_sekolah").on("select2:select", function(e) {
+        if (e.params.data.newOption) {
+            $('#provinsi_sekolah').removeAttr('readOnly');
+            console.log("New option added:", e.params.data.text);
+        }
+    });
+
+    $.ajax({
+        url: '/add-sekolah/',
+        method: 'POST',
+        data: {
+            asal_sekolah: $('#asal_sekolah').val(), 
+            provinsi_sekolah: $('#provinsi_sekolah').val() 
+        },
+        success: function(response) {
+            console.log('Data added successfully:', response);
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX Error:', status, error);
+            console.log(xhr.responseText);
+        }
+    });
+});
 
          $(document).ready(function() {
          $("#pilihan1").select2();

@@ -86,7 +86,7 @@
                             </div>
                         </div>
                         <label class="form-check">
-                            <input type="checkbox" name="remember" class="form-check-input">
+                            <input type="checkbox" name="remember" class="form-check-input" required>
                             <span class="form-check-label">Accept <a href="#">&nbsp;terms of service</a></span>
                         </label>
                     </div>

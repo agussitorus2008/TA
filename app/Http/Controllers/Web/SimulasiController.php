@@ -79,11 +79,11 @@ class SimulasiController extends Controller
         $hasil = ($peringkat / count($listNilai));
 
         $rekomendasi = DB::table('mv_rekapitulasi_nilai_to')
-        ->join('kelulusan', 'mv_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
-        ->where('mv_rekapitulasi_nilai_to.total_nilai', '<=', $nilai)
-        ->select('kelulusan.id_prodi')
-        ->orderByDesc('mv_rekapitulasi_nilai_to.total_nilai');
-        
+            ->join('kelulusan', 'mv_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
+            ->where('mv_rekapitulasi_nilai_to.total_nilai', '<=', $nilai)
+            ->select('kelulusan.id_prodi')
+            ->orderByDesc('mv_rekapitulasi_nilai_to.total_nilai')
+            ->get();
 
         if (empty($rekomendasi)) {
             $errorMessage = "Tidak ada rekomendasi yang cocok untuk kamu";
@@ -114,6 +114,5 @@ class SimulasiController extends Controller
         ]);  
     
     }
-
 
 }

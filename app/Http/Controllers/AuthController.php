@@ -50,6 +50,7 @@ class AuthController extends Controller
             } else {
                 return redirect()->route('siswa.main');
             }
+            
         }
         return redirect()->back()->withErrors(['msg' => 'Login details are not valid']);
     }

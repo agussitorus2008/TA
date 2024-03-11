@@ -45,7 +45,8 @@ class SiswaController extends Controller
         $user = Auth::user();
         $prodi = Prodi::where('active', 2024)->get();
         $sekolah = Sekolah::all();
-        return view('app.siswa.profile.edit', compact('user', 'prodi', 'sekolah'));
+        $selectedProdi = Siswa::where('username', $email)->first();
+        return view('app.siswa.profile.edit', compact('user', 'prodi', 'sekolah', 'selectedProdi'));
     }
 
     public function add(Request $request, $email)

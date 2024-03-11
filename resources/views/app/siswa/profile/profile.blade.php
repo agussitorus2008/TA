@@ -30,7 +30,7 @@
             <div class="row">
                 <div class="col-md-6 mb-3 mt-3">
                     <label for="nama" class="form-label">Nama Lengkap</label>
-                    <input type="text" class="form-control form-control-lg" id="nama" name="nama" value="{{$user->nama}}" readonly>
+                    <input type="text" class="form-control form-control-lg" id="nama" name="nama" value="{{$siswa->first_name}}" readonly>
                     @if(empty($siswa))
                     <label for="nama" class="form-label mt-2">Asal Sekolah</label>
                     <input type="text" class="form-control form-control-lg text-danger" id="nama" name="nama" value="Belum ada data siswa" readonly>
