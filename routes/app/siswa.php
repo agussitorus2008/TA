@@ -1,10 +1,12 @@
 <?php
-use App\Http\Controllers\Web\DashboardController;
-use App\Http\Controllers\Web\SiswaController;
+
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\IndexController;
+use App\Http\Controllers\Web\SiswaController;
+use App\Http\Controllers\Web\SimulasiController;
+use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\TryoutSiswaController;
 use App\Http\Controllers\Web\HasilTryoutSiswaController;
-use App\Http\Controllers\Web\SimulasiController;
 
 Route::prefix('/siswa')->group(function () {
     Route::get('/main', [SiswaController::class, 'index'])->name('siswa.main');
