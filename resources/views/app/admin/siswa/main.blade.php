@@ -28,7 +28,7 @@
                                         <td>{{ $siswaList->firstItem() + $index }}</td>
                                         <td>{{ $siswa->first_name }}</td>
                                         <td>{{ $siswa->asal_sekolah }}</td>
-                                        <a href="{{ route('admin.siswa.tryoutdetail', ['id' => 1]) }}">Detail Siswa</a>
+                                        <td><a href="#" class="detail-link" data-id="{{ $siswa->id }}">Detail</a>
                                         </td>
                                         </td>
                                         <td>{{ $siswa->status }}</td>
