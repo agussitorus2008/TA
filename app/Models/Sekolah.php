@@ -10,7 +10,7 @@ class Sekolah extends Model
     use HasFactory;
 
     protected $table = "sekolah_sma";
-    
+
     protected $fillable = [
         'id',
         'propinsi',

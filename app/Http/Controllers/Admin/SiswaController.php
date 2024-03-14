@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Models\User;
 use App\Models\Siswa;
 use App\Models\Tryout;
-use App\Models\Nilaito;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -19,7 +18,12 @@ class SiswaController extends Controller
      */
     public function index()
     {
-        $siswaList = Siswa::paginate(10);
+        $siswaList = Siswa::join('sekolah_sma', 't_siswa.sekolah', '=', 'sekolah_sma.id')
+            ->select('t_siswa.*', 'sekolah_sma.*')
+            ->paginate(10);
+
+        // $siswaList = Siswa::all();
+
         return view('app.admin.siswa.main', ['siswaList' => $siswaList]);
     }
 
@@ -32,6 +36,27 @@ class SiswaController extends Controller
     {
         //
     }
+    public function showindex($id)
+    {
+        // Cari data tryout berdasarkan ID
+        $tryout = Tryout::findOrFail($id);
+
+        // Cari siswa yang terkait dengan tryout tersebut berdasarkan kolom 'username'
+        $siswa = Siswa::where('username', $tryout->username)->first();
+
+        return view('app.admin.siswa.tryout', compact('siswa', 'tryout'));
+    }
+
+    public function tryoutdetail($id)
+    {
+        // Cari data tryout berdasarkan ID
+        $tryout = Tryout::findOrFail($id);
+
+        // Cari siswa yang terkait dengan tryout tersebut berdasarkan kolom 'username'
+        $siswa = Siswa::where('username', $tryout->username)->first();
+
+        return view('app.admin.siswa.tryoutdetail', compact('siswa', 'tryout'));
+    }
 
     public function tryout()
     {
@@ -41,17 +66,6 @@ class SiswaController extends Controller
         return view('app.admin.siswa.tryout', compact('siswa', 'tryouts'));
     }
 
-    public function tryoutdetail($id)
-    {
-        // Ambil data siswa berdasarkan ID
-        $siswa = Siswa::findOrFail($id);
-
-        // Ambil data tryout yang diikuti oleh siswa
-        $tryouts = Tryout::where('siswa_id', $id)->get();
-
-        // Load view tryoutdetail.blade.php dan passing data siswa dan tryouts
-        return view('app.admin.siswa.tryoutdetail', compact('siswa', 'tryouts'));
-    }
     /**
      * Store a newly created resource in storage.
      *

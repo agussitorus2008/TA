@@ -12,9 +12,9 @@ Route::prefix('admin')->group(function () {
 
     Route::prefix('siswa')->group(function () {
         Route::get('/main', [SiswaController::class, 'index'])->name('admin.siswa.main');
-        Route::get('/tryout', [SiswaController::class, 'tryout'])->name('admin.siswa.tryout');
-
         Route::get('/tryoutdetail/{id}', [SiswaController::class, 'tryoutdetail'])->name('admin.siswa.tryoutdetail');
+
+        Route::get('/tryout', [SiswaController::class, 'tryout'])->name('admin.siswa.tryout');
 
 
         // Rute untuk mengarahkan pengguna ke halaman tryout berdasarkan ID tryout

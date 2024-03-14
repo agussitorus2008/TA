@@ -25,10 +25,11 @@
                             <tbody>
                                 @foreach ($siswaList as $index => $siswa)
                                     <tr>
-                                        <td>{{ $siswaList->firstItem() + $index }}</td>
                                         <td>{{ $siswa->first_name }}</td>
-                                        <td>{{ $siswa->asal_sekolah }}</td>
-                                        <td><a href="#" class="detail-link" data-id="{{ $siswa->id }}">Detail</a>
+                                        <td>{{ $siswa->sekolah }}</td>
+                                        <td>
+                                            <a href="">Detail</a>
+                                        </td>
                                         </td>
                                         </td>
                                         <td>{{ $siswa->status }}</td>
@@ -45,20 +46,4 @@
             </div>
         </div>
     </div>
-@endsection
-@section('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const detailLinks = document.querySelectorAll('.detail-link');
-
-            detailLinks.forEach(link => {
-                link.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    const siswaId = this.getAttribute('data-id');
-                    const url = "{{ route('admin.siswa.tryout.show', ':id') }}";
-                    window.location.href = url.replace(':id', siswaId);
-                });
-            });
-        });
-    </script>
 @endsection

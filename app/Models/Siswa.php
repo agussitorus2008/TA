@@ -25,6 +25,11 @@ class Siswa extends Model
         'pilihan2_utbk_aktual',
     ];
 
+    // public function sekolahSMA()
+    // {
+    //     return $this->hasOne(Sekolah::class, 'sekolah', 'id');
+    // }
+
     public function pilihan1()
     {
         return $this->belongsTo(Prodi::class, 'pilihan1_utbk_aktual', 'id_prodi');

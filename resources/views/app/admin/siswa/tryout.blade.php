@@ -38,7 +38,7 @@
                                         <td>{{ $tryout->tanggal }}</td>
                                         <td>{{ $tryout->total }}</td>
                                         <td>
-                                            <a href="{{ route('admin.siswa.tryoutdetail', ['id' => 1]) }}">Detail Siswa</a>
+                                            <a href="">Detail Siswa</a>
                                             <button onclick="editTryout({{ $tryout->id_to }})">Ubah</button>
                                             <button onclick="deleteTryout({{ $tryout->id_to }})">Hapus</button>
                                         </td>
