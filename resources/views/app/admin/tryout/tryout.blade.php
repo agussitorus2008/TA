@@ -17,15 +17,7 @@
                 <div class="">
                     <h5>{{ $siswa->first_name }}</h5>
                     <p style="font-size: 18px">{{ $siswa->asal_sekolah }}</p>
-                </div>
-                <div style="text-align: right;">
-                    <a href="{{ route('admin.siswa.tryout.add', ['username' => $siswa->username]) }}" class="btn btn-primary mb-2">Tambah</a>
-                </div>
-                @if (session('success'))
-                    <div class="alert alert-success" role="alert">
-                        {{ session('success') }}
-                    </div>
-                @endif                               
+                </div>                              
                 <div class="d-flex justify-content-end mb-3">
                     <div class="table">
                         <table class="table table-striped">
@@ -51,13 +43,7 @@
                                         <td>{{ \Carbon\Carbon::parse($tryout->tanggal)->format('d-m-y') }}</td>
                                         <td>{{ $avg }}</td>
                                         <td>
-                                            <a href="{{ route('admin.siswa.tryout.detail', ['username' => $siswa->username, 'nama_tryout' => $tryout->nama_tryout, 'rata' => $avg]) }}" class="btn btn-primary">Detail</a>
-                                            <a href="{{ route('admin.siswa.tryout.edit', ['username' => $siswa->username, 'nama_tryout' => $tryout->nama_tryout]) }}" class="btn btn-warning">Ubah</a>
-                                            <form action="{{ route('admin.siswa.tryout.delete', ['username' => $siswa->username, 'nama_tryout' => $tryout->nama_tryout]) }}" method="POST" style="display: inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger">Hapus</button>
-                                            </form>                              
+                                            <a href="{{ route('admin.siswa.detailtryout.detail', ['username' => $siswa->username, 'nama_tryout' => $tryout->nama_tryout, 'rata' => $avg]) }}" class="btn btn-primary">Detail</a>                            
                                         </td>                                        
                                     </tr>
                                 @endforeach

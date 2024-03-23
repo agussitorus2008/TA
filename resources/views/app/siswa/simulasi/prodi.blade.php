@@ -1,12 +1,12 @@
 @extends('layouts.main')
 
 @section('title')
-<h6 style="color:#0A407F;font-size:25px" class="d-none d-sm-inline-block h-16px ms-3">SIMULASI PRODI DAN PTN</h6>
+<h6 style="color:#0A407F;font-size:25px" class="d-none d-sm-inline-block h-16px ms-3">SIMULASI PROGRAM STUDI</h6>
 @endsection
 @section('content')
 <div class="content">
 
-    <form action="{{route('siswa.simulasi.test')}}" method="POST">
+    <form action="{{route('siswa.simulasi.test_prodi')}}" method="POST">
         @csrf
         <div class="container">
             <div class="row justify-content-center text-center">
@@ -44,12 +44,8 @@
         <div class="container">
             <div class="row justify-content-center text-center">
                 <div class="col-6 col-sm-4 col-md-3 col-lg-4 col-xl-4">
-                    <h5>Program Studi dan PTN</h5>
-                        <select name="prodi" class="form-control" id="select2">
-                            @foreach($prodi as $p)
-                            <option value="{{ $p->id_prodi }}">{{ $p->nama_prodi_ptn }}</option>
-                            @endforeach
-                        </select>
+                    <h5>Program Studi</h5>
+                    <input type="text" class="form-control" name="prodi" value="{{ old('prodi') }}" placeholder="Nama Prodi">
                 </div>
                 
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 col-xl-2">
@@ -61,55 +57,9 @@
         </div>
     </form>
 
-    <h3 id="kategori" class="text-center"></h3>
-
-    <div class="row justify-content-center" id="result-section" style="display: none">
-        <div class="col-2">
-            <div class="card text-white bg-primary mb-3">
-                <div class="card-header">Peringkat saya</div>
-                <div class="card-body">
-                    <p class="card-text" id="peringkat"></p>
-                </div>
-            </div>
-        </div>
-        <div class="col-2">
-            <div class="card text-white bg-success mb-3">
-                <div class="card-header">Total Pendaftar</div>
-                <div class="card-body">
-                    <p class="card-text" id="total_pendaftar"></p>
-                </div>
-            </div>
-        </div>
-        <div class="col-2">
-            <div class="card text-white bg-danger mb-3">
-                <div class="card-header">Daya Tampung</div>
-                <div class="card-body">
-                    <p class="card-text" id="daya_tampung"></p>
-                </div>
-            </div>
-        </div>
-        <div class="col-2">
-            <div class="card text-white bg-warning mb-3">
-                <div class="card-header">Nilai Saya</div>
-                <div class="card-body">
-                    <p class="card-text" id="nilai_saya"></p>
-                </div>
-            </div>
-        </div>
-        <div class="col-3">
-            <div class="card text-white bg-info mb-3">
-                <div class="card-header">Nilai rata rata yang masuk</div>
-                <div class="card-body">
-                    <p class="card-text" id="nilai_rata"></p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-
     <p id="rekomendasi-message" class="text-center text-danger"></p>
     <div id="rekomendasi-table" style="display: none;">
-        <h4 class="text-center text-success">Berikut Rekomendasi Program studi dan PTN yang cocok untuk anda</h4>
+        <h4 class="text-center text-success">Berikut Rekomendasi PTN yang cocok untuk anda berdasarkan Program studi yang anda inginkan</h4>
         <div class="card">
             <table class="table datatable-basic">
                 <thead>
@@ -161,11 +111,8 @@ $(document).ready(function() {
 
                 $('#peringkat').text(response.peringkat);
                 $('#total_pendaftar').text(response.total_pendaftar);
-                $('#daya_tampung').text(response.daya_tampung);
-                $('#nilai_saya').text((response.nilai_saya * 10).toLocaleString('en-US', { minimumFractionDigits: 2 }));
-                $('#nilai_rata').text((response.nilai_rata * 10).toLocaleString('en-US', { minimumFractionDigits: 2 }));
-
-                $('#result-section').show();
+                $('#nilai_saya').text(response.nilai_saya);
+                $('#nilai_rata').text(response.nilai_rata);
 
                 if (response.rekomendasi) {
                     // Display the rekomendasi table or error message
@@ -173,7 +120,7 @@ $(document).ready(function() {
                         // Display the table
                         $('#rekomendasi-table tbody').empty();
                         $.each(response.rekomendasi.data, function(index, item) {
-                            $('#rekomendasi-table tbody').append('<tr><td>' + (index + 1) + '</td><td>' + item.nama_prodi + '</td><td>' + item.nama_ptn + ' - ' + item.nama_singkat + '</td></tr>');
+                            $('#rekomendasi-table tbody').append('<tr><td>' + (index + 1) + '</td><td>' + item.nama_prodi + '</td><td>' + item.nama_singkat + '</td></tr>');
                         });
                         $('#rekomendasi-message').hide();
                         $('#rekomendasi-table').show();
@@ -188,17 +135,15 @@ $(document).ready(function() {
                     }
                 }
             },
-            error: function(xhr, status, error) {
-                if (xhr.responseJSON && xhr.responseJSON.error) {
-                    var errorMessage = xhr.responseJSON.error;
-                    $('#rekomendasi-message').text(errorMessage).show();
-                } else {
-                    $('#rekomendasi-message').text("Terjadi kesalahan pada server").show();
-                }
+            error: function(error) {
+                var errorMessage = error.responseJSON.error;
+                $('#rekomendasi-message').text(errorMessage).show();
             }
         });
     });
 });
+
+
 </script>
 
 @endsection   

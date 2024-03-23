@@ -29,12 +29,12 @@
                             <tbody>
                                 @foreach ($siswaList as $index => $siswa)
                                     <tr>
-                                        <td>{{ ($siswaList->currentPage() - 1) * $siswaList->perPage() + $index + 1 }}</td>
+                                        <td>{{ $index + 1 }}</td>
                                         <td>{{ $siswa->first_name }}</td>
                                         <td>{{ $siswa->asal_sekolah }}</td>
                                         <td class="{{ $statusList[$siswa->username] == 'Belum Ada Nilai Tryout' ? 'text-danger' : 'text-success' }}">{{ $statusList[$siswa->username] }}</td>
                                         <td>
-                                            <a href="{{ route('admin.siswa.tryout', ['username' => $siswa->username]) }}" class="btn btn-primary">Detail</a>
+                                            <a href="{{ route('admin.siswa.detailtryout', ['username' => $siswa->username]) }}" class="btn btn-primary">Detail</a>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -75,7 +75,7 @@
                     });
                     
                     // Update pagination links
-                    $('.pagination').html(response.siswaList.links);
+                    // $('.pagination').html(response.siswaList.links);
                     
                     // Add event listener for pagination links
                     $('.pagination a').on('click', function(e) {

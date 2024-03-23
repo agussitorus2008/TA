@@ -90,7 +90,7 @@
                             </tbody>
                         </table>
                         <div style="text-align: right;">
-                            <a href="{{route('admin.siswa.tryout', $siswa->username)}}" class="btn btn-primary">Kembali</a>
+                            <a href="{{route('admin.siswa.detailtryout', $siswa->username)}}" class="btn btn-primary">Kembali</a>
                         </div>
                     </div>
                 </div>

@@ -48,13 +48,17 @@
         </div>
     </div>
 
+    <div id="error-message" style="display: none;">
+        <!-- Error message will be displayed here -->
+    </div>
+
     <div class="container">
         <div class="row justify-content-center text-center">
             <div class="col-xl-6">
                 <h4>Pilihan 1</h4>
                 <div class="card" style="background-color: #3DA059;">
                     <div class="card-header d-flex align-items-center">
-                        <h5 class="text-white m-2">{{$siswa->pilihan1->nama_prodi_ptn}} DAYA TAMPUNG:20</h5>
+                        <h5 class="text-white m-2">{{$siswa->pilihan1->nama_prodi_ptn}} DAYA TAMPUNG: {{ $dayatampung1->daya_tampung }}</h5>
                     </div>
                 </div>
             </div>
@@ -62,7 +66,7 @@
                 <h4>Pilihan 2</h4>
                 <div class="card" style="background-color: #0A407F;">
                     <div class="card-header d-sm-flex align-items-center">
-                        <h5 class="text-white m-2">{{$siswa->pilihan2->nama_prodi_ptn}} DAYA TAMPUNG:75</h5>
+                        <h5 class="text-white m-2">{{$siswa->pilihan2->nama_prodi_ptn}} DAYA TAMPUNG: {{ $dayatampung2->daya_tampung }}</h5>
                     </div>
                 </div>
             </div>
@@ -73,19 +77,19 @@
     <div class="container">
         <div class="row justify-content-center text-center">
             <div class="col-xl-6">
-                <p>Peringkat 1 dari dari 500 Pendaftar Pilihan 1</p>
-                <p>Peringkat 1 dari 700 Total Pendaftar</p>
+                <p>Peringkat {{ $peringkat11 }} dari dari {{$totalpendaftar11}} Pendaftar Pilihan 1</p>
+                <p>Peringkat {{ $peringkat1 }} dari {{$totalpendaftar1}} Total Pendaftar</p>
             </div>
             <div class="col-xl-6">
-                <p>Peringkat 3 dari dari 800 Pendaftar Pilihan 1</p>
-                <p>Peringkat 1 dari 1000 Total Pendaftar</p>
+                <p>Peringkat {{$peringkat22}} dari dari {{$totalpendaftar22}} Pendaftar Pilihan 1</p>
+                <p>Peringkat {{$peringkat2}} dari {{$totalpendaftar2}} Total Pendaftar</p>
             </div>
             <hr>
         </div>
     </div>
     
     <div class="card">
-        <div class="card-header">
+        {{-- <div class="card-header">
             <div class="row">
                 <div class="col-md-2">
                     <div class="form-group form-inline">
@@ -97,7 +101,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
 
         <table class="table datatable-basic">
             <thead>
@@ -105,6 +109,7 @@
                     <th>No</th>
                     <th>Tanggal</th>
                     <th>PPU</th>
+                    <th>PU</th>
                     <th>PM</th>
                     <th>PK</th>
                     <th>LBI</th>
@@ -115,7 +120,26 @@
                 </tr>
             </thead>
             <tbody>
-        
+                @foreach($nilaito as $index => $nilai)
+                <tr>
+                <?php
+                    $total = 0;
+                    $total += ($nilai->ppu * $bobot_ppu + $nilai->pu * $bobot_pu + $nilai->pm * $bobot_pm + $nilai->pk * $bobot_pk + $nilai->lbi * $bobot_lbi + $nilai->lbe * $bobot_lbe + $nilai->pbm * $bobot_pbm);
+                    $rata = $total / 7;
+                ?>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ \Carbon\Carbon::parse($nilai->tanggal)->format('d-m-y') }}</td>
+                    <td>{{ $nilai->ppu }}</td>
+                    <td>{{ $nilai->pu }}</td>
+                    <td>{{ $nilai->pm }}</td>
+                    <td>{{ $nilai->pk }}</td>
+                    <td>{{ $nilai->lbi }}</td>
+                    <td>{{ $nilai->lbe }}</td>
+                    <td>{{ $nilai->pbm }}</td>
+                    <td>{{ number_format($total, 2) * 10 }}</td>
+                    <td>{{ number_format($rata, 2) * 10 }}</td>
+                </tr>
+                @endforeach
             </tbody>
         </table>
     </div>  
@@ -202,6 +226,28 @@
         });
 
     </script>
+    <script>
+    // Make an AJAX request to check for the error
+    fetch('{{ route('siswa.hasilTryout.main') }}')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Check if there is an error message
+            if (data.error) {
+                // Display the error message
+                document.getElementById('error-message').innerText = data.error;
+                document.getElementById('error-message').style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+</script>
+
 
 </div>
 @endsection   

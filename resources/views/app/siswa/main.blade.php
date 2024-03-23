@@ -26,7 +26,7 @@
                     <div class=" mx-auto mb-3">
                         <img src="{{ asset('assets/images/Group 50.png') }}" alt="" class="img-fluid">
                     </div>
-                    <h5 class="my-1"><p>Pendaftar 14.717</p></h5>
+                    <h5 class="my-1"><p>Pendaftar {{$total_pendaftar}}</p></h5>
                 </div>
             </div>
         </div>
@@ -37,7 +37,7 @@
                     <div class=" mx-auto mb-3">
                         <img src="{{ asset('assets/images/Vector.png') }}" alt="" class="img-fluid">
                     </div>
-                    <h5 class="my-1"><p>Nilai rata-rata Tryout Pendaftar saat ini 653.47</p></h5>
+                    <h5 class="my-1"><p>Nilai rata-rata Tryout Pendaftar saat ini {{number_format($rata, 2) * 10}}</p></h5>
                 </div>
             </div>
         </div>  
@@ -50,7 +50,7 @@
                     <div class=" mx-auto mb-3">
                         <img src="{{ asset('assets/images/Vector (1).png') }}" alt="" class="img-fluid">
                     </div>
-                    <h5 class="my-1"><p>1.835 Sekolah </p></h5>
+                    <h5 class="my-1"><p>{{$sekolah}} Sekolah </p></h5>
                 </div>
             </div>
         </div>
@@ -61,7 +61,7 @@
                     <div class=" mx-auto mb-3">
                         <img src="{{ asset('assets/images/Vector.png') }}" alt="" class="img-fluid">
                     </div>
-                    <h5 class="my-1"><p>985.24 Nilai Maksimum Tryout saat ini</p></h5>
+                    <h5 class="my-1"><p>{{number_format($max, 2) * 10}} Nilai Maksimum Tryout saat ini</p></h5>
                 </div>
             </div>
         </div>  

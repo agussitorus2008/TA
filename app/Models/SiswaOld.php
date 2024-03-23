@@ -5,27 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Siswa extends Model
+class SiswaOld extends Model
 {
     use HasFactory;
 
-    protected $table = "siswa";
-    protected $primaryKey = 'id';
+    protected $table = "t_siswa";
+    protected $primaryKey = 'username';
 
     protected $fillable = [
         'username',
         'telp1',
+        'telp2',
+        'password',
         'email',
-        'first_name',
+        'role',
         'asal_sekolah',
         'kelompok_ujian',
         'pilihan1_utbk_aktual',
         'pilihan2_utbk_aktual',
-        'active',
-        'created_at',
-        'updated_at'
     ];
-
 
     public function pilihan1()
     {
@@ -37,8 +35,8 @@ class Siswa extends Model
         return $this->belongsTo(Prodi::class, 'pilihan2_utbk_aktual', 'id_prodi');
     }
 
-    public function sekolahSMA()
+    public function sekolah()
     {
-        return $this->belongsTo(Sekolah::class, 'asal_sekolah', 'id');
+        return $this->belongsTo(Sekolah::class, 'asal_sekolah', 'id'); // Adjust relationship and key names accordingly
     }
 }

@@ -8,13 +8,13 @@ use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\TryoutSiswaController;
 use App\Http\Controllers\Web\HasilTryoutSiswaController;
 
-Route::prefix('/siswa')->group(function () {
+Route::prefix('/siswa')->middleware(['auth', 'user'])->group(function () {
     Route::get('/main', [SiswaController::class, 'index'])->name('siswa.main');
     Route::get('/view', [SiswaController::class, 'index'])->name('siswa.view');
 
     Route::prefix('/tryoutSaya')->group(function () {
         Route::get('/main', [TryoutSiswaController::class, 'index'])->name('siswa.tryoutSaya.main');
-        Route::get('/detail/{id}', [TryoutSiswaController::class, 'index'])->name('siswa.tryoutSaya.detail');
+        Route::get('/detail/{nama_tryout}/{rata}', [TryoutSiswaController::class, 'show'])->name('siswa.tryoutSaya.detail');
     });
 
     Route::prefix('/hasilTryoutSiswa')->group(function () {
@@ -32,5 +32,11 @@ Route::prefix('/siswa')->group(function () {
     Route::prefix('/simulasi')->group(function () {
         Route::get('/main', [SimulasiController::class, 'index'])->name('siswa.simulasi.main');
         Route::post('/test', [SimulasiController::class, 'prediksi'])->name('siswa.simulasi.test');
+
+        Route::get('/ptn', [SimulasiController::class, 'index_ptn'])->name('siswa.simulasi.ptn');
+        Route::post('/test_ptn', [SimulasiController::class, 'prediksi_ptn'])->name('siswa.simulasi.test_ptn');
+
+        Route::get('/prodi', [SimulasiController::class, 'index_prodi'])->name('siswa.simulasi.prodi');
+        Route::post('/test_prodi', [SimulasiController::class, 'prediksi_prodi'])->name('siswa.simulasi.test_prodi');
     });
 });

@@ -20,4 +20,8 @@ class Prodi extends Model
         'jenjang',
     ];
 
+    public function ptn()
+    {
+        return $this->belongsTo(PTN::class, 'id_ptn', 'id_ptn');
+    }
 }

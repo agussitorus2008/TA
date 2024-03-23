@@ -52,7 +52,7 @@
                         <label class="form-label">Email</label>
                         <div class="form-control-feedback form-control-feedback-start">
                             <input type="text" name="email" value="{{ old('email') }}" class="form-control"
-                                placeholder="john@doe.com" />
+                                placeholder="email@gmail.com" />
                             <div class="form-control-feedback-icon">
                                 <i class="ph-user-circle text-muted"></i>
                             </div>

@@ -6,10 +6,11 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Siswa;
+use App\Models\Nilai;
+use App\Models\Nilaito;
 use App\Models\Prodi;
 use App\Models\Sekolah;
-
-
+use Carbon\Carbon;
 
 class SiswaController extends Controller
 {
@@ -29,7 +30,21 @@ class SiswaController extends Controller
 
     public function index()
     {
-        return view('app.siswa.main');
+        $total_pendaftar = Siswa::where('active', now()->year)
+            ->count();
+        $rata = Nilai::join('nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 'nilai_to.username')
+            ->whereYear('nilai_to.tanggal', now()->year)
+            ->avg('mv_rekapitulasi_nilai_to.total_nilai');
+        $max = Nilai::join('nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 'nilai_to.username')
+            ->whereYear('nilai_to.tanggal', now()->year)
+            ->max('mv_rekapitulasi_nilai_to.total_nilai');
+
+        $sekolah = Siswa::join('sekolah_sma', 'siswa.asal_sekolah', '=', 'sekolah_sma.sekolah')
+            ->whereYear('siswa.active', now()->year)
+            ->distinct('sekolah_sma.sekolah')
+            ->count();
+
+        return view('app.siswa.main', compact('total_pendaftar', 'rata', 'max', 'sekolah'));
     }
 
     public function view($email)
@@ -68,6 +83,7 @@ class SiswaController extends Controller
         $siswa->pilihan1_utbk_aktual = $request->pilihan1_utbk_aktual;
         $siswa->pilihan2_utbk_aktual = $request->pilihan2_utbk_aktual;
         $siswa->telp1 = auth()->user()->no_handphone;
+        $siswa->active = Carbon::now()->year;
     
         $siswa->save();
     
@@ -100,6 +116,7 @@ class SiswaController extends Controller
         $siswa->pilihan1_utbk_aktual = $request->pilihan1_utbk_aktual;
         $siswa->pilihan2_utbk_aktual = $request->pilihan2_utbk_aktual;
         $siswa->telp1 = auth()->user()->no_handphone;
+        $siswa->active = Carbon::now()->year;
 
         // Save the updated record
         $siswa->save();

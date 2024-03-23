@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-    @include('layouts.head')
+    @include('layouts_admin.head')
 <body>
 	<!-- Main navbar -->
 	<div class="navbar navbar-dark navbar-expand-lg navbar-static border-bottom border-bottom-white border-opacity-10" style="background-color:#E0F1FA">
@@ -26,17 +26,7 @@
                             <img src="{{asset('assets/images/user_847969.png')}}" class="w-32px h-32px rounded-pill" alt="">
                             <span class="status-indicator bg-success"></span>
                         </div>
-                        {{-- <span class="d-none d-lg-inline-block mx-lg-2 text-dark">
-                            @php
-                                $nama = Auth::user()->nama;
-                                // Panjang maksimum nama yang diizinkan dalam tampilan
-                                $panjangMaksimum = 10;
-                                // Jika nama lebih panjang dari panjang maksimum, potong dan tambahkan ellipsis
-                                $namaTampilan = strlen($nama) > $panjangMaksimum ? substr($nama, 0, $panjangMaksimum) . '...' : $nama;
-                            @endphp
-                            {{ $namaTampilan }}
-                        </span> --}}
-                        <span class="d-none d-lg-inline-block mx-lg-2 text-dark" style="font-weight: bold;">{{ Auth::User()->email }}</span>
+                        <span class="d-none d-lg-inline-block mx-lg-2 text-dark" style="font-weight: bold;">{{ Auth::User()->nama }}</span>
                     </a>
     
                     <div class="dropdown-menu dropdown-menu-end">
@@ -59,7 +49,7 @@
 	<div class="page-content">
 
 		<!-- Main sidebar -->
-		@include('layouts.sidebar')
+		@include('layouts_admin.sidebar')
 		<!-- /main sidebar -->
 
 
@@ -75,7 +65,7 @@
             <!-- Footer -->
 				<div class="navbar navbar-sm navbar-footer border-top">
                     <div class="container-fluid">
-                        @include('layouts.footer')
+                        @include('layouts_admin.footer')
                     </div>
                 </div>
 			<!-- /footer -->

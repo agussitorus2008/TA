@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Sekolah;
+use App\Models\Siswa;
 use Illuminate\Support\Str;
 
 class ApiController extends Controller
@@ -25,7 +26,6 @@ class ApiController extends Controller
     public function addSekolah(Request $request)
     {
         $sekolah = new Sekolah();
-
         do {
             $randomId = Str::random(10);
         } while (Sekolah::where('id', $randomId)->exists());
@@ -37,5 +37,23 @@ class ApiController extends Controller
 
         return response()->json(['message' => 'Data sekolah berhasil ditambahkan']);
     }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+        $siswaList = Siswa::where('first_name', 'like', "%$query%")->paginate(100);
+
+        return response()->json(['siswaList' => $siswaList]);
+    }
+
+    public function filter(Request $request)
+    {
+        $query = $request->input('active');
+        $siswaList = Siswa::where('active', $query)
+            ->get();
+
+        return response()->json(['siswaList' => $siswaList]);
+    }
+
 
 }

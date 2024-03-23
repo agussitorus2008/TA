@@ -10,41 +10,27 @@
         <thead>
             <tr>
                 <th>No</th>
-                <th>Jumlah Tryout</th>
+                <th>Nama Tryout</th>
                 <th>Tanggal</th>
-                <th>Rata rata Nilai Tryout</th>
+                <th>Rata-Rata Nilai Tryout</th>
                 <th>Action</th>
             </tr>
         </thead>
         <tbody>
+            @foreach ($tryouts as $index => $tryout)
+            <?php
+                $avg = ($bobot_ppu * $tryout->ppu) + ($bobot_pu * $tryout->pu) + ($bobot_pm * $tryout->pm) + ($bobot_pk * $tryout->pk) + ($bobot_lbi * $tryout->lbi) + ($bobot_lbe * $tryout->lbe) + ($bobot_pbm * $tryout->pbm);
+                $avg = $avg / 7;
+                $avg = number_format($avg, 2) * 10;
+            ?>
             <tr>
-                <td>1</td>
-                <td>Eugene</td>
-                <td>Kopyov</td>
-                <td>@Kopyov</td>
-                <td><a href="" class="btn btn-primary">Detail</a></td>
+                <td>{{ $index + 1 }}</td>
+                <td>Tryout {{ $tryout->nama_tryout }}</td>
+                <td>{{ \Carbon\Carbon::parse($tryout->tanggal)->format('d-m-y') }}</td>
+                <td>{{ $avg }}</td>
+                <td><a href="{{route('siswa.tryoutSaya.detail', ['nama_tryout' => $tryout->nama_tryout, 'rata' => $avg])}}" class="btn btn-primary">Detail</a></td>
             </tr>
-            <tr>
-                <td>2</td>
-                <td>Victoria</td>
-                <td>Baker</td>
-                <td>@Vicky</td>
-                <td><a href="" class="btn btn-primary">Detail</a></td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>James</td>
-                <td>Alexander</td>
-                <td>@Alex</td>
-                <td><a href="" class="btn btn-primary">Detail</a></td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td>Franklin</td>
-                <td>Morrison</td>
-                <td>@Frank</td>
-                <td><a href="" class="btn btn-primary">Detail</a></td>
-            </tr>
+            @endforeach
         </tbody>
     </table>
 </div>

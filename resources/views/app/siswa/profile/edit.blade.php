@@ -84,18 +84,29 @@
         </div>
     </div>
 
+
     <script>
         $(document).ready(function() {
-    $("#asal_sekolah").select2({
-        tags: true,
-        createTag: function(params) {
-            return params.term.trim() !== '' ? {
-                id: params.term,
-                text: params.term,
-                newOption: true
-            } : null;
-        }
-    });
+        $("#pilihan1").select2();
+        });
+
+        $(document).ready(function() {
+        $("#pilihan2").select2();
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $("#asal_sekolah").select2({
+            tags: true,
+            createTag: function(params) {
+                return params.term.trim() !== '' ? {
+                    id: params.term,
+                    text: params.term,
+                    newOption: true
+                } : null;
+            }
+        });
 
     $("#asal_sekolah").on("select2:select", function(e) {
         if (e.params.data.newOption) {
@@ -119,16 +130,9 @@
             console.log(xhr.responseText);
         }
     });
-});
+    });
+    </script>
 
-         $(document).ready(function() {
-         $("#pilihan1").select2();
-         });
-
-         $(document).ready(function() {
-         $("#pilihan2").select2();
-         });
-     </script>
      <script>
         $(document).ready(function() {
         $('#asal_sekolah').change(function() {

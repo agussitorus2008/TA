@@ -10,6 +10,9 @@ class Nilai extends Model
     use HasFactory;
 
     protected $table = "mv_rekapitulasi_nilai_to";
+    protected $primaryKey = 'username';
+    public $incrementing = false;
+    public $timestamps = false;
     
     protected $fillable = [
         'id_to',

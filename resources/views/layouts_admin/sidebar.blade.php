@@ -31,7 +31,7 @@
                     <i class="ph-dots-three sidebar-resize-show"></i>
                 </li>
                 <li class="nav-item">
-                    <a href="{{route('siswa.main')}}" class="nav-link">
+                    <a href="{{route('admin.main')}}" class="nav-link">
                         <i class="ph-house"></i>
                         <span>
                             Dashboard
@@ -39,38 +39,17 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{route('siswa.profile.main')}}" class="nav-link">
+                    <a href="{{route('admin.siswa.main')}}" class="nav-link">
                         <i class="ph-article"></i>
                         <span>Data Siswa</span>
                     </a>
                 </li>
-                <li class="nav-item nav-item-submenu">
-                    <a href="#" class="nav-link">
-                        <i class="ph-layout"></i>
+                <li class="nav-item">
+                    <a href="{{route('admin.detailtryout.main')}}" class="nav-link">
+                        <i class="ph-swatches"></i>
                         <span>Tryout</span>
                     </a>
-                    <ul class="nav-group-sub collapse">
-                        <li class="nav-item"><a href="{{route('siswa.tryoutSaya.main')}}" class="nav-link">Tryout saya</a></li>
-                        <li class="nav-item"><a href="{{route('siswa.hasilTryout.main')}}" class="nav-link">Hasil tryout</a></li>
-                    </ul>
-                </li>   
-                <li class="nav-item nav-item-submenu">
-                    <a href="#" class="nav-link">
-                        <i class="ph-layout"></i>
-                        <span>Simulasi</span>
-                    </a>
-                    <ul class="nav-group-sub collapse">
-                        <li class="nav-item"><a href="{{route('siswa.simulasi.main')}}" class="nav-link">PTN & Program Studi</a></li>
-                        <li class="nav-item"><a href="{{route('siswa.simulasi.ptn')}}" class="nav-link">PTN</a></li>
-                        <li class="nav-item"><a href="{{route('siswa.simulasi.prodi')}}" class="nav-link">Program Studi</a></li>
-                    </ul>
                 </li>
-                {{-- <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="ph-globe"></i>
-                        <span>Lalu Lintas</span>
-                    </a>
-                </li> --}}
             </ul>
         </div>
         <!-- /main navigation -->

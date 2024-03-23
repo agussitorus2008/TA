@@ -9,11 +9,11 @@ class Nilaito extends Model
 {
     use HasFactory;
 
-    protected $table = "t_nilai_to";
+    protected $table = "nilai_to";
 
     protected $fillable = [
         'username',
-        'id_to',
+        'nama_tryout',
         'pu',
         'ppu',
         'pbm',
@@ -22,6 +22,9 @@ class Nilaito extends Model
         'lbe',
         'pm',
         'active',
+    ];
 
+    protected $dates = [
+        'tanggal',
     ];
 }

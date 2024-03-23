@@ -64,7 +64,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'nama' => 'required',
-            'no_handphone' => 'required',
+            'no_handphone' => 'required|unique:users',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
             'password_confirmation' => 'required|same:password',
@@ -74,6 +74,7 @@ class AuthController extends Controller
             'email.required' => 'Email harus diisi.',
             'email.email' => 'Email tidak valid.',
             'email.unique' => 'Email sudah terdaftar.',
+            'no_handphone.unique' => 'No Telepon sudah terdaftar.',
             'password.required' => 'Password harus diisi.',
             'password.min' => 'Password minimal 6 karakter.',
             'password' => 'Password tidak sesuai.',
