@@ -39,10 +39,7 @@ class SiswaController extends Controller
             ->whereYear('nilai_to.tanggal', now()->year)
             ->max('mv_rekapitulasi_nilai_to.total_nilai');
 
-        $sekolah = Siswa::join('sekolah_sma', 'siswa.asal_sekolah', '=', 'sekolah_sma.sekolah')
-            ->whereYear('siswa.active', now()->year)
-            ->distinct('sekolah_sma.sekolah')
-            ->count();
+        $sekolah = Sekolah::count();
 
         return view('app.siswa.main', compact('total_pendaftar', 'rata', 'max', 'sekolah'));
     }

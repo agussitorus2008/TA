@@ -30,10 +30,6 @@
                     </a>
     
                     <div class="dropdown-menu dropdown-menu-end">
-                        <a href="#" class="dropdown-item">
-                            <i class="ph-user-circle me-2"></i>
-                            Profile
-                        </a>
                         <a href="{{route('auth.dologout')}}" class="dropdown-item">
                             <i class="ph-sign-out me-2"></i>
                             Logout

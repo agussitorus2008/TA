@@ -23,20 +23,26 @@ class ApiController extends Controller
         }
     }
 
+
     public function addSekolah(Request $request)
     {
-        $sekolah = new Sekolah();
-        do {
-            $randomId = Str::random(10);
-        } while (Sekolah::where('id', $randomId)->exists());
+        try {
+            $sekolah = new Sekolah();
+            do {
+                $randomId = Str::random(10);
+            } while (Sekolah::where('id', $randomId)->exists());
 
-        $sekolah->id = $randomId;
-        $sekolah->sekolah = $request->asal_sekolah;
-        $sekolah->propinsi = $request->provinsi_sekolah;
-        $sekolah->save();
+            $sekolah->id = $randomId;
+            $sekolah->sekolah = $request->asal_sekolah;
+            $sekolah->propinsi = $request->provinsi_sekolah;
+            $sekolah->save();
 
-        return response()->json(['message' => 'Data sekolah berhasil ditambahkan']);
+            return response()->json(['message' => 'Data sekolah berhasil ditambahkan']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
+
 
     public function search(Request $request)
     {

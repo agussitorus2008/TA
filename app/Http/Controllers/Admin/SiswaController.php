@@ -35,6 +35,7 @@ class SiswaController extends Controller
             ->whereNotIn('active', [0, 23]) // Exclude 0 and 23
             ->distinct()
             ->pluck('active'); // Get distinct values
+            
         return view('app.admin.siswa.main', compact('siswaList', 'tahun', 'statusList'));
     }
 

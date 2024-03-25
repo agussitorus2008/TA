@@ -48,36 +48,42 @@
 </div>
 
 <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script>
-        const chart = Highcharts.chart('chart', {
+<script>
+    const years = {!! json_encode($years) !!}; // Mengonversi data $years menjadi array JavaScript
+    const averages = {!! json_encode($averages, JSON_NUMERIC_CHECK) !!};
+
+    const seriesData = averages.map(function(value) {
+    return parseFloat((value * 10).toFixed(2));
+});
+
+
+    console.log('tahun :', years);
+    console.log('Rata Data:', seriesData);
+
+    const chart = Highcharts.chart('chart', {
         chart: {
             type: 'column'
         },
-
-        legend: {
-            align: 'right',
-            verticalAlign: 'middle',
-            layout: 'vertical'
+        title: {
+            text: 'Grafik Nilai Rata-Rata Tryout'
         },
-
         xAxis: {
-            categories: ['2020', '2021', '2022', '2023'],
-            labels: {
-                x: -10
+            categories: years, // Menggunakan variabel JavaScript years sebagai kategori
+            title: {
+                text: 'Tahun'
             }
         },
-
         yAxis: {
-            allowDecimals: false,
+            title: {
+                text: 'Nilai Rata-Rata'
+            },
+            min: 0
         },
-        
-
         series: [{
             name: 'Nilai rata-rata',
-            data: [900, 510, 600, 750],
+            data: seriesData, // Menggunakan variabel JavaScript averages sebagai data
             color: '#3DA059'
         }],
-
         responsive: {
             rules: [{
                 condition: {
@@ -108,19 +114,24 @@
                 }
             }]
         }
-        });
+    });
 
-        document.getElementById('small').addEventListener('click', function () {
+    // Tambahkan event listener untuk mengubah ukuran chart
+    document.getElementById('small').addEventListener('click', function () {
         chart.setSize(400);
-        });
+    });
 
-        document.getElementById('large').addEventListener('click', function () {
+    document.getElementById('large').addEventListener('click', function () {
         chart.setSize(600);
-        });
+    });
 
-        document.getElementById('auto').addEventListener('click', function () {
+    document.getElementById('auto').addEventListener('click', function () {
         chart.setSize(null);
-        });
+    });
+</script>
+    
 
-    </script>
+
+
+
 @endsection

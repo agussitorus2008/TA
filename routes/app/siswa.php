@@ -7,6 +7,7 @@ use App\Http\Controllers\Web\SimulasiController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\TryoutSiswaController;
 use App\Http\Controllers\Web\HasilTryoutSiswaController;
+use App\Http\Controllers\ProfileController;
 
 Route::prefix('/siswa')->middleware(['auth', 'user'])->group(function () {
     Route::get('/main', [SiswaController::class, 'index'])->name('siswa.main');
@@ -27,6 +28,10 @@ Route::prefix('/siswa')->middleware(['auth', 'user'])->group(function () {
         Route::post('/add/{email}', [SiswaController::class, 'add'])->name('siswa.profile.add');
         Route::get('/edit/{email}', [SiswaController::class, 'edit'])->name('siswa.profile.edit');
         Route::post('/update/{email}', [SiswaController::class, 'update'])->name('siswa.profile.update');
+    });
+
+    Route::prefix('/data_siswa')->group(function () {
+        Route::get('/main', [ProfileController::class, 'siswa'])->name('siswa.data_siswa.main');
     });
 
     Route::prefix('/simulasi')->group(function () {

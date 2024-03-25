@@ -23,16 +23,25 @@ class HasilTryoutSiswaController extends Controller
         $user = Auth::user();
         $siswa = Siswa::where('username', $user->email)->first();
 
-        if(empty($siswa)){
-            $siswa = "Belum ada data siswa";
+        if ($siswa == null) {
+            $errorMessage = "Belum ada data nilai";
+            return response()->json(['error' => $errorMessage], 422);
         }
 
         $nilaito = Nilaito::where('username', $user->email)->get();
 
+        $tryoutCount = $nilaito->count();
+
         $nilai = Nilaito::where('username', $user->email)->latest()->first();
 
-        if(empty($nilaito)){
-            $siswa = "Belum ada nilai tryout";
+        if ($nilai == null) {
+            $errorMessage = "Belum ada data nilai";
+            return response()->json(['error' => $errorMessage], 422);
+        }
+        
+        if ($nilaito == null) {
+            $errorMessage = "Belum ada data nilai";
+            return response()->json(['error' => $errorMessage], 422);
         }
 
         $bobot = Nilai::whereNotNull('nilai_ppu')
@@ -158,7 +167,15 @@ class HasilTryoutSiswaController extends Controller
         $totalpendaftar11 = count($listNilaipilihan1);
         $totalpendaftar22 = count($listNilaipilihan2);
 
-        return view('app.siswa.hasilTryout.main', compact('user', 'siswa', 'totalPendaftar', 'totalSekolah', 'nilaito', 'bobot_ppu', 'bobot_pu', 'bobot_pm', 'bobot_pk', 'bobot_lbi', 'bobot_lbe', 'bobot_pbm', 'peringkat1', 'peringkat2', 'totalpendaftar11', 'totalpendaftar22', 'totalpendaftar1', 'totalpendaftar2', 'peringkat11', 'peringkat22', 'dayatampung1', 'dayatampung2'));
+        $totalData = $nilaito->map(function ($item) use ($bobot_ppu, $bobot_pu, $bobot_pm, $bobot_pk, $bobot_lbi, $bobot_lbe, $bobot_pbm) {
+            return number_format(($item->ppu * $bobot_ppu + $item->pu * $bobot_pu + $item->pm * $bobot_pm + $item->pk * $bobot_pk + $item->lbi * $bobot_lbi + $item->lbe * $bobot_lbe + $item->pbm * $bobot_pbm) * 10, 2, '.', '');
+                });
+        
+        $rataData = $nilaito->map(function ($item) use ($bobot_ppu, $bobot_pu, $bobot_pm, $bobot_pk, $bobot_lbi, $bobot_lbe, $bobot_pbm) {
+            return number_format((($item->ppu * $bobot_ppu + $item->pu * $bobot_pu + $item->pm * $bobot_pm + $item->pk * $bobot_pk + $item->lbi * $bobot_lbi + $item->lbe * $bobot_lbe + $item->pbm * $bobot_pbm) / 7) * 10, 2);
+        });
+
+        return view('app.siswa.hasilTryout.main', compact('user', 'siswa', 'totalPendaftar', 'totalSekolah', 'nilaito', 'bobot_ppu', 'bobot_pu', 'bobot_pm', 'bobot_pk', 'bobot_lbi', 'bobot_lbe', 'bobot_pbm', 'peringkat1', 'peringkat2', 'totalpendaftar11', 'totalpendaftar22', 'totalpendaftar1', 'totalpendaftar2', 'peringkat11', 'peringkat22', 'dayatampung1', 'dayatampung2', 'totalData', 'rataData', 'tryoutCount'));
     }
 
     /**

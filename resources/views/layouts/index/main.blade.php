@@ -115,34 +115,6 @@
             </div>
         </div>
 
-        <div class="pt-100 carousel" style="background-image: linear-gradient(to bottom, #0F5FAB, #FFFFFF);">
-            <div class="container mb-5">
-                <div class="section-title text-center">
-                    <h2><span>TESTIMONI</span></h2>
-                    <p style="color: #000000">Jadilah bagian dari mereka yang sudah merasakan manfaat tryout di KAWALPTN-KU. Apa kata mereka yang lulus PTN Impian mereka?</p>
-                </div>
-
-                <div class="row justify-content-center text-center">
-                    <div class="testimonial-items">
-                        <div class="testimonial-info-text">
-                            <img src="assets/img/client-1.png" alt="client image">
-                            <h3>Alisa Meair</h3>
-                            <p>CEO of  Company</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Testimonial Section End --> 
-
-        <!-- Blog Section Start -->
-
-        <!-- Blog Section End -->
-
-        <!-- Subscribe Section Start -->
-        <!-- Subscribe Section End -->
-
-        <!-- Footer Section Start -->
 		@include('layouts.index.footer')
         <!-- Back To Top End -->
         @include('layouts.index.script')

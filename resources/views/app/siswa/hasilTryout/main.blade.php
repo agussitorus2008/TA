@@ -5,6 +5,12 @@
 @endsection
 
 @section('content')
+
+    <div id="error-message" style="display: none;">
+        <!-- Error message will be displayed here -->
+    </div>
+
+
 <div class="content">
 
     <!-- Main charts -->
@@ -48,10 +54,6 @@
         </div>
     </div>
 
-    <div id="error-message" style="display: none;">
-        <!-- Error message will be displayed here -->
-    </div>
-
     <div class="container">
         <div class="row justify-content-center text-center">
             <div class="col-xl-6">
@@ -89,19 +91,6 @@
     </div>
     
     <div class="card">
-        {{-- <div class="card-header">
-            <div class="row">
-                <div class="col-md-2">
-                    <div class="form-group form-inline">
-                        <label for="show" class="mr-2">Show per page:</label>
-                        <select class="form-control" id="show" name="show">
-                            <option value="10">5</option>
-                            <option value="20">10</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div> --}}
 
         <table class="table datatable-basic">
             <thead>
@@ -146,89 +135,95 @@
     <div class="">
         <div id="chart"></div>
     </div>
+</div>
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script>
-        const chart = Highcharts.chart('chart', {
-        chart: {
-            type: 'column'
-        },
-
-        legend: {
-            align: 'right',
-            verticalAlign: 'middle',
-            layout: 'vertical'
-        },
-
-        xAxis: {
-            categories: ['1/10', '2/10', '3/10', '4/10', '5/10', '6/10'],
-            labels: {
-                x: -10
-            }
-        },
-
-        yAxis: {
-            allowDecimals: false,
-        },
-        
-
-        series: [{
-            name: 'Pilihan 1',
-            data: [900, 510, 600, 750, 500, 800],
-            color: '#3DA059'
-        }, {
-            name: 'Pilihan 2',
-            data: [800, 700, 600, 500, 648, 790],
-            color: '#0A407F'
-        }],
-
-        responsive: {
-            rules: [{
-                condition: {
-                    maxWidth: 500
+        try { 
+            const totalData = {!! json_encode($totalData, JSON_NUMERIC_CHECK) !!};
+            const rataData = {!! json_encode($rataData, JSON_NUMERIC_CHECK) !!};
+            var tryoutCount = {!! $tryoutCount !!};
+    
+            var categories = Array.from({ length: tryoutCount }, (_, i) => (i + 1).toString());
+    
+            const chart = Highcharts.chart('chart', {
+                chart: {
+                    type: 'column'
                 },
-                chartOptions: {
-                    legend: {
-                        align: 'center',
-                        verticalAlign: 'bottom',
-                        layout: 'horizontal'
-                    },
-                    yAxis: {
-                        labels: {
-                            align: 'left',
-                            x: 0,
-                            y: -5
-                        },
-                        title: {
-                            text: null
-                        }
-                    },
-                    subtitle: {
-                        text: null
-                    },
-                    credits: {
-                        enabled: false
+                legend: {
+                    align: 'right',
+                    verticalAlign: 'middle',
+                    layout: 'vertical'
+                },
+                xAxis: {
+                    categories: categories,
+                    labels: {
+                        x: -10
                     }
+                },
+                yAxis: {
+                    allowDecimals: false
+                },
+                series: [{
+                    name: 'Total Nilai',
+                    data: totalData,
+                    color: '#3DA059'
+                }, {
+                    name: 'Rata rata nilai',
+                    data: rataData,
+                    color: '#0A407F'
+                }],
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
+                        },
+                        chartOptions: {
+                            legend: {
+                                align: 'center',
+                                verticalAlign: 'bottom',
+                                layout: 'horizontal'
+                            },
+                            yAxis: {
+                                labels: {
+                                    align: 'left',
+                                    x: 0,
+                                    y: -5
+                                },
+                                title: {
+                                    text: null
+                                }
+                            },
+                            subtitle: {
+                                text: null
+                            },
+                            credits: {
+                                enabled: false
+                            }
+                        }
+                    }]
                 }
-            }]
+            });
+    
+            document.getElementById('small').addEventListener('click', function () {
+                chart.setSize(400);
+            });
+    
+            document.getElementById('large').addEventListener('click', function () {
+                chart.setSize(600);
+            });
+    
+            document.getElementById('auto').addEventListener('click', function () {
+                chart.setSize(null);
+            });
+        } catch (error) {
+            console.error('An error occurred:', error.message);
+            // Handle the error here
         }
-        });
-
-        document.getElementById('small').addEventListener('click', function () {
-        chart.setSize(400);
-        });
-
-        document.getElementById('large').addEventListener('click', function () {
-        chart.setSize(600);
-        });
-
-        document.getElementById('auto').addEventListener('click', function () {
-        chart.setSize(null);
-        });
-
     </script>
-    <script>
-    // Make an AJAX request to check for the error
-    fetch('{{ route('siswa.hasilTryout.main') }}')
+
+
+<script>
+    fetch('{{ route('siswa.hasilTryout.main') }}') // Ganti dengan route yang benar
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -236,18 +231,20 @@
             return response.json();
         })
         .then(data => {
-            // Check if there is an error message
+            // Cek jika ada pesan error dalam respons
             if (data.error) {
-                // Display the error message
+                // Tampilkan pesan error
                 document.getElementById('error-message').innerText = data.error;
                 document.getElementById('error-message').style.display = 'block';
+            } else {
+                // Lanjutkan dengan menampilkan konten lain jika tidak ada error
+                document.getElementById('content').style.display = 'block';
             }
         })
         .catch(error => {
             console.error('Error fetching data:', error);
+            document.getElementById('error-message').style.display = 'block';
         });
 </script>
 
-
-</div>
 @endsection   

@@ -4,7 +4,7 @@
             <div class="col-sm-6">
                 <div class="footer-widget">
                     <div class="footer-logo">
-                        <a href="index.html">
+                        <a href="#">
                             <img src="{{asset('assets/images/Group 17.png')}}" alt="logo" width="350">
                         </a>
                     </div>

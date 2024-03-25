@@ -116,20 +116,23 @@
     });
 
     $.ajax({
-        url: '/add-sekolah/',
-        method: 'POST',
-        data: {
-            asal_sekolah: $('#asal_sekolah').val(), 
-            provinsi_sekolah: $('#provinsi_sekolah').val() 
-        },
-        success: function(response) {
-            console.log('Data added successfully:', response);
-        },
-        error: function(xhr, status, error) {
-            console.error('AJAX Error:', status, error);
-            console.log(xhr.responseText);
-        }
-    });
+    url: '/add-sekolah/',
+    method: 'POST',
+    data: {
+        asal_sekolah: $('#asal_sekolah').val(), 
+        provinsi_sekolah: $('#provinsi_sekolah').val() 
+    },
+    success: function(response) {
+        console.log('Data added successfully:', response);
+    },
+    error: function(xhr, status, error) {
+        console.error('AJAX Error:', status, error);
+        // Menampilkan pesan error dari respons JSON
+        var errorMessage = xhr.responseJSON.error;
+        console.log(errorMessage); // Lakukan penanganan error yang sesuai di sini
+    }
+});
+
     });
     </script>
 

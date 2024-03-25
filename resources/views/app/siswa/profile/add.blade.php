@@ -79,43 +79,51 @@
     </div>
 
     <script>
-        $(document).ready(function() {
-        $("#asal_sekolah").select2({
-            tags: true,
-            createTag: function(params) {
-                return params.term.trim() !== '' ? {
-                    id: params.term,
-                    text: params.term,
-                    newOption: true
-                } : null;
-            }
-        });
+       $(document).ready(function() {
+    $("#asal_sekolah").select2({
+        tags: true,
+        createTag: function(params) {
+            return params.term.trim() !== '' ? {
+                id: params.term,
+                text: params.term,
+                newOption: true
+            } : null;
+        }
+    });
 
     $("#asal_sekolah").on("select2:select", function(e) {
         if (e.params.data.newOption) {
-            $('#provinsi_sekolah').removeAttr('readOnly');
-            console.log("New option added:", e.params.data.text);
-        }
-    });
+            // Mengambil nilai dan teks opsi baru yang ditambahkan
+            var newValue = e.params.data.id;
+            var newText = e.params.data.text;
 
-    $.ajax({
-        url: '/add-sekolah/',
-        method: 'POST',
-        data: {
-            asal_sekolah: $('#asal_sekolah').val(), 
-            provinsi_sekolah: $('#provinsi_sekolah').val() 
-        },
-        success: function(response) {
-            console.log('Data added successfully:', response);
-        },
-        error: function(xhr, status, error) {
-            console.error('AJAX Error:', status, error);
-            console.log(xhr.responseText);
+            // Menghapus atribut readOnly dari dropdown provinsi_sekolah
+            $('#provinsi_sekolah').removeAttr('readonly');
+
+            // Menampilkan pesan log bahwa opsi baru ditambahkan
+            console.log("New option added:", newText);
+
+            // Menjalankan permintaan AJAX untuk menambahkan sekolah
+            $.ajax({
+                url: '/add-sekolah/',
+                method: 'POST',
+                data: {
+                    asal_sekolah: newValue,
+                    provinsi_sekolah: $('#provinsi_sekolah').val() 
+                },
+                success: function(response) {
+                    console.log('Data added successfully:', response);
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', status, error);
+                    // Menampilkan pesan error dari respons JSON
+                    var errorMessage = xhr.responseJSON.error;
+                    console.log(errorMessage); // Lakukan penanganan error yang sesuai di sini
+                }
+            });
         }
     });
 });
-
-
 
          $(document).ready(function() {
          $("#pilihan1").select2();

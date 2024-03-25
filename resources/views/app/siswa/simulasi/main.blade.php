@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('title')
-<h6 style="color:#0A407F;font-size:25px" class="d-none d-sm-inline-block h-16px ms-3">SIMULASI PRODI DAN PTN</h6>
+<h6 style="color:#0A407F;font-size:25px" class="d-none d-sm-inline-block h-16px ms-3">SIMULASI PROGRAM STUDI DAN PTN</h6>
 @endsection
 @section('content')
 <div class="content">
