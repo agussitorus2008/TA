@@ -153,7 +153,8 @@ class SimulasiController extends Controller
             // $namaPTN = PTN::where('id_ptn', $ptnId)->select('nama_singkat');
 
             // Cari prodi-prodi yang terkait dengan PTN
-            $prodi = Prodi::where('id_ptn', $ptnId)->pluck('id_prodi');
+            $prodi = Prodi::where('id_ptn', $ptnId)
+                ->pluck('id_prodi');
 
             // Ambil bobot berdasarkan prodi yang ditemukan
             $bobot = Kelulusan::whereIn('id_prodi', $prodi)
@@ -167,6 +168,7 @@ class SimulasiController extends Controller
                 ->whereNotNull('nilai_lbe')
                 ->whereNotNull('nilai_pbm')
                 ->firstOrFail();
+
 
             // Hitung nilai
             $nilai = (($request->ppu * $bobot->nilai_ppu / $bobot->ppu_benar) + 
@@ -243,7 +245,7 @@ class SimulasiController extends Controller
                     ($request->pk * $bobot->nilai_pk / $bobot->pk_benar) + 
                     ($request->lbi * $bobot->nilai_lbi / $bobot->lbi_benar) + 
                     ($request->lbe * $bobot->nilai_lbe / $bobot->lbe_benar) + 
-                    ($request->pbm * $bobot->nilai_pbm / $bobot->pbm_benar)) / 6;
+                    ($request->pbm * $bobot->nilai_pbm / $bobot->pbm_benar)) / 7;
 
             // Cari kelulusan berdasarkan prodi dan nilai
             $kelulusan = DB::table('mv_rekapitulasi_nilai_to')

@@ -43,6 +43,13 @@
         </div>
         <div class="container">
             <div class="row justify-content-center text-center">
+                {{-- <div class="col-6 col-sm-4 col-md-3 col-lg-4 col-xl-4">
+                    <h5>JENIS</h5>
+                    <select name="jenis" class="form-control">
+                        <option value="SAINTEK">SAINTEK</option>
+                        <option value="SOSHUM">SOSHUM</option>
+                    </select>
+                </div> --}}
                 <div class="col-6 col-sm-4 col-md-3 col-lg-4 col-xl-4">
                     <h5>PTN</h5>
                         <select name="ptn" class="form-control" id="select2">
