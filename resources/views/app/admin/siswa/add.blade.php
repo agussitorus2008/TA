@@ -19,8 +19,8 @@
         <div class="col-xl-6">
         <form action="{{ route('admin.siswa.tryout.add', ['username' => $siswa->username]) }}" method="POST">
             @csrf
-            <input type="hidden" name="nama_tryout" value="{{ $nama_tryout + 1 }}">
-            <p>Tryout ke : {{ $nama_tryout + 1 }}</p>
+            <p>Tryout ke :</p><input type="number" class="form-control mb-2" name="nama_tryout" value="{{ $nama_tryout + 1 }}" style="width: 100px">
+            {{-- <p>Tryout ke : {{ $nama_tryout + 1 }}</p> --}}
             <p>Tanggal Tryout : <input type="date" name="tanggal" required style="width: 200px; padding: .375rem .75rem; font-size: 1rem; line-height: 1.5; color: #495057; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; border-radius: .25rem; transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;"></p>
         </div>
         <hr>

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Nilai;
 use App\Models\Nilaito;
+use App\Models\ViewNilaiFinalTerbaru;
 
 class TryoutSiswaController extends Controller
 {
@@ -20,34 +21,27 @@ class TryoutSiswaController extends Controller
         $user = Auth::user();
         $tryouts = Nilaito::where('username', $user->email)->get();
 
-        if(empty($tryouts)){
-            $errorMessage = "Belum ada nilai tryout";
-            return response()->json(['error' => $errorMessage], 422);
+        if($tryouts){
+
+            $bobot_ppu = 30;
+            $bobot_pu = 20;
+            $bobot_pm = 20;
+            $bobot_pk = 15;
+            $bobot_lbi = 30;
+            $bobot_lbe = 20;
+            $bobot_pbm = 20;
+            $bobot_total = 155;
+
+            $mahasiswa = ViewNilaiFinalTerbaru::where('username', auth()->user()->email)->first();
+
+            $nilaiRata = 0;
+
+            if($mahasiswa){
+                $nilaiRata = $mahasiswa->average_to;
+            }
+
         }
-
-        $bobot = Nilai::whereNotNull('nilai_ppu')
-        ->whereNotNull('nilai_pu')
-        ->whereNotNull('nilai_pm')
-        ->whereNotNull('nilai_pk')
-        ->whereNotNull('nilai_lbi')
-        ->whereNotNull('nilai_lbe')
-        ->whereNotNull('nilai_pbm')
-        ->first();
-
-        if ($bobot == null) {
-            $errorMessage = "Bobot nilai belum diatur";
-            return response()->json(['error' => $errorMessage], 422);
-        }
-
-        $bobot_ppu = $bobot->nilai_ppu / $bobot->ppu_benar;
-        $bobot_pu = $bobot->nilai_pu / $bobot->pu_benar;
-        $bobot_pm = $bobot->nilai_pm / $bobot->pm_benar;
-        $bobot_pk = $bobot->nilai_pk / $bobot->pk_benar;
-        $bobot_lbi = $bobot->nilai_lbi / $bobot->lbi_benar;
-        $bobot_lbe = $bobot->nilai_lbe / $bobot->lbe_benar;
-        $bobot_pbm = $bobot->nilai_pbm / $bobot->pbm_benar;
-
-        return view('app.siswa.tryoutSaya.main', compact('tryouts', 'bobot_ppu', 'bobot_pu', 'bobot_pm', 'bobot_pk', 'bobot_lbi', 'bobot_lbe', 'bobot_pbm'));
+        return view('app.siswa.tryoutSaya.main', compact('tryouts', 'bobot_ppu', 'bobot_pu', 'bobot_pm', 'bobot_pk', 'bobot_lbi', 'bobot_lbe', 'bobot_pbm', 'nilaiRata', 'bobot_total'));
     }
 
     /**
@@ -86,29 +80,16 @@ class TryoutSiswaController extends Controller
 
             if($tryout){
 
-                $bobot = Nilai::whereNotNull('nilai_ppu')
-                ->whereNotNull('nilai_pu')
-                ->whereNotNull('nilai_pm')
-                ->whereNotNull('nilai_pk')
-                ->whereNotNull('nilai_lbi')
-                ->whereNotNull('nilai_lbe')
-                ->whereNotNull('nilai_pbm')
-                ->first();
-        
-                if ($bobot == null) {
-                    $errorMessage = "Bobot nilai belum diatur";
-                    return response()->json(['error' => $errorMessage], 422);
-                }
-        
-                $bobot_ppu = $bobot->nilai_ppu / $bobot->ppu_benar;
-                $bobot_pu = $bobot->nilai_pu / $bobot->pu_benar;
-                $bobot_pm = $bobot->nilai_pm / $bobot->pm_benar;
-                $bobot_pk = $bobot->nilai_pk / $bobot->pk_benar;
-                $bobot_lbi = $bobot->nilai_lbi / $bobot->lbi_benar;
-                $bobot_lbe = $bobot->nilai_lbe / $bobot->lbe_benar;
-                $bobot_pbm = $bobot->nilai_pbm / $bobot->pbm_benar;
+                $bobot_ppu = 30;
+                $bobot_pu = 20;
+                $bobot_pm = 20;
+                $bobot_pk = 15;
+                $bobot_lbi = 30;
+                $bobot_lbe = 20;
+                $bobot_pbm = 20;
+                $bobot_total = 155;
             
-                return view("app.siswa.tryoutSaya.detail", compact('tryout', 'bobot_ppu', 'bobot_pu', 'bobot_pm', 'bobot_pk', 'bobot_lbi', 'bobot_lbe', 'bobot_pbm', 'rata'));
+                return view("app.siswa.tryoutSaya.detail", compact('tryout', 'bobot_ppu', 'bobot_pu', 'bobot_pm', 'bobot_pk', 'bobot_lbi', 'bobot_lbe', 'bobot_pbm', 'rata', 'bobot_total'));
                 }
         
                 else{

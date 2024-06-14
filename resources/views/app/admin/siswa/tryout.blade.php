@@ -25,7 +25,10 @@
                     <div class="alert alert-success" role="alert">
                         {{ session('success') }}
                     </div>
-                @endif                               
+                @endif   
+                @if($tryouts == null)
+                    <h5 class="alert alert-danger text-center">Belum Ada Data Nilai</h5>
+                @else                            
                 <div class="d-flex justify-content-end mb-3">
                     <div class="table">
                         <table class="table table-striped">
@@ -41,8 +44,8 @@
                             <tbody>
                                 @foreach ($tryouts as $index => $tryout)
                                     <?php
-                                        $avg = ($bobot_ppu * $tryout->ppu) + ($bobot_pu * $tryout->pu) + ($bobot_pm * $tryout->pm) + ($bobot_pk * $tryout->pk) + ($bobot_lbi * $tryout->lbi) + ($bobot_lbe * $tryout->lbe) + ($bobot_pbm * $tryout->pbm);
-                                        $avg = $avg / 7;
+                                        $avg = ($tryout->ppu/$bobot_ppu * 100) + ($tryout->pu/$bobot_pu * 100) + ($tryout->pm/$bobot_pm*100) + ($tryout->pk/$bobot_pk*100) + ($tryout->lbi/$bobot_lbi*100) + ($tryout->lbe/$bobot_lbe*100) + ($tryout->pbm/$bobot_pbm*100);
+                                        $avg = ($tryout->pu + $tryout->ppu + $tryout->pm + $tryout->pk + $tryout->lbi + $tryout->lbe + $tryout->pbm)/$bobot_total*100;
                                         $avg = number_format($avg, 2) * 10;
                                     ?>
                                     <tr>
@@ -63,6 +66,8 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        <h5>Nilai Rata - Rata: {{ $nilaiRata ? number_format($nilaiRata->average_to * 10, 2) : 0 }}</h5>
+                        @endif
                     </div>
                 </div>
             </div>

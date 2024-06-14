@@ -20,6 +20,9 @@ Route::prefix('/siswa')->middleware(['auth', 'user'])->group(function () {
 
     Route::prefix('/hasilTryoutSiswa')->group(function () {
         Route::any('/main', [HasilTryoutSiswaController::class, 'index'])->name('siswa.hasilTryout.main');
+        Route::get('/pilihan1/{nama_prodi}', [HasilTryoutSiswaController::class, 'pilihan1'])->name('siswa.hasilTryout.pilihan1');
+        Route::get('/pilihanTotal/{nama_prodi}', [HasilTryoutSiswaController::class, 'pilihanTotal'])->name('siswa.hasilTryout.pilihanTotal');
+        Route::get('/rekomendasi', [HasilTryoutSiswaController::class, 'rekomendasi'])->name('siswa.hasilTryout.rekomendasi');
     });
 
     Route::prefix('/profile')->group(function () {

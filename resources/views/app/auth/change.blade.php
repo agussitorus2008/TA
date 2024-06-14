@@ -9,24 +9,20 @@
                     </div>
                     <h5 class="mb-0" style="color: #0A407F">LUPA PASSWORD</h5>
                 </div>
-
+                
                 <div class="row justify-content-center text-center">
                     <input type="hidden" name="email" value="{{ $email }}"/>
                     <p>{{ $email }}</p>
                 </div>
 
-
                 <div class="mb-3">
                     <label class="form-label">Password Baru</label>
                     <div class="form-control-feedback form-control-feedback-start">
-                        <input type="password" name="password" class="form-control" placeholder="•••••••••••" />
+                        <input type="password" name="password" class="form-control" placeholder="•••••••••••"/>
                         <div class="form-control-feedback-icon">
                             <i class="ph-lock text-muted"></i>
                         </div>
                     </div>
-                    @error('password')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
                 </div>
 
                 <div class="mb-3">
@@ -38,7 +34,7 @@
                             <i class="ph-lock text-muted"></i>
                         </div>
                     </div>
-                    @error('password_confirmation')
+                    @error('password')
                         <div class="text-danger">{{ $message }}</div>
                     @enderror
                 </div>

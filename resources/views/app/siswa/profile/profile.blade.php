@@ -59,7 +59,7 @@
                 <div class="col-xl-2">
                     <div class="card" style="background-color: #0A407F;">
                         <div class="align-items-center">
-                            <h6 class="text-center m-2 text-white font-weight-bold">Pilihan Jurusan </h6>
+                            <h6 class="text-center m-2 text-white font-weight-bold">Pilihan Jurusan</h6>
                         </div>
                     </div>
                 </div>

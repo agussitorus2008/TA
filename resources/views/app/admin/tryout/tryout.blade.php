@@ -17,7 +17,10 @@
                 <div class="">
                     <h5>{{ $siswa->first_name }}</h5>
                     <p style="font-size: 18px">{{ $siswa->asal_sekolah }}</p>
-                </div>                              
+                </div>
+                @if($nilaiRata == null)
+                    <h5 class="alert alert-danger text-center">Belum Ada Data Nilai</h5>
+                @else                              
                 <div class="d-flex justify-content-end mb-3">
                     <div class="table">
                         <table class="table table-striped">
@@ -34,7 +37,7 @@
                                 @foreach ($tryouts as $index => $tryout)
                                     <?php
                                         $avg = ($bobot_ppu * $tryout->ppu) + ($bobot_pu * $tryout->pu) + ($bobot_pm * $tryout->pm) + ($bobot_pk * $tryout->pk) + ($bobot_lbi * $tryout->lbi) + ($bobot_lbe * $tryout->lbe) + ($bobot_pbm * $tryout->pbm);
-                                        $avg = $avg / 7;
+                                        $avg = ($tryout->pu + $tryout->ppu + $tryout->pm + $tryout->pk + $tryout->lbi + $tryout->lbe + $tryout->pbm)/$bobot_total*100;
                                         $avg = number_format($avg, 2) * 10;
                                     ?>
                                     <tr>
@@ -49,8 +52,10 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        <h5>Nilai Rata - Rata : {{ number_format($nilaiRata->average_to, 2) * 10 }}</h5>
                     </div>
                 </div>
+                @endif
             </div>
         </div>
     </div>

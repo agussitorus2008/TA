@@ -64,12 +64,14 @@ class AuthController extends Controller
     {
         $request->validate([
             'nama' => 'required',
+            'nama' => ['required', 'regex:/^[^\d]*$/'],
             'no_handphone' => 'required|unique:users',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
             'password_confirmation' => 'required|same:password',
         ], [
             'nama.required' => 'Nama harus diisi.',
+            'nama.regex' => 'Nama tidak boleh mengandung angka.',
             'no_handphone.required' => 'Nomor handphone harus diisi.',
             'email.required' => 'Email harus diisi.',
             'email.email' => 'Email tidak valid.',
@@ -123,10 +125,11 @@ class AuthController extends Controller
         }
 
         $user = DB::table('users')->where('email', $request->email)->first();
+        $email =  $request->email;
 
         if ($user) {
             // Email terdaftar, arahkan ke form ganti password
-            return view('app.auth.change')->with('email', $request->email);
+            return view('app.auth.change', compact('email'));
         } else {
             // Email tidak terdaftar, kembalikan ke form lupa password dengan pesan
             return view('app.auth.forget')->with('error', 'Email tidak terdaftar.');

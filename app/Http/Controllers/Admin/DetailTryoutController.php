@@ -9,6 +9,7 @@ use App\Models\Tryout;
 use App\Models\Nilaito;
 use App\Models\Nilai;
 use App\Models\Kelulusan;
+use App\Models\ViewNilaiFinalTerbaru;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -56,29 +57,18 @@ class DetailTryoutController extends Controller
             $tryouts = "Belum ada data Nilai Tryout";
         }
 
-        $bobot = Nilai::whereNotNull('nilai_ppu')
-        ->whereNotNull('nilai_pu')
-        ->whereNotNull('nilai_pm')
-        ->whereNotNull('nilai_pk')
-        ->whereNotNull('nilai_lbi')
-        ->whereNotNull('nilai_lbe')
-        ->whereNotNull('nilai_pbm')
-        ->first();
+        $bobot_ppu = 30;
+        $bobot_pu = 20;
+        $bobot_pm = 20;
+        $bobot_pk = 15;
+        $bobot_lbi = 30;
+        $bobot_lbe = 20;
+        $bobot_pbm = 20;
+        $bobot_total = 155;
 
-        if ($bobot == null) {
-            $errorMessage = "Bobot nilai belum diatur";
-            return response()->json(['error' => $errorMessage], 422);
-        }
+        $nilaiRata = ViewNilaiFinalTerbaru::where('username', $username)->first();
 
-        $bobot_ppu = $bobot->nilai_ppu / $bobot->ppu_benar;
-        $bobot_pu = $bobot->nilai_pu / $bobot->pu_benar;
-        $bobot_pm = $bobot->nilai_pm / $bobot->pm_benar;
-        $bobot_pk = $bobot->nilai_pk / $bobot->pk_benar;
-        $bobot_lbi = $bobot->nilai_lbi / $bobot->lbi_benar;
-        $bobot_lbe = $bobot->nilai_lbe / $bobot->lbe_benar;
-        $bobot_pbm = $bobot->nilai_pbm / $bobot->pbm_benar;
-
-        return view('app.admin.tryout.tryout', compact('tryouts', 'siswa', 'bobot_ppu', 'bobot_pu', 'bobot_pm', 'bobot_pk', 'bobot_lbi', 'bobot_lbe', 'bobot_pbm'));
+        return view('app.admin.tryout.tryout', compact('tryouts', 'siswa', 'bobot_ppu', 'bobot_pu', 'bobot_pm', 'bobot_pk', 'bobot_lbi', 'bobot_lbe', 'bobot_pbm', 'nilaiRata', 'bobot_total'));
     }
 
     public function detail_tryout($username, $nama_tryout, $rata)
@@ -90,29 +80,16 @@ class DetailTryoutController extends Controller
 
         if($siswa){
 
-        $bobot = Nilai::whereNotNull('nilai_ppu')
-        ->whereNotNull('nilai_pu')
-        ->whereNotNull('nilai_pm')
-        ->whereNotNull('nilai_pk')
-        ->whereNotNull('nilai_lbi')
-        ->whereNotNull('nilai_lbe')
-        ->whereNotNull('nilai_pbm')
-        ->first();
-
-        if ($bobot == null) {
-            $errorMessage = "Bobot nilai belum diatur";
-            return response()->json(['error' => $errorMessage], 422);
-        }
-
-        $bobot_ppu = $bobot->nilai_ppu / $bobot->ppu_benar;
-        $bobot_pu = $bobot->nilai_pu / $bobot->pu_benar;
-        $bobot_pm = $bobot->nilai_pm / $bobot->pm_benar;
-        $bobot_pk = $bobot->nilai_pk / $bobot->pk_benar;
-        $bobot_lbi = $bobot->nilai_lbi / $bobot->lbi_benar;
-        $bobot_lbe = $bobot->nilai_lbe / $bobot->lbe_benar;
-        $bobot_pbm = $bobot->nilai_pbm / $bobot->pbm_benar;
+        $bobot_ppu = 30;
+        $bobot_pu = 20;
+        $bobot_pm = 20;
+        $bobot_pk = 15;
+        $bobot_lbi = 30;
+        $bobot_lbe = 20;
+        $bobot_pbm = 20;
+        $bobot_total = 155;
     
-        return view("app.admin.tryout.tryoutdetail", compact('siswa', 'tryout', 'bobot_ppu', 'bobot_pu', 'bobot_pm', 'bobot_pk', 'bobot_lbi', 'bobot_lbe', 'bobot_pbm', 'rata'));
+        return view("app.admin.tryout.tryoutdetail", compact('siswa', 'tryout', 'bobot_ppu', 'bobot_pu', 'bobot_pm', 'bobot_pk', 'bobot_lbi', 'bobot_lbe', 'bobot_pbm', 'rata', 'bobot_total'));
         }
 
         else{

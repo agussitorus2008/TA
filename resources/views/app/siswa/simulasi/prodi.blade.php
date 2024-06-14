@@ -9,7 +9,7 @@
     <form action="{{route('siswa.simulasi.test_prodi')}}" method="POST">
         @csrf
         <div class="container">
-            <div class="row justify-content-center text-center">
+            {{-- <div class="row justify-content-center text-center">
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 col-xl-2">
                     <h5>PPU</h5>
                     <input type="number" class="form-control" name="ppu" value="{{ old('ppu') }}" required>
@@ -38,6 +38,18 @@
                     <h5>PBM</h5>
                     <input type="number" class="form-control" name="pbm" value="{{ old('pbm') }}" required>
                 </div>
+            </div> --}}
+            @if($nilai == null)
+                <div class="row justify-content-center text-center">
+                    <div class="col-6 col-sm-4 col-md-3 col-lg-4 col-xl-4">
+                        <h4 class="alert alert-danger">Anda Belum Memiliki Data Nilai</h4>
+                    </div>
+                </div>
+            @else
+            <div class="row">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-4 col-xl-4">
+                    <h4>Nilai anda : {{ number_format($nilai, 2) * 10 }} dari {{ $nilaiCount }}x Tryout</h4>
+                </div>
             </div>
             <hr>
         </div>
@@ -45,16 +57,17 @@
             <div class="row justify-content-center text-center">
                 <div class="col-6 col-sm-4 col-md-3 col-lg-4 col-xl-4">
                     <h5>Program Studi</h5>
-                    <input type="text" class="form-control" name="prodi" value="{{ old('prodi') }}" placeholder="Nama Prodi">
+                    <input type="text" class="form-control" name="prodi" value="{{ old('prodi') }}" placeholder="Nama Prodi" required>
                 </div>
                 
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 col-xl-2">
                     <h5></h5>
-                    <button class="btn" type="submit" style="background-color: #0A407F; color:#fff">Generate</button>
+                    <button class="btn" type="submit" style="background-color: #0A407F; color:#fff">Simulasi</button>
                 </div>
-                <hr>
+                <hr class="mt-4">
             </div>
         </div>
+        @endif
     </form>
 
     <p id="rekomendasi-message" class="text-center text-danger"></p>
@@ -67,6 +80,7 @@
                         <th>No</th>
                         <th>Program Studi</th>
                         <th>PTN</th>
+                        <th>Nilai Rata-Rata Yang Masuk</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -120,7 +134,7 @@ $(document).ready(function() {
                         // Display the table
                         $('#rekomendasi-table tbody').empty();
                         $.each(response.rekomendasi.data, function(index, item) {
-                            $('#rekomendasi-table tbody').append('<tr><td>' + (index + 1) + '</td><td>' + item.nama_prodi + '</td><td>' + item.nama_singkat + '</td></tr>');
+                            $('#rekomendasi-table tbody').append('<tr><td>' + (index + 1) + '</td><td>' + item.nama_prodi + '</td><td>' + item.nama_singkat + '</td><td>' + (item.average_total_nilai * 10).toLocaleString('en-US', { minimumFractionDigits: 2 }) + '</td></tr>');
                         });
                         $('#rekomendasi-message').hide();
                         $('#rekomendasi-table').show();

@@ -40,6 +40,8 @@ Route::get('/search_prodi', 'ProdiController@search')->name('search_prodi');
 Route::get('/get-provinces/{asalSekolah}', [ApiController::class, 'getProvinces']);
 Route::post('/add-sekolah/', [ApiController::class, 'addSekolah']);
 
+Route::get('/get-prodi-from-ptn/{idPtn}', [ApiController::class, 'getProdiFromPTN']);
+
 Route::get('/siswa/search', [ApiController::class, 'search']);
 Route::get('/siswa/filter', [ApiController::class, 'filter']);
 

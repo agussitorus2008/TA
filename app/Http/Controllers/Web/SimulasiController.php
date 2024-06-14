@@ -10,7 +10,8 @@ use App\Models\DayaTampung;
 use App\Models\Siswa;
 use App\Models\SiswaOld;
 use App\Models\Kelulusan;
-use App\Models\Nilai;
+use App\Models\Nilaito;
+use App\Models\ViewNilaiFinalTerbaru;
 use Illuminate\Support\Facades\DB;
 
 class SimulasiController extends Controller
@@ -19,21 +20,36 @@ class SimulasiController extends Controller
     {
         $prodi = Prodi::where('active', 2024)->get();
 
-        return view('app.siswa.simulasi.main', compact('prodi'));
+        $nilai = ViewNilaiFinalTerbaru::where('username', auth()->user()->email)->first();
+        $nilaiCount = Nilaito::where('username', auth()->user()->email)->count();
+        if($nilai){
+            $nilai = $nilai->average_to;
+        }
+        return view('app.siswa.simulasi.main', compact('prodi', 'nilai', 'nilaiCount'));
     }
 
     public function index_ptn()
     {
         $ptn = PTN::where('active', 10)->get();
+        $nilai = ViewNilaiFinalTerbaru::where('username', auth()->user()->email)->first();
+        $nilaiCount = Nilaito::where('username', auth()->user()->email)->count();
+        if($nilai){
+            $nilai = $nilai->average_to;
+        }
 
-        return view('app.siswa.simulasi.ptn', compact('ptn'));
+        return view('app.siswa.simulasi.ptn', compact('ptn', 'nilai', 'nilaiCount'));
     }
 
     public function index_prodi()
     {
         $prodi = PTN::where('active', 10)->get();
+        $nilai = ViewNilaiFinalTerbaru::where('username', auth()->user()->email)->first();
+        $nilaiCount = Nilaito::where('username', auth()->user()->email)->count();
+        if($nilai){
+            $nilai = $nilai->average_to;
+        }
 
-        return view('app.siswa.simulasi.prodi', compact('prodi'));
+        return view('app.siswa.simulasi.prodi', compact('prodi', 'nilai', 'nilaiCount'));
     }
 
     public function prediksi(Request $request)
@@ -42,6 +58,7 @@ class SimulasiController extends Controller
         $kategori = "";
 
         $prodi = $request->prodi;
+        // dd($prodi);
 
         $daya_tampung = DayaTampung::where('id_prodi', $prodi)
         ->where('tahun', 2024)
@@ -49,47 +66,38 @@ class SimulasiController extends Controller
 
         $ratarataNilai = Kelulusan::where('id_prodi', $prodi)
             ->where('active', 2023)
-            ->join('mv_rekapitulasi_nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
-            ->pluck('total_nilai')
+            ->join('view_rekapitulasi_nilai_to_sebelum2', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 'kelulusan.username')
+            ->pluck('average_to')
             ->toArray();
         
-        $listNilai = SiswaOld::where('pilihan1_utbk_aktual', $prodi)
-            ->orWhere('pilihan2_utbk_aktual', $prodi)
-            ->join('mv_rekapitulasi_nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 't_siswa.username')
-            ->pluck('total_nilai')
-            ->toArray();
+        // $listNilai = SiswaOld::where('pilihan1_utbk_aktual', $prodi)
+        //     ->orWhere('pilihan2_utbk_aktual', $prodi)
+        //     ->join('view_rekapitulasi_nilai_to_sebelum2', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 't_siswa.username')
+        //     ->pluck('average_to')
+        //     ->toArray();
+        
+        $listNilai = SiswaOld::join('view_rekapitulasi_nilai_to_sebelum2', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 't_siswa.username')
+        ->where('t_siswa.pilihan1_utbk', $prodi)
+        ->orWhere('t_siswa.pilihan2_utbk', $prodi)
+        ->pluck('view_rekapitulasi_nilai_to_sebelum2.average_to')
+        ->toArray();
 
         if ($listNilai == null) {
             $errorMessage = "Belum ada data nilai";
             return response()->json(['error' => $errorMessage], 422);
         }
 
-        $bobot = Kelulusan::where('id_prodi', $prodi)
-        ->where('active', 2023)
-        ->join('mv_rekapitulasi_nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
-        ->whereNotNull('nilai_ppu')
-        ->whereNotNull('nilai_pu')
-        ->whereNotNull('nilai_pm')
-        ->whereNotNull('nilai_pk')
-        ->whereNotNull('nilai_lbi')
-        ->whereNotNull('nilai_lbe')
-        ->whereNotNull('nilai_pbm')
-        ->first();
+        $nilai = ViewNilaiFinalTerbaru::where('username', auth()->user()->email)->first()->average_to;
 
-        if ($bobot == null) {
-            $errorMessage = "Bobot nilai belum diatur";
+        if(empty($nilai)){
+            $errorMessage = "Anda Belum memiliki data nilai";
             return response()->json(['error' => $errorMessage], 422);
         }
 
-        $bobot_ppu = $bobot->nilai_ppu / $bobot->ppu_benar;
-        $bobot_pu = $bobot->nilai_pu / $bobot->pu_benar;
-        $bobot_pm = $bobot->nilai_pm / $bobot->pm_benar;
-        $bobot_pk = $bobot->nilai_pk / $bobot->pk_benar;
-        $bobot_lbi = $bobot->nilai_lbi / $bobot->lbi_benar;
-        $bobot_lbe = $bobot->nilai_lbe / $bobot->lbe_benar;
-        $bobot_pbm = $bobot->nilai_pbm / $bobot->pbm_benar;
-
-        $nilai = (($request->ppu * $bobot_ppu) + ($request->pu * $bobot_pu) + ($request->pm * $bobot_pm) + ($request->pk * $bobot_pk) + ($request->lbi * $bobot_lbi) + ($request->lbe * $bobot_lbe) + ($request->pbm * $bobot_pbm)) / 6;
+        if ($nilai <= 0) {
+            $errorMessage = "Tidak ada rekomendasi yang cocok untuk kamu";
+            return response()->json(['error' => $errorMessage], 422);
+        }
 
         $listNilai[] = $nilai;
 
@@ -98,25 +106,59 @@ class SimulasiController extends Controller
         $peringkat = array_search($nilai, array_values($listNilai), true);
         $peringkat += 1;
 
+        // dd($peringkat);
+
         $hasil = ($peringkat / count($listNilai));
 
-        $rekomendasi = DB::table('mv_rekapitulasi_nilai_to')
-            ->join('kelulusan', 'mv_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
-            ->where('mv_rekapitulasi_nilai_to.total_nilai', '<=', $nilai)
+        $rekomendasi = DB::table('view_rekapitulasi_nilai_to_sebelum2')
+            ->join('kelulusan', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 'kelulusan.username')
+            ->where('view_rekapitulasi_nilai_to_sebelum2.average_to', '<=', $nilai)
             ->select('kelulusan.id_prodi')
-            ->orderByDesc('mv_rekapitulasi_nilai_to.total_nilai')
+            ->orderByDesc('view_rekapitulasi_nilai_to_sebelum2.average_to')
             ->get();
+        
+        $checkRekomendasi = DB::table('t_prodi')
+            ->whereIn('t_prodi.id_prodi', $rekomendasi->pluck('id_prodi'))
+            ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
+            ->join('view_rekapitulasi_nilai_to_sebelum2', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 'kelulusan.username')
+            ->select('t_prodi.id_prodi', DB::raw('avg(view_rekapitulasi_nilai_to_sebelum2.average_to) as average_total_nilai'))
+            ->groupBy('t_prodi.id_prodi')
+            ->get(); 
 
-        if (empty($rekomendasi)) {
+        $rekomendasiFinal = [];
+
+        foreach($checkRekomendasi as $check) {
+            if($nilai >= $check->average_total_nilai) { 
+                $rekomendasiFinal[] = $check->id_prodi;
+            }
+        }
+        
+        if(empty($rekomendasiFinal)) { 
             $errorMessage = "Tidak ada rekomendasi yang cocok untuk kamu";
             return response()->json(['error' => $errorMessage], 422);
         }
-    
-        $prodiRekomendasi = Prodi::whereIn('id_prodi', $rekomendasi->pluck('id_prodi'))
-            ->join('t_ptn', 't_prodi.id_ptn', '=', 't_ptn.id_ptn')
-            ->select('t_prodi.*', 't_ptn.nama_ptn', 't_ptn.nama_singkat')
-            ->paginate(300);
 
+        $prodiIds = $rekomendasiFinal; 
+
+        $prodiRekomendasi = Prodi::whereIn('t_prodi.id_prodi', $prodiIds)
+            ->join('t_ptn', 't_prodi.id_ptn', '=', 't_ptn.id_ptn')
+            ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
+            ->join('view_rekapitulasi_nilai_to_sebelum2', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 'kelulusan.username')
+            ->select(
+                't_prodi.id_prodi',
+                't_prodi.nama_prodi',
+                't_ptn.nama_ptn',
+                't_ptn.nama_singkat',
+                DB::raw('AVG(view_rekapitulasi_nilai_to_sebelum2.average_to) as average_total_nilai')
+            )
+            ->groupBy(
+                't_prodi.id_prodi',
+                't_prodi.nama_prodi',
+                't_ptn.nama_ptn',
+                't_ptn.nama_singkat'
+            )
+            ->orderByDesc('average_total_nilai')
+            ->paginate(300);
 
         if ($hasil >= 1) {
             $kategori = "Macet Total";
@@ -149,56 +191,78 @@ class SimulasiController extends Controller
             // Ambil id PTN dari request
             $ptnId = $request->ptn;
 
-            // Cari nama singkat PTN berdasarkan id
-            // $namaPTN = PTN::where('id_ptn', $ptnId)->select('nama_singkat');
-
-            // Cari prodi-prodi yang terkait dengan PTN
             $prodi = Prodi::where('id_ptn', $ptnId)
                 ->pluck('id_prodi');
 
-            // Ambil bobot berdasarkan prodi yang ditemukan
-            $bobot = Kelulusan::whereIn('id_prodi', $prodi)
-                ->where('active', 2023)
-                ->join('mv_rekapitulasi_nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
-                ->whereNotNull('nilai_ppu')
-                ->whereNotNull('nilai_pu')
-                ->whereNotNull('nilai_pm')
-                ->whereNotNull('nilai_pk')
-                ->whereNotNull('nilai_lbi')
-                ->whereNotNull('nilai_lbe')
-                ->whereNotNull('nilai_pbm')
-                ->firstOrFail();
+            $nilai = ViewNilaiFinalTerbaru::where('username', auth()->user()->email)->first()->average_to;
 
+            if(empty($nilai)){
+                $errorMessage = "Anda Belum memiliki data nilai";
+                return response()->json(['error' => $errorMessage], 422);
+            }
 
-            // Hitung nilai
-            $nilai = (($request->ppu * $bobot->nilai_ppu / $bobot->ppu_benar) + 
-                    ($request->pu * $bobot->nilai_pu / $bobot->pu_benar) + 
-                    ($request->pm * $bobot->nilai_pm / $bobot->pm_benar) + 
-                    ($request->pk * $bobot->nilai_pk / $bobot->pk_benar) + 
-                    ($request->lbi * $bobot->nilai_lbi / $bobot->lbi_benar) + 
-                    ($request->lbe * $bobot->nilai_lbe / $bobot->lbe_benar) + 
-                    ($request->pbm * $bobot->nilai_pbm / $bobot->pbm_benar)) / 6;
-
-            // Cari kelulusan berdasarkan prodi dan nilai
-            $kelulusan = DB::table('mv_rekapitulasi_nilai_to')
-                ->join('kelulusan', 'mv_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
-                ->whereIn('kelulusan.id_prodi', $prodi)
-                ->where('mv_rekapitulasi_nilai_to.total_nilai', '<=', $nilai)
-                ->select('kelulusan.id_prodi')
-                ->orderByDesc('mv_rekapitulasi_nilai_to.total_nilai')
-                ->get();
-
-            // Jika tidak ada kelulusan, kembalikan pesan kesalahan
-            if ($kelulusan->isEmpty()) {
+            if ($nilai <= 0) {
                 $errorMessage = "Tidak ada rekomendasi yang cocok untuk kamu";
                 return response()->json(['error' => $errorMessage], 422);
             }
 
+            // Cari kelulusan berdasarkan prodi dan nilai
+            $kelulusan = DB::table('view_rekapitulasi_nilai_to_sebelum2')
+                ->join('kelulusan', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 'kelulusan.username')
+                ->whereIn('kelulusan.id_prodi', $prodi)
+                ->where('view_rekapitulasi_nilai_to_sebelum2.average_to', '<=', $nilai)
+                ->select('kelulusan.id_prodi')
+                ->orderByDesc('view_rekapitulasi_nilai_to_sebelum2.average_to')
+                ->get();
+            
+                if($kelulusan->isEmpty()) {
+                    $errorMessage = "Tidak ada rekomendasi yang cocok untuk kamu";
+                    return response()->json(['error' => $errorMessage], 422);
+                }
+
+            $checkRekomendasi = DB::table('t_prodi')
+            ->whereIn('t_prodi.id_prodi', $kelulusan->pluck('id_prodi'))
+            ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
+            ->join('view_rekapitulasi_nilai_to_sebelum2', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 'kelulusan.username')
+            ->select('t_prodi.id_prodi', DB::raw('avg(view_rekapitulasi_nilai_to_sebelum2.average_to) as average_total_nilai'))
+            ->groupBy('t_prodi.id_prodi')
+            ->get(); 
+    
+            $rekomendasiFinal = [];
+    
+            foreach($checkRekomendasi as $check) {
+                if($nilai >= $check->average_total_nilai) { 
+                    $rekomendasiFinal[] = $check->id_prodi;
+                }
+            }
+            
+            if(empty($rekomendasiFinal)) { 
+                $errorMessage = "Tidak ada rekomendasi yang cocok untuk kamu";
+                return response()->json(['error' => $errorMessage], 422);
+            }
+    
+            $prodiIds = $rekomendasiFinal; 
+
             // Ambil rekomendasi prodi berdasarkan kelulusan
-            $prodiRekomendasi = Prodi::whereIn('id_prodi', $kelulusan->pluck('id_prodi'))
-                ->join('t_ptn', 't_prodi.id_ptn', '=', 't_ptn.id_ptn')
-                ->select('nama_prodi', 't_ptn.nama_singkat')
-                ->paginate(300);
+            $prodiRekomendasi = Prodi::whereIn('t_prodi.id_prodi', $prodiIds)
+            ->join('t_ptn', 't_prodi.id_ptn', '=', 't_ptn.id_ptn')
+            ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
+            ->join('view_rekapitulasi_nilai_to_sebelum2', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 'kelulusan.username')
+            ->select(
+                't_prodi.id_prodi',
+                't_prodi.nama_prodi',
+                't_ptn.nama_ptn',
+                't_ptn.nama_singkat',
+                DB::raw('AVG(view_rekapitulasi_nilai_to_sebelum2.average_to) as average_total_nilai')
+            )
+            ->groupBy(
+                't_prodi.id_prodi',
+                't_prodi.nama_prodi',
+                't_ptn.nama_ptn',
+                't_ptn.nama_singkat'
+            )
+            ->orderByDesc('average_total_nilai')
+            ->paginate(300);
 
 
             return response()->json([
@@ -225,35 +289,25 @@ class SimulasiController extends Controller
                 return response()->json(['error' => $errorMessage], 422);
             }
 
-            // Ambil bobot berdasarkan ID Prodi yang ditemukan
-            $bobot = Kelulusan::whereIn('id_prodi', $prodiIds)
-                ->where('active', 2023)
-                ->join('mv_rekapitulasi_nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
-                ->whereNotNull('nilai_ppu')
-                ->whereNotNull('nilai_pu')
-                ->whereNotNull('nilai_pm')
-                ->whereNotNull('nilai_pk')
-                ->whereNotNull('nilai_lbi')
-                ->whereNotNull('nilai_lbe')
-                ->whereNotNull('nilai_pbm')
-                ->firstOrFail();
+            $nilai = ViewNilaiFinalTerbaru::where('username', auth()->user()->email)->first()->average_to;
 
-            // Hitung nilai
-            $nilai = (($request->ppu * $bobot->nilai_ppu / $bobot->ppu_benar) +
-                    ($request->pu * $bobot->nilai_pu / $bobot->pu_benar) +  
-                    ($request->pm * $bobot->nilai_pm / $bobot->pm_benar) + 
-                    ($request->pk * $bobot->nilai_pk / $bobot->pk_benar) + 
-                    ($request->lbi * $bobot->nilai_lbi / $bobot->lbi_benar) + 
-                    ($request->lbe * $bobot->nilai_lbe / $bobot->lbe_benar) + 
-                    ($request->pbm * $bobot->nilai_pbm / $bobot->pbm_benar)) / 7;
+            if(empty($nilai)){
+                $errorMessage = "Anda Belum memiliki data nilai";
+                return response()->json(['error' => $errorMessage], 422);
+            }
+
+            if ($nilai <= 0) {
+                $errorMessage = "Tidak ada rekomendasi yang cocok untuk kamu";
+                return response()->json(['error' => $errorMessage], 422);
+            }
 
             // Cari kelulusan berdasarkan prodi dan nilai
-            $kelulusan = DB::table('mv_rekapitulasi_nilai_to')
-                ->join('kelulusan', 'mv_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
+            $kelulusan = DB::table('view_rekapitulasi_nilai_to_sebelum2')
+                ->join('kelulusan', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 'kelulusan.username')
                 ->whereIn('kelulusan.id_prodi', $prodiIds)
-                ->where('mv_rekapitulasi_nilai_to.total_nilai', '<=', $nilai)
+                ->where('view_rekapitulasi_nilai_to_sebelum2.average_to', '<=', $nilai)
                 ->select('kelulusan.id_prodi')
-                ->orderByDesc('mv_rekapitulasi_nilai_to.total_nilai')
+                ->orderByDesc('view_rekapitulasi_nilai_to_sebelum2.average_to')
                 ->get();
 
             // Jika tidak ada kelulusan, kembalikan pesan kesalahan
@@ -262,11 +316,48 @@ class SimulasiController extends Controller
                 return response()->json(['error' => $errorMessage], 422);
             }
 
-            // Ambil rekomendasi prodi berdasarkan kelulusan
-            $prodiRekomendasi = Prodi::whereIn('id_prodi', $kelulusan->pluck('id_prodi'))
-                ->join('t_ptn', 't_prodi.id_ptn', '=', 't_ptn.id_ptn')
-                ->select('t_prodi.nama_prodi', 't_ptn.nama_singkat')
-                ->paginate(300);
+            $checkRekomendasi = DB::table('t_prodi')
+            ->whereIn('t_prodi.id_prodi', $kelulusan->pluck('id_prodi'))
+            ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
+            ->join('view_rekapitulasi_nilai_to_sebelum2', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 'kelulusan.username')
+            ->select('t_prodi.id_prodi', DB::raw('avg(view_rekapitulasi_nilai_to_sebelum2.average_to) as average_total_nilai'))
+            ->groupBy('t_prodi.id_prodi')
+            ->get(); 
+    
+            $rekomendasiFinal = [];
+    
+            foreach($checkRekomendasi as $check) {
+                if($nilai >= $check->average_total_nilai) { 
+                    $rekomendasiFinal[] = $check->id_prodi;
+                }
+            }
+            
+            if(empty($rekomendasiFinal)) { 
+                $errorMessage = "Tidak ada rekomendasi yang cocok untuk kamu";
+                return response()->json(['error' => $errorMessage], 422);
+            }
+    
+            $ptnRekomendasi = $rekomendasiFinal; 
+
+            $prodiRekomendasi = Prodi::whereIn('t_prodi.id_prodi', $ptnRekomendasi)
+            ->join('t_ptn', 't_prodi.id_ptn', '=', 't_ptn.id_ptn')
+            ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
+            ->join('view_rekapitulasi_nilai_to_sebelum2', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 'kelulusan.username')
+            ->select(
+                't_prodi.id_prodi',
+                't_prodi.nama_prodi',
+                't_ptn.nama_ptn',
+                't_ptn.nama_singkat',
+                DB::raw('AVG(view_rekapitulasi_nilai_to_sebelum2.average_to) as average_total_nilai')
+            )
+            ->groupBy(
+                't_prodi.id_prodi',
+                't_prodi.nama_prodi',
+                't_ptn.nama_ptn',
+                't_ptn.nama_singkat'
+            )
+            ->orderByDesc('average_total_nilai')
+            ->paginate(300);
 
             return response()->json([
                 'rekomendasi' => $prodiRekomendasi,

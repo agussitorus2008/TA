@@ -12,7 +12,7 @@
 
                 <div class="row justify-content-center text-center mb-3">
                     @if (isset($error))
-                        <p>{{ $error }}</p>
+                        <p class="alert alert-danger">{{ $error }}</p>
                     @endif
                 </div>
 
