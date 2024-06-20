@@ -32,11 +32,10 @@ class DashboardController extends Controller
 
         $currentYear = Carbon::now()->year;
 
-        // Query data tryout dari tahun berjalan dan tahun sebelumnya
         $data = Nilai::join('nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 'nilai_to.username')
             ->selectRaw('YEAR(nilai_to.tanggal) as year, AVG(mv_rekapitulasi_nilai_to.total_nilai) as average')
-            ->whereYear('nilai_to.tanggal', '>=', $currentYear) // Memfilter tahun yang sama atau setelah tahun berjalan
-            ->whereYear('nilai_to.tanggal', '<=', $currentYear + 1) // Memfilter hingga tahun berikutnya
+            ->whereYear('nilai_to.tanggal', '>=', $currentYear) 
+            ->whereYear('nilai_to.tanggal', '<=', $currentYear + 1) 
             ->groupBy('year')
             ->get();
 
@@ -47,8 +46,6 @@ class DashboardController extends Controller
             $years[] = $item->year;
             $averages[] = $item->average;
         }
-
-
 
         return view('app.admin.dashboard.main', compact('total_pendaftar', 'rata', 'max', 'sekolah', 'years', 'averages'));
     }

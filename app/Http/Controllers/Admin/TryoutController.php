@@ -31,10 +31,8 @@ class TryoutController extends Controller
             'nama_tryout.unique' => 'Sudah ada nilai tryout',
         ]);
 
-        // Ambil data siswa berdasarkan username
         $siswa = Siswa::where('username', $username)->first();  
 
-        // Pastikan siswa ditemukan sebelum melanjutkan
         if (!$siswa) {
             return redirect()->back()->with('error', 'Siswa tidak ditemukan');
         }

@@ -14,5 +14,4 @@ class ProfileController extends Controller
         $siswa = Siswa::where('username', $user->email)->first();
         return view('app.siswa.data_siswa.main', compact('user', 'siswa'));
     }
-
 }

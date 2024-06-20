@@ -4,8 +4,33 @@
 <h6 style="color:#0A407F;font-size:25px" class="d-none d-sm-inline-block h-16px ms-3">SIMULASI PROGRAM STUDI DAN PTN</h6>
 @endsection
 @section('content')
-<div class="content">
+<style>
+    #loading-spinner {
+        position: fixed;
+        z-index: 9999;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(255, 255, 255, 0.8); /* White background with opacity */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
+    .spinner-border-lg {
+            width: 4rem;
+            height: 4rem;
+            border-width: 0.5rem;
+        }
+</style>
+<!-- Spinner element -->
+
+<div class="content">
+    <div id="loading-spinner" class="d-none">
+        <div class="spinner-border spinner-border-lg text-primary" role="status">
+        </div>
+    </div>
     <form action="{{route('siswa.simulasi.test')}}" method="POST">
         @csrf
         <div class="container">
@@ -157,6 +182,9 @@
     
             var formData = $(this).serialize();
             console.log("Form data being sent:", formData);
+            
+            // Show the loading spinner
+            $('#loading-spinner').removeClass('d-none');
     
             $.ajax({
                 type: 'POST',
@@ -208,6 +236,9 @@
                             $('#pagination-links').empty();
                         }
                     }
+    
+                    // Hide the loading spinner
+                    $('#loading-spinner').addClass('d-none');
                 },
                 error: function(xhr, status, error) {
                     console.error("Error details:", {
@@ -215,6 +246,9 @@
                         status: status,
                         error: error
                     });
+    
+                    // Hide the loading spinner
+                    $('#loading-spinner').addClass('d-none');
                     
                     if (xhr.responseJSON && xhr.responseJSON.error) {
                         var errorMessage = xhr.responseJSON.error;
@@ -226,7 +260,7 @@
             });
         });
     });
-    </script>
+</script>
     
 
 @endsection   

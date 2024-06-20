@@ -21,7 +21,7 @@ class DetailTryoutController extends Controller
     {
         $siswaList = Siswa::paginate(10);
 
-        $statusList = []; // Inisialisasi array untuk menyimpan status
+        $statusList = [];
 
         foreach ($siswaList as $siswa) {
             $nilaitoCount = Nilaito::where('username', $siswa->username)->count();
@@ -34,10 +34,10 @@ class DetailTryoutController extends Controller
         }
 
         $tahun = Siswa::select('active')
-            ->whereNotNull('active') // Exclude null values
-            ->whereNotIn('active', [0, 23]) // Exclude 0 and 23
+            ->whereNotNull('active')
+            ->whereNotIn('active', [0, 23])
             ->distinct()
-            ->pluck('active'); // Get distinct values
+            ->pluck('active');
         return view('app.admin.tryout.main', compact('siswaList', 'tahun', 'statusList'));
     }
 

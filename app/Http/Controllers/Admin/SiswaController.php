@@ -19,7 +19,7 @@ class SiswaController extends Controller
     {
         $siswaList = Siswa::paginate(20);
 
-        $statusList = []; // Inisialisasi array untuk menyimpan status
+        $statusList = [];
 
         foreach ($siswaList as $siswa) {
             $nilaitoCount = Nilaito::where('username', $siswa->username)->count();
@@ -32,10 +32,10 @@ class SiswaController extends Controller
         }
 
         $tahun = Siswa::select('active')
-            ->whereNotNull('active') // Exclude null values
-            ->whereNotIn('active', [0, 23]) // Exclude 0 and 23
+            ->whereNotNull('active')
+            ->whereNotIn('active', [0, 23])
             ->distinct()
-            ->pluck('active'); // Get distinct values
+            ->pluck('active');
             
         return view('app.admin.siswa.main', compact('siswaList', 'tahun', 'statusList'));
     }
@@ -92,8 +92,8 @@ class SiswaController extends Controller
 
     public function tryout()
     {
-        $siswa = Siswa::first(); // Mengambil data siswa, Anda mungkin perlu menyesuaikan query ini sesuai dengan kebutuhan Anda
-        $tryouts = Tryout::all(); // Mengambil data tryout, Anda mungkin perlu menyesuaikan query ini sesuai dengan kebutuhan Anda
+        $siswa = Siswa::first();
+        $tryouts = Tryout::all();
 
         return view('app.admin.siswa.tryout', compact('siswa', 'tryouts'));
     }

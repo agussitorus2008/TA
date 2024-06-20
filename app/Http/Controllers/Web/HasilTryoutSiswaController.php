@@ -70,8 +70,8 @@ class HasilTryoutSiswaController extends Controller
             ->orWhere('t_siswa.pilihan2_utbk', $siswa->pilihan1_utbk_aktual)
             ->orWhere('t_siswa.pilihan1_utbk', $siswa->pilihan2_utbk_aktual)
             ->orWhere('t_siswa.pilihan2_utbk', $siswa->pilihan2_utbk_aktual)
-            ->join('view_rekapitulasi_nilai_to_sebelum2', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 't_siswa.username')
-            ->pluck('view_rekapitulasi_nilai_to_sebelum2.username')
+            ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 't_siswa.username')
+            ->pluck('view_rekapitulasi_nilai_to_sebelum.username')
             ->toArray();
 
 
@@ -108,10 +108,10 @@ class HasilTryoutSiswaController extends Controller
         ->where('tahun', 2024)
         ->first();
 
-        $listNilai1 = SiswaOld::join('view_rekapitulasi_nilai_to_sebelum2', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 't_siswa.username')
+        $listNilai1 = SiswaOld::join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 't_siswa.username')
             ->where('t_siswa.pilihan1_utbk', $siswa->pilihan1_utbk_aktual)
             ->orWhere('t_siswa.pilihan2_utbk', $siswa->pilihan1_utbk_aktual)
-            ->pluck('view_rekapitulasi_nilai_to_sebelum2.average_to')
+            ->pluck('view_rekapitulasi_nilai_to_sebelum.average_to')
             ->toArray();
 
         // $listNilai1 = ViewNilaiFinal::where('pilihan1_utbk', $siswa->pilihan1_utbk_aktual)
@@ -119,10 +119,10 @@ class HasilTryoutSiswaController extends Controller
         //     ->pluck('average_to')
         //     ->toArray();
 
-        $listNilai2 = SiswaOld::join('view_rekapitulasi_nilai_to_sebelum2', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 't_siswa.username')
+        $listNilai2 = SiswaOld::join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 't_siswa.username')
             ->where('t_siswa.pilihan1_utbk', $siswa->pilihan2_utbk_aktual)
             ->orWhere('t_siswa.pilihan2_utbk', $siswa->pilihan2_utbk_aktual)
-            ->pluck('view_rekapitulasi_nilai_to_sebelum2.average_to')
+            ->pluck('view_rekapitulasi_nilai_to_sebelum.average_to')
             ->toArray();
         // $listNilai2 = ViewNilaiFinal::where('pilihan1_utbk', $siswa->pilihan2_utbk_aktual)
         //     ->orWhere('pilihan2_utbk', $siswa->pilihan2_utbk_aktual)
@@ -157,16 +157,16 @@ class HasilTryoutSiswaController extends Controller
 
         // untuk pilihan 1
         $listNilaipilihan1 = SiswaOld::where('t_siswa.pilihan1_utbk', $siswa->pilihan1_utbk_aktual)
-            ->join('view_rekapitulasi_nilai_to_sebelum2', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 't_siswa.username')
-            ->pluck('view_rekapitulasi_nilai_to_sebelum2.average_to')
+            ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 't_siswa.username')
+            ->pluck('view_rekapitulasi_nilai_to_sebelum.average_to')
             ->toArray();
         // $listNilaipilihan1 = ViewNilaiFinal::where('pilihan1_utbk', $siswa->pilihan1_utbk_aktual)
         //     ->pluck('average_to')
         //     ->toArray();
     
         $listNilaipilihan2 = SiswaOld::where('t_siswa.pilihan1_utbk', $siswa->pilihan2_utbk_aktual)
-            ->join('view_rekapitulasi_nilai_to_sebelum2', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 't_siswa.username')
-            ->pluck('view_rekapitulasi_nilai_to_sebelum2.average_to')
+            ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 't_siswa.username')
+            ->pluck('view_rekapitulasi_nilai_to_sebelum.average_to')
             ->toArray();
         // $listNilaipilihan2 = ViewNilaiFinal::where('pilihan1_utbk', $siswa->pilihan2_utbk_aktual)
         // ->pluck('average_to')
@@ -327,30 +327,25 @@ class HasilTryoutSiswaController extends Controller
      */
     public function pilihan1($nama_prodi)
     {
-        // Find the program by its name
         $prodi = Prodi::where('nama_prodi_ptn', $nama_prodi)->first();
         if (!$prodi) {
-            // Handle the case where the program is not found
             abort(404, 'Program not found');
         }
 
-        // Get the user's total score
         $user = auth()->user();
         $userTotalNilai = ViewNilaiFinalTerbaru::where('username', $user->email)->first()->average_to;
+        
         $nama = Siswa::where('username',$user->email)->first();
 
-        // Get the scores of all other applicants for the same program
         $listNilaipilihan1 = SiswaOld::where('t_siswa.pilihan1_utbk', $prodi->id_prodi)
-            ->join('view_rekapitulasi_nilai_to_sebelum2', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 't_siswa.username')
-            ->select('t_siswa.username', 'view_rekapitulasi_nilai_to_sebelum2.average_to', 't_siswa.first_name')
+            ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 't_siswa.username')
+            ->select('t_siswa.username', 'view_rekapitulasi_nilai_to_sebelum.average_to', 't_siswa.first_name')
             ->get()
             ->map(function ($item) {
                 return $item->getAttributes();
             })
             ->toArray();
 
-
-        // Append the user's score to the list
         $listNilaipilihan1[] = [
             'username' => $user->email,
             'average_to' => $userTotalNilai,
@@ -358,15 +353,12 @@ class HasilTryoutSiswaController extends Controller
             // 'asal_sekolah' => $nama->asal_sekolah
         ];
 
-        // Sort the list in descending order (higher scores first)
         usort($listNilaipilihan1, function($a, $b) {
             return $b['average_to'] <=> $a['average_to'];
         });
 
-        // Determine the user's rank
         $userRank = array_search($user->email, array_column($listNilaipilihan1, 'username')) + 1;
 
-        // Pass the necessary data to the view
         return view('app.siswa.hasilTryout.pilihan1', [
             'userRank' => $userRank,
             'nama_prodi' => $nama_prodi,
@@ -377,30 +369,25 @@ class HasilTryoutSiswaController extends Controller
 
     public function pilihanTotal($nama_prodi)
     {
-        // Find the program by its name
         $prodi = Prodi::where('nama_prodi_ptn', $nama_prodi)->first();
         if (!$prodi) {
-            // Handle the case where the program is not found
             abort(404, 'Program not found');
         }
 
-        // Get the user's total score
         $user = auth()->user();
         $userTotalNilai = ViewNilaiFinalTerbaru::where('username', $user->email)->first()->average_to;
         $nama = Siswa::where('username',$user->email)->first();
 
-        // Get the scores of all other applicants for the same program
         $listNilaipilihan1 = SiswaOld::where('t_siswa.pilihan1_utbk', $prodi->id_prodi)
             ->orWhere('t_siswa.pilihan2_utbk', $prodi->id_prodi)
-            ->join('view_rekapitulasi_nilai_to_sebelum2', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 't_siswa.username')
-            ->select('t_siswa.username', 'view_rekapitulasi_nilai_to_sebelum2.average_to', 't_siswa.first_name')
+            ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 't_siswa.username')
+            ->select('t_siswa.username', 'view_rekapitulasi_nilai_to_sebelum.average_to', 't_siswa.first_name')
             ->get()
             ->map(function ($item) {
                 return $item->getAttributes();
             })
             ->toArray();
 
-        // Append the user's score to the list
         $listNilaipilihan1[] = [
             'username' => $user->email,
             'average_to' => $userTotalNilai,
@@ -408,15 +395,12 @@ class HasilTryoutSiswaController extends Controller
             // 'asal_sekolah' => $nama->asal_sekolah
         ];
 
-        // Sort the list in descending order (higher scores first)
         usort($listNilaipilihan1, function($a, $b) {
             return $b['average_to'] <=> $a['average_to'];
         });
 
-        // Determine the user's rank
         $userRank = array_search($user->email, array_column($listNilaipilihan1, 'username')) + 1;
 
-        // Pass the necessary data to the view
         return view('app.siswa.hasilTryout.pilihanTotal', [
             'userRank' => $userRank,
             'nama_prodi' => $nama_prodi,
@@ -488,30 +472,29 @@ class HasilTryoutSiswaController extends Controller
         }
 
         $nilai = $siswacheck->average_to;
-        // $nilai = 49.3750; 
+        // $nilai = 100.3750; 
 
         $rekomendasi = DB::table('t_prodi')
             ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
-            ->join('view_rekapitulasi_nilai_to_sebelum2', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 'kelulusan.username')
+            ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 'kelulusan.username')
             ->join('t_daya_tampung_prodi', 't_daya_tampung_prodi.id_prodi', '=', 't_prodi.id_prodi')
-            ->select('t_prodi.id_prodi', 't_daya_tampung_prodi.daya_tampung', 'view_rekapitulasi_nilai_to_sebelum2.average_to')
-            ->groupBy('t_prodi.id_prodi', 't_daya_tampung_prodi.daya_tampung', 'view_rekapitulasi_nilai_to_sebelum2.average_to')
-            ->having('view_rekapitulasi_nilai_to_sebelum2.average_to', '<=', $nilai)
-            ->orderBy('view_rekapitulasi_nilai_to_sebelum2.average_to', 'desc')
+            ->select('t_prodi.id_prodi', 't_daya_tampung_prodi.daya_tampung', 'view_rekapitulasi_nilai_to_sebelum.average_to')
+            ->groupBy('t_prodi.id_prodi', 't_daya_tampung_prodi.daya_tampung', 'view_rekapitulasi_nilai_to_sebelum.average_to')
+            ->having('view_rekapitulasi_nilai_to_sebelum.average_to', '<=', $nilai)
+            ->orderBy('view_rekapitulasi_nilai_to_sebelum.average_to', 'desc')
             ->get();
         
 
         $listNilai2 = SiswaOld::whereIn('pilihan1_utbk_aktual', $rekomendasi->pluck('id_prodi'))
             ->orWhereIn('pilihan2_utbk_aktual', $rekomendasi->pluck('id_prodi'))
-            ->join('view_rekapitulasi_nilai_to_sebelum2', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 't_siswa.username')
-            ->select('t_siswa.pilihan1_utbk_aktual', 't_siswa.pilihan2_utbk_aktual', 'view_rekapitulasi_nilai_to_sebelum2.average_to')
+            ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 't_siswa.username')
+            ->select('t_siswa.pilihan1_utbk_aktual', 't_siswa.pilihan2_utbk_aktual', 'view_rekapitulasi_nilai_to_sebelum.average_to')
             ->get();
 
         $debugInfo = [];
         $rekomendasiFinal = [];
         $userScores = [];
 
-        // Group the scores by `id_prodi`
         foreach ($listNilai2 as $item) {
             $id_prodi1 = $item->pilihan1_utbk_aktual;
             $id_prodi2 = $item->pilihan2_utbk_aktual;
@@ -528,13 +511,11 @@ class HasilTryoutSiswaController extends Controller
             $userScores[$id_prodi2][] = $total_nilai;
         }
 
-        // Track processed id_prodi to avoid duplicates
         $processedProdi = [];
 
         foreach ($rekomendasi as $check) {
             $id_prodi = $check->id_prodi;
 
-            // Skip if already processed
             if (in_array($id_prodi, $processedProdi)) {
                 continue;
             }
@@ -545,27 +526,21 @@ class HasilTryoutSiswaController extends Controller
                 $userScores[$id_prodi] = [];
             }
 
-            // Append the user's score to the list
             $scores = $userScores[$id_prodi];
             $scores[] = $nilai;
 
-            // Sort the scores in descending order
             rsort($scores);
 
-            // Determine the user's rank
             $peringkat = array_search($nilai, $scores) + 1;
 
-            // Calculate the average score for this `id_prodi`
 
-            // Collect debugging information
-            $debugInfo[] = ['id_prodi' => $id_prodi, 'peringkat' => $peringkat];
+            // $debugInfo[] = ['id_prodi' => $id_prodi, 'peringkat' => $peringkat];
+            // dd($debugInfo);
 
-            // Check if the user's rank fits within the program's capacity
             if ($peringkat <= $check->daya_tampung && count($rekomendasiFinal) < 2) {
                 $rekomendasiFinal[] = ['id_prodi' => $id_prodi, 'peringkat' => $peringkat];
             }
 
-            // Stop processing if we already have 2 recommendations
             if (count($rekomendasiFinal) >= 2) {
                 break;
             }

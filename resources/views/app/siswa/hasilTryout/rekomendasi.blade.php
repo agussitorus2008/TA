@@ -18,6 +18,7 @@
         @else
         <div class="container">
             <div class="row justify-content-center text-center">
+                <h4 class="text-center text-success mb-4">Berikut Rekomendasi Program Studi dan Perguruan Tinggi Negeri yang Cocok Untuk Anda</h4>
                 <div class="col-xl-6">
                     <h4>Pilihan 1</h4>
                     <div class="card" style="background-color: #3DA059;">

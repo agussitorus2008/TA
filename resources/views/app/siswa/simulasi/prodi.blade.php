@@ -4,7 +4,32 @@
 <h6 style="color:#0A407F;font-size:25px" class="d-none d-sm-inline-block h-16px ms-3">SIMULASI PROGRAM STUDI</h6>
 @endsection
 @section('content')
+<style>
+    #loading-spinner {
+        position: fixed;
+        z-index: 9999;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(255, 255, 255, 0.8); /* White background with opacity */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .spinner-border-lg {
+            width: 4rem;
+            height: 4rem;
+            border-width: 0.5rem;
+        }
+</style>
+
 <div class="content">
+    <div id="loading-spinner" class="d-none">
+        <div class="spinner-border spinner-border-lg text-primary" role="status">
+        </div>
+    </div>
 
     <form action="{{route('siswa.simulasi.test_prodi')}}" method="POST">
         @csrf
@@ -105,6 +130,7 @@ $(document).ready(function() {
     $('form').submit(function(event) {
         event.preventDefault();
 
+        $('#loading-spinner').removeClass('d-none');
         $.ajax({
             type: 'POST',
             url: $(this).attr('action'),
@@ -148,16 +174,76 @@ $(document).ready(function() {
                         $('#pagination-links').empty();
                     }
                 }
+                $('#loading-spinner').addClass('d-none');
             },
             error: function(error) {
                 var errorMessage = error.responseJSON.error;
                 $('#rekomendasi-message').text(errorMessage).show();
+                $('#loading-spinner').addClass('d-none');
             }
         });
     });
 });
-
-
 </script>
+
+{{-- <script>
+    $(document).ready(function() {
+        $('form').submit(function(event) {
+            event.preventDefault();
+    
+            var formData = $(this).serialize();
+            console.log("Form data being sent:", formData);
+    
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: formData, 
+                dataType: 'json',
+    
+                success: function(response) {
+                    console.log("Server response:", response);
+    
+                    if (response.rekomendasi) {
+                        // Display the rekomendasi table or error message
+                        if (response.rekomendasi.data.length > 0) {
+                            // Display the table
+                            $('#rekomendasi-table tbody').empty();
+                            $.each(response.rekomendasi.data, function(index, item) {
+                                $('#rekomendasi-table tbody').append('<tr><td>' + (index + 1) + '</td><td>' + item.nama_prodi + '</td><td>' + item.nama_ptn + ' - ' + item.nama_singkat + '</td><td>' + (item.average_total_nilai * 10).toLocaleString('en-US', { minimumFractionDigits: 2 }) + '</td></tr>');
+                            });
+                            $('#rekomendasi-message').hide();
+                            $('#rekomendasi-table').show();
+    
+                            // Handle pagination links
+                            $('#pagination-links').html(response.rekomendasi.links);
+                        } else {
+                            // Display the error message
+                            $('#rekomendasi-message')
+                                .text('Maaf sepertinya tidak ada prodi yang cocok untuk kamu')
+                                .addClass('alert alert-danger')
+                                .show();
+                            $('#rekomendasi-table').hide();
+                            $('#pagination-links').empty();
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error details:", {
+                        xhr: xhr,
+                        status: status,
+                        error: error
+                    });
+                    
+                    if (xhr.responseJSON && xhr.responseJSON.error) {
+                        var errorMessage = xhr.responseJSON.error;
+                        $('#rekomendasi-message').text(errorMessage).addClass('alert alert-danger').show();
+                    } else {
+                        $('#rekomendasi-message').text("Terjadi kesalahan pada server").addClass('alert alert-danger').show();
+                    }
+                }
+            });
+        });
+    });
+    </script> --}}
 
 @endsection   

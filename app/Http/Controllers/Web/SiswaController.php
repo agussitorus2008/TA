@@ -61,19 +61,7 @@ class SiswaController extends Controller
         $user = Auth::user();
         $prodi = Prodi::where('active', 2024)->get();
         $sekolah = Sekolah::all();
-        // $selectedProdi = DB::table('siswa')
-        // ->leftJoin('t_ptn as p1', DB::raw('p1.id_ptn'), '=', 'siswa.pilihan1_utbk_aktual')
-        // ->leftJoin('t_ptn as p2', DB::raw('p2.id_ptn'), '=', 'siswa.pilihan2_utbk_aktual')
-        // ->select(
-        //     'siswa.*',
-        //     DB::raw('p1.nama_ptn as pilihan1_nama_ptn'),
-        //     DB::raw('p1.id_ptn as pilihan1_id_ptn'),
-        //     DB::raw('p2.nama_ptn as pilihan2_nama_ptn'),
-        //     DB::raw('p2.id_ptn as pilihan2_id_ptn')
-        // )
-        // ->where('siswa.username', $email)
-        // ->first();
-
+        
         $selectedProdi = Siswa::where('username', $email)->first();
 
         $selectedProdi1 = $selectedProdi->pilihan1_utbk_aktual;
@@ -139,15 +127,12 @@ class SiswaController extends Controller
             'prodi_piihan2.different' => 'Pilihan 1 dan Pilihan 2 tidak boleh sama',
         ]);
 
-        // Retrieve the existing record based on the username (email)
         $siswa = Siswa::where('username', $email)->first();
 
-        // Check if the record exists
         if (!$siswa) {
             return redirect()->route('siswa.profile.main')->withError('Siswa not found');
         }
 
-        // Update the record's properties
         $siswa->first_name = $request->nama;
         $siswa->asal_sekolah = $request->asal_sekolah;
         $siswa->kelompok_ujian = $request->kelompok_ujian;
@@ -156,7 +141,6 @@ class SiswaController extends Controller
         $siswa->telp1 = auth()->user()->no_handphone;
         $siswa->active = Carbon::now()->year;
 
-        // Save the updated record
         $siswa->save();
 
         return redirect()->route('siswa.profile.main')->withSuccess('Data Siswa Berhasil Diubah');

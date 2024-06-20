@@ -128,10 +128,8 @@ class AuthController extends Controller
         $email =  $request->email;
 
         if ($user) {
-            // Email terdaftar, arahkan ke form ganti password
             return view('app.auth.change', compact('email'));
         } else {
-            // Email tidak terdaftar, kembalikan ke form lupa password dengan pesan
             return view('app.auth.forget')->with('error', 'Email tidak terdaftar.');
         }
     }
