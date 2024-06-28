@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Web;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Siswa;
+use App\Models\TSiswa;
 use App\Models\Nilai;
-use App\Models\Nilaito;
 use App\Models\Prodi;
 use App\Models\PTN;
+use App\Models\ViewNilaiFInal;
 use App\Models\Sekolah;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +20,7 @@ class SiswaController extends Controller
     public function profile()
     {
         $user = Auth::user();
-        $siswa = Siswa::where('username', $user->email)->first();
+        $siswa = TSiswa::where('username', $user->email)->first();
         if($siswa){
             $propinsi = Sekolah::where('sekolah', $siswa->asal_sekolah)->value('propinsi');
         }
@@ -33,14 +33,17 @@ class SiswaController extends Controller
 
     public function index()
     {
-        $total_pendaftar = Siswa::where('active', now()->year)
+        $total_pendaftar = TSiswa::where('active', now()->year)
             ->count();
-        $rata = Nilai::join('nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 'nilai_to.username')
-            ->whereYear('nilai_to.tanggal', now()->year)
+        $rata = Nilai::join('t_nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 't_nilai_to.username')
+            ->whereYear('t_nilai_to.tanggal', now()->year)
             ->avg('mv_rekapitulasi_nilai_to.total_nilai');
-        $max = Nilai::join('nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 'nilai_to.username')
-            ->whereYear('nilai_to.tanggal', now()->year)
+        $max = Nilai::join('t_nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 't_nilai_to.username')
+            ->whereYear('t_nilai_to.tanggal', now()->year)
             ->max('mv_rekapitulasi_nilai_to.total_nilai');
+
+        // $rata = ViewNilaiFInal::avg('average_to');
+        // $max = ViewNilaiFInal::max('average_to');
 
         $sekolah = Sekolah::count();
 
@@ -62,10 +65,10 @@ class SiswaController extends Controller
         $prodi = Prodi::where('active', 2024)->get();
         $sekolah = Sekolah::all();
         
-        $selectedProdi = Siswa::where('username', $email)->first();
+        $selectedProdi = TSiswa::where('username', $email)->first();
 
-        $selectedProdi1 = $selectedProdi->pilihan1_utbk_aktual;
-        $selectedProdi2 = $selectedProdi->pilihan2_utbk_aktual;
+        $selectedProdi1 = $selectedProdi->pilihan1_utbk;
+        $selectedProdi2 = $selectedProdi->pilihan2_utbk;
 
         $prodi1 = Prodi::where('id_prodi', $selectedProdi1)->first();
         $prodi2 = Prodi::where('id_prodi', $selectedProdi2)->first();
@@ -99,13 +102,13 @@ class SiswaController extends Controller
             'prodi_piihan2.different' => 'Pilihan 1 dan Pilihan 2 tidak boleh sama',
         ]);
         
-        $siswa = new Siswa();
+        $siswa = new TSiswa();
         $siswa->username = $email;
         $siswa->first_name = $request->nama;
         $siswa->asal_sekolah = $request->asal_sekolah;
         $siswa->kelompok_ujian = $request->kelompok_ujian;
-        $siswa->pilihan1_utbk_aktual = $request->prodi_piihan1;
-        $siswa->pilihan2_utbk_aktual = $request->prodi_piihan2;
+        $siswa->pilihan1_utbk = $request->prodi_piihan1;
+        $siswa->pilihan2_utbk = $request->prodi_piihan2;
         $siswa->telp1 = auth()->user()->no_handphone;
         $siswa->active = Carbon::now()->year;
     
@@ -127,7 +130,7 @@ class SiswaController extends Controller
             'prodi_piihan2.different' => 'Pilihan 1 dan Pilihan 2 tidak boleh sama',
         ]);
 
-        $siswa = Siswa::where('username', $email)->first();
+        $siswa = TSiswa::where('username', $email)->first();
 
         if (!$siswa) {
             return redirect()->route('siswa.profile.main')->withError('Siswa not found');
@@ -136,8 +139,8 @@ class SiswaController extends Controller
         $siswa->first_name = $request->nama;
         $siswa->asal_sekolah = $request->asal_sekolah;
         $siswa->kelompok_ujian = $request->kelompok_ujian;
-        $siswa->pilihan1_utbk_aktual = $request->prodi_piihan1;
-        $siswa->pilihan2_utbk_aktual = $request->prodi_piihan2;
+        $siswa->pilihan1_utbk = $request->prodi_piihan1;
+        $siswa->pilihan2_utbk = $request->prodi_piihan2;
         $siswa->telp1 = auth()->user()->no_handphone;
         $siswa->active = Carbon::now()->year;
 

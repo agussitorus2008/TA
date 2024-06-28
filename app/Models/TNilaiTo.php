@@ -5,15 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Nilaito extends Model
+class TNilaiTo extends Model
 {
     use HasFactory;
 
-    protected $table = "nilai_to";
+    protected $table = "t_nilai_to";
 
     protected $fillable = [
         'username',
+        'id_to',
         'nama_tryout',
+        'tanggal',
         'pu',
         'ppu',
         'pbm',

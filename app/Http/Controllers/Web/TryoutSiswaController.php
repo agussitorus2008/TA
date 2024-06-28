@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Nilai;
-use App\Models\Nilaito;
-use App\Models\ViewNilaiFinalTerbaru;
+use App\Models\TNilaito;
+use App\Models\ViewNilaiFinal;
 
 class TryoutSiswaController extends Controller
 {
@@ -19,7 +19,7 @@ class TryoutSiswaController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $tryouts = Nilaito::where('username', $user->email)->get();
+        $tryouts = TNilaito::where('username', $user->email)->get();
 
         if($tryouts){
 
@@ -32,7 +32,7 @@ class TryoutSiswaController extends Controller
             $bobot_pbm = 20;
             $bobot_total = 155;
 
-            $mahasiswa = ViewNilaiFinalTerbaru::where('username', auth()->user()->email)->first();
+            $mahasiswa = ViewNilaiFinal::where('username', auth()->user()->email)->first();
 
             $nilaiRata = 0;
 
@@ -74,7 +74,7 @@ class TryoutSiswaController extends Controller
     public function show($nama_tryout, $rata)
     {
         $user = Auth::user();
-        $tryout = Nilaito::where('nama_tryout', $nama_tryout)
+        $tryout = TNilaito::where('nama_tryout', $nama_tryout)
             ->where('username', $user->email)
             ->first();
 

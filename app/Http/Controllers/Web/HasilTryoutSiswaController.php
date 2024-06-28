@@ -4,13 +4,11 @@ namespace App\Http\Controllers\Web;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Siswa;
+use App\Models\TSiswa;
 use App\Models\Nilaito;
 use App\Models\Nilai;
 use App\Models\Prodi;
-use App\Models\SiswaOld;
 use App\Models\DayaTampung;
-use App\Models\ViewNilaiFinalTerbaru;
 use App\Models\ViewNilaiFinal;
 use Illuminate\Support\Facades\DB;
 
@@ -24,7 +22,7 @@ class HasilTryoutSiswaController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $siswa = Siswa::where('username', $user->email)->first();
+        $siswa = TSiswa::where('username', $user->email)->first();
 
         if ($siswa == null) {
             $errorMessage = "Belum ada data nilai";
@@ -35,7 +33,7 @@ class HasilTryoutSiswaController extends Controller
 
         $tryoutCount = $nilaito->count();
 
-        $siswacheck = ViewNilaiFinalTerbaru::where('username', auth()->user()->email)->first();
+        $siswacheck = ViewNilaiFinal::where('username', auth()->user()->email)->first();
 
         if (empty($siswacheck)) {
             $errorMessage = "Belum ada data nilai";
@@ -66,69 +64,41 @@ class HasilTryoutSiswaController extends Controller
         $bobot_total = 155;
 
 
-        $totalPendaftar = SiswaOld::where('t_siswa.pilihan1_utbk', $siswa->pilihan1_utbk_aktual)
-            ->orWhere('t_siswa.pilihan2_utbk', $siswa->pilihan1_utbk_aktual)
-            ->orWhere('t_siswa.pilihan1_utbk', $siswa->pilihan2_utbk_aktual)
-            ->orWhere('t_siswa.pilihan2_utbk', $siswa->pilihan2_utbk_aktual)
-            ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 't_siswa.username')
-            ->pluck('view_rekapitulasi_nilai_to_sebelum.username')
-            ->toArray();
-
-
-        // $totalPendaftar = ViewNilaiFinal::where('pilihan1_utbk', $siswa->pilihan1_utbk_aktual)
-        //     ->orWhere('pilihan2_utbk', $siswa->pilihan1_utbk_aktual)
-        //     ->orWhere('pilihan1_utbk', $siswa->pilihan2_utbk_aktual)
-        //     ->orWhere('pilihan2_utbk', $siswa->pilihan2_utbk_aktual)
-        //     ->pluck('username')
-        //     ->toArray();
-
-        // try {
-        //     $totalPendaftar = ViewNilaiFinal::groupBy('username', 'pilihan1_utbk', 'pilihan2_utbk', 'average_to')->get();
-        //     dd($totalPendaftar);
-        // } catch (\Exception $e) {
-        //     dd($e->getMessage());
-        // }  
         
-        // $totalPendaftar = ViewNilaiFinal::where('username', '004606046')->first();
-        // dd($totalPendaftar);
-
-        
-        $totalSekolah = SiswaOld::distinct()
+        $totalSekolah = TSiswa::distinct()
             ->select('asal_sekolah')
-            ->orWhere('pilihan2_utbk', $siswa->pilihan1_utbk_aktual)
-            ->orWhere('pilihan1_utbk', $siswa->pilihan2_utbk_aktual)
-            ->orWhere('pilihan2_utbk', $siswa->pilihan2_utbk_aktual)
+            ->orWhere('pilihan2_utbk', $siswa->pilihan1_utbk)
+            ->orWhere('pilihan1_utbk', $siswa->pilihan2_utbk)
+            ->orWhere('pilihan2_utbk', $siswa->pilihan2_utbk)
             ->count();
 
-        $dayatampung1 = DayaTampung::where('id_prodi', $siswa->pilihan1_utbk_aktual)
+        $dayatampung1 = DayaTampung::where('id_prodi', $siswa->pilihan1_utbk)
         ->where('tahun', 2024)
         ->first();
 
-        $dayatampung2 = DayaTampung::where('id_prodi', $siswa->pilihan2_utbk_aktual)
+        $dayatampung2 = DayaTampung::where('id_prodi', $siswa->pilihan2_utbk)
         ->where('tahun', 2024)
         ->first();
 
-        $listNilai1 = SiswaOld::join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 't_siswa.username')
-            ->where('t_siswa.pilihan1_utbk', $siswa->pilihan1_utbk_aktual)
-            ->orWhere('t_siswa.pilihan2_utbk', $siswa->pilihan1_utbk_aktual)
-            ->pluck('view_rekapitulasi_nilai_to_sebelum.average_to')
+        $listNilai1 = TSiswa::join('view_rekapitulasi_nilai_to', 'view_rekapitulasi_nilai_to.username', '=', 't_siswa.username')
+            ->where(function($query) use ($siswa) {
+                $query->where('t_siswa.pilihan1_utbk', $siswa->pilihan1_utbk)
+                        ->orWhere('t_siswa.pilihan2_utbk', $siswa->pilihan1_utbk);
+            })
+            ->where('t_siswa.username', '!=', $siswa->username)
+            ->pluck('view_rekapitulasi_nilai_to.average_to')
             ->toArray();
 
-        // $listNilai1 = ViewNilaiFinal::where('pilihan1_utbk', $siswa->pilihan1_utbk_aktual)
-        //     ->orWhere('pilihan2_utbk', $siswa->pilihan1_utbk_aktual)
-        //     ->pluck('average_to')
-        //     ->toArray();
 
-        $listNilai2 = SiswaOld::join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 't_siswa.username')
-            ->where('t_siswa.pilihan1_utbk', $siswa->pilihan2_utbk_aktual)
-            ->orWhere('t_siswa.pilihan2_utbk', $siswa->pilihan2_utbk_aktual)
-            ->pluck('view_rekapitulasi_nilai_to_sebelum.average_to')
+        $listNilai2 = TSiswa::join('view_rekapitulasi_nilai_to', 'view_rekapitulasi_nilai_to.username', '=', 't_siswa.username')
+            ->where(function($query) use ($siswa) {
+                $query->where('t_siswa.pilihan1_utbk', $siswa->pilihan2_utbk)
+                        ->orWhere('t_siswa.pilihan2_utbk', $siswa->pilihan2_utbk);
+            })
+            ->where('t_siswa.username', '!=', $siswa->username)
+            ->pluck('view_rekapitulasi_nilai_to.average_to')
             ->toArray();
-        // $listNilai2 = ViewNilaiFinal::where('pilihan1_utbk', $siswa->pilihan2_utbk_aktual)
-        //     ->orWhere('pilihan2_utbk', $siswa->pilihan2_utbk_aktual)
-        //     ->pluck('average_to')
-        //     ->toArray();
-
+        
 
         if ($listNilai1 == null) {
             $peringkat1 = 0;
@@ -155,23 +125,20 @@ class HasilTryoutSiswaController extends Controller
         $totalpendaftar1 = count($listNilai1);
         $totalpendaftar2 = count($listNilai2);
 
+        $totalPendaftar = $totalpendaftar1 + $totalpendaftar2;
+
         // untuk pilihan 1
-        $listNilaipilihan1 = SiswaOld::where('t_siswa.pilihan1_utbk', $siswa->pilihan1_utbk_aktual)
-            ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 't_siswa.username')
-            ->pluck('view_rekapitulasi_nilai_to_sebelum.average_to')
+        $listNilaipilihan1 = TSiswa::where('t_siswa.pilihan1_utbk', $siswa->pilihan1_utbk)
+            ->where('t_siswa.username', '!=', $siswa->username)
+            ->join('view_rekapitulasi_nilai_to', 'view_rekapitulasi_nilai_to.username', '=', 't_siswa.username')
+            ->pluck('view_rekapitulasi_nilai_to.average_to')
             ->toArray();
-        // $listNilaipilihan1 = ViewNilaiFinal::where('pilihan1_utbk', $siswa->pilihan1_utbk_aktual)
-        //     ->pluck('average_to')
-        //     ->toArray();
     
-        $listNilaipilihan2 = SiswaOld::where('t_siswa.pilihan1_utbk', $siswa->pilihan2_utbk_aktual)
-            ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 't_siswa.username')
-            ->pluck('view_rekapitulasi_nilai_to_sebelum.average_to')
+        $listNilaipilihan2 = TSiswa::where('t_siswa.pilihan1_utbk', $siswa->pilihan2_utbk)
+            ->where('t_siswa.username', '!=', $siswa->username)
+            ->join('view_rekapitulasi_nilai_to', 'view_rekapitulasi_nilai_to.username', '=', 't_siswa.username')
+            ->pluck('view_rekapitulasi_nilai_to.average_to')
             ->toArray();
-        // $listNilaipilihan2 = ViewNilaiFinal::where('pilihan1_utbk', $siswa->pilihan2_utbk_aktual)
-        // ->pluck('average_to')
-        // ->toArray();
-    
 
         if ($listNilaipilihan1 == null) {
             $peringkat11 = 0;
@@ -206,7 +173,7 @@ class HasilTryoutSiswaController extends Controller
             return number_format($item->total_nilai * 10, 2);
         });
 
-        $nilaiRata = ViewNilaiFinalTerbaru::where('username', auth()->user()->email)->first()->average_to;
+        $nilaiRata = ViewNilaiFinal::where('username', auth()->user()->email)->first()->average_to;
 
         if ($nilaiRata == null) {
             $errorMessage = "Belum ada nilai diatur";
@@ -221,104 +188,6 @@ class HasilTryoutSiswaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function generate()
-    {
-        $user = Auth::user();
-        $totalNilai = 0;
-        $bobot = Nilai::whereNotNull('nilai_ppu')
-        ->whereNotNull('nilai_pu')
-        ->whereNotNull('nilai_pm')
-        ->whereNotNull('nilai_pk')
-        ->whereNotNull('nilai_lbi')
-        ->whereNotNull('nilai_lbe')
-        ->whereNotNull('nilai_pbm')
-        ->first();
-
-        if ($bobot == null) {
-            $errorMessage = "Bobot nilai belum diatur";
-            return response()->json(['error' => $errorMessage], 422);
-        }
-
-        $bobot_ppu = $bobot->nilai_ppu / $bobot->ppu_benar;
-        $bobot_pu = $bobot->nilai_pu / $bobot->pu_benar;
-        $bobot_pm = $bobot->nilai_pm / $bobot->pm_benar;
-        $bobot_pk = $bobot->nilai_pk / $bobot->pk_benar;
-        $bobot_lbi = $bobot->nilai_lbi / $bobot->lbi_benar;
-        $bobot_lbe = $bobot->nilai_lbe / $bobot->lbe_benar;
-        $bobot_pbm = $bobot->nilai_pbm / $bobot->pbm_benar;
-     
-        $nilaito = Nilai::where('username', $user->email)->first();
-
-        if(empty($nilaito)){
-            $nilaito = "Belum ada data nilai";
-        }else{
-            $totalNilai += (($nilaito->ppu * $bobot_ppu) + ($nilaito->pu * $bobot_pu) + ($nilaito->pbm * $bobot_pbm) + ($nilaito->pk * $bobot_pk) + ($nilaito->lbi * $bobot_lbi) + ($nilaito->lbe * $bobot_lbe) + ($nilaito->pm * $bobot_pm)) / 7;
-        }
-
-        $rekomendasi = DB::table('mv_rekapitulasi_nilai_to')
-            ->join('kelulusan', 'mv_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
-            ->where('mv_rekapitulasi_nilai_to.total_nilai', '<=', $totalNilai)
-            ->select('kelulusan.id_prodi')
-            ->orderBy('mv_rekapitulasi_nilai_to.total_nilai', 'DESC')
-            ->get();
-
-        $prodiRekomendasi1 = Prodi::whereIn('id_prodi', $rekomendasi->pluck('id_prodi'))
-            ->select('nama_prodi_ptn')
-            ->first();
-
-        $prodiRekomendasi2 = Prodi::whereIn('id_prodi', $rekomendasi->pluck('id_prodi'))
-            ->select('nama_prodi_ptn')
-            ->skip(1)
-            ->first();
-
-        $listNilai1 = SiswaOld::where('pilihan1_utbk_aktual', $prodiRekomendasi1)
-            ->orWhere('pilihan2_utbk_aktual', $prodiRekomendasi1)
-            ->join('mv_rekapitulasi_nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 't_siswa.username')
-            ->pluck('total_nilai')
-            ->toArray();
-        
-        $listNilai2 = SiswaOld::where('pilihan1_utbk_aktual', $prodiRekomendasi2)
-            ->orWhere('pilihan2_utbk_aktual', $prodiRekomendasi2)
-            ->join('mv_rekapitulasi_nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 't_siswa.username')
-            ->pluck('total_nilai')
-            ->toArray();
-
-        if ($listNilai1 == null) {
-            $errorMessage = "Belum ada data nilai";
-            return response()->json(['error' => $errorMessage], 422);
-        }
-
-        if ($listNilai2 == null) {
-            $errorMessage = "Belum ada data nilai";
-            return response()->json(['error' => $errorMessage], 422);
-        }
-
-        $listNilai1[] = $totalNilai;
-        $listNilai2[] = $totalNilai;
-
-        arsort($listNilai1);
-        arsort($listNilai2);
-
-        $peringkat1 = array_search($totalNilai, array_values($listNilai1), true);
-        $peringkat1 += 1;
-
-        $peringkat2 = array_search($totalNilai, array_values($listNilai2), true);
-        $peringkat2 += 1;
-
-
-        $pendaftar1 = count($listNilai1);
-        $pendaftar2 = count($listNilai2);
-
-        return [
-            'prodiRekomendasi1' => $prodiRekomendasi1,
-            'prodiRekomendasi2' => $prodiRekomendasi2,
-            'peringkatRekomendasi1' => $peringkat1,
-            'peringkatRekomendasi2' => $peringkat2,
-            'pendaftarRekomendasi1' => $pendaftar1,
-            'pendaftarRekomendasi2' => $pendaftar2
-        ];        
-    }
-
     /**
      * Store a newly created resource in storage.
      *
@@ -333,13 +202,14 @@ class HasilTryoutSiswaController extends Controller
         }
 
         $user = auth()->user();
-        $userTotalNilai = ViewNilaiFinalTerbaru::where('username', $user->email)->first()->average_to;
+        $userTotalNilai = ViewNilaiFinal::where('username', $user->email)->first()->average_to;
         
-        $nama = Siswa::where('username',$user->email)->first();
+        $nama = TSiswa::where('username',$user->email)->first();
 
-        $listNilaipilihan1 = SiswaOld::where('t_siswa.pilihan1_utbk', $prodi->id_prodi)
-            ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 't_siswa.username')
-            ->select('t_siswa.username', 'view_rekapitulasi_nilai_to_sebelum.average_to', 't_siswa.first_name')
+        $listNilaipilihan1 = TSiswa::where('t_siswa.pilihan1_utbk', $prodi->id_prodi)
+            ->where('t_siswa.username', '!=', $user->email)
+            ->join('view_rekapitulasi_nilai_to', 'view_rekapitulasi_nilai_to.username', '=', 't_siswa.username')
+            ->select('t_siswa.username', 'view_rekapitulasi_nilai_to.average_to', 't_siswa.first_name')
             ->get()
             ->map(function ($item) {
                 return $item->getAttributes();
@@ -375,18 +245,21 @@ class HasilTryoutSiswaController extends Controller
         }
 
         $user = auth()->user();
-        $userTotalNilai = ViewNilaiFinalTerbaru::where('username', $user->email)->first()->average_to;
-        $nama = Siswa::where('username',$user->email)->first();
+        $userTotalNilai = ViewNilaiFinal::where('username', $user->email)->first()->average_to;
+        $nama = TSiswa::where('username',$user->email)->first();
 
-        $listNilaipilihan1 = SiswaOld::where('t_siswa.pilihan1_utbk', $prodi->id_prodi)
-            ->orWhere('t_siswa.pilihan2_utbk', $prodi->id_prodi)
-            ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 't_siswa.username')
-            ->select('t_siswa.username', 'view_rekapitulasi_nilai_to_sebelum.average_to', 't_siswa.first_name')
-            ->get()
-            ->map(function ($item) {
-                return $item->getAttributes();
-            })
-            ->toArray();
+        $listNilaipilihan1 = TSiswa::where(function($query) use ($prodi, $user) {
+            $query->where('t_siswa.pilihan1_utbk', $prodi->id_prodi)
+                  ->orWhere('t_siswa.pilihan2_utbk', $prodi->id_prodi);
+        })
+        ->where('t_siswa.username', '!=', $user->email)
+        ->join('view_rekapitulasi_nilai_to', 'view_rekapitulasi_nilai_to.username', '=', 't_siswa.username')
+        ->select('t_siswa.username', 'view_rekapitulasi_nilai_to.average_to', 't_siswa.first_name')
+        ->get()
+        ->map(function ($item) {
+            return $item->getAttributes();
+        })
+        ->toArray();        
 
         $listNilaipilihan1[] = [
             'username' => $user->email,
@@ -458,13 +331,14 @@ class HasilTryoutSiswaController extends Controller
     public function rekomendasi()
     {
         $user = Auth::user();
-        $siswa = Siswa::where('username', $user->email)->first();
+        $siswa = TSiswa::where('username', $user->email)->first();
+        $prodiRekomendasi = [];
 
         if ($siswa == null) {
             return response()->json(['error' => "Belum ada data nilai"], 422);
         }
 
-        $siswacheck = ViewNilaiFinalTerbaru::where('username', auth()->user()->email)->first();
+        $siswacheck = ViewNilaiFinal::where('username', auth()->user()->email)->first();
         
         if (empty($siswacheck)) {
             $errorMessage = "Belum ada data nilai";
@@ -472,103 +346,101 @@ class HasilTryoutSiswaController extends Controller
         }
 
         $nilai = $siswacheck->average_to;
-        // $nilai = 100.3750; 
 
-        $rekomendasi = DB::table('t_prodi')
+        if ($nilai == null) {
+            $nilai = null;
+        }
+        else {
+            $rekomendasi = DB::table('t_prodi')
             ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
-            ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 'kelulusan.username')
+            ->join('view_rekapitulasi_nilai_to', 'view_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
             ->join('t_daya_tampung_prodi', 't_daya_tampung_prodi.id_prodi', '=', 't_prodi.id_prodi')
-            ->select('t_prodi.id_prodi', 't_daya_tampung_prodi.daya_tampung', 'view_rekapitulasi_nilai_to_sebelum.average_to')
-            ->groupBy('t_prodi.id_prodi', 't_daya_tampung_prodi.daya_tampung', 'view_rekapitulasi_nilai_to_sebelum.average_to')
-            ->having('view_rekapitulasi_nilai_to_sebelum.average_to', '<=', $nilai)
-            ->orderBy('view_rekapitulasi_nilai_to_sebelum.average_to', 'desc')
+            ->select('t_prodi.id_prodi', 't_daya_tampung_prodi.daya_tampung', 'view_rekapitulasi_nilai_to.average_to')
+            ->groupBy('t_prodi.id_prodi', 't_daya_tampung_prodi.daya_tampung', 'view_rekapitulasi_nilai_to.average_to')
+            ->having('view_rekapitulasi_nilai_to.average_to', '<=', $nilai)
+            ->orderBy('view_rekapitulasi_nilai_to.average_to', 'desc')
             ->get();
         
 
-        $listNilai2 = SiswaOld::whereIn('pilihan1_utbk_aktual', $rekomendasi->pluck('id_prodi'))
-            ->orWhereIn('pilihan2_utbk_aktual', $rekomendasi->pluck('id_prodi'))
-            ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 't_siswa.username')
-            ->select('t_siswa.pilihan1_utbk_aktual', 't_siswa.pilihan2_utbk_aktual', 'view_rekapitulasi_nilai_to_sebelum.average_to')
-            ->get();
+            $listNilai2 = TSiswa::whereIn('pilihan1_utbk', $rekomendasi->pluck('id_prodi'))
+                ->orWhereIn('pilihan2_utbk', $rekomendasi->pluck('id_prodi'))
+                ->join('view_rekapitulasi_nilai_to', 'view_rekapitulasi_nilai_to.username', '=', 't_siswa.username')
+                ->select('t_siswa.pilihan1_utbk', 't_siswa.pilihan2_utbk', 'view_rekapitulasi_nilai_to.average_to')
+                ->get();
 
-        $debugInfo = [];
-        $rekomendasiFinal = [];
-        $userScores = [];
+            $debugInfo = [];
+            $rekomendasiFinal = [];
+            $userScores = [];
 
-        foreach ($listNilai2 as $item) {
-            $id_prodi1 = $item->pilihan1_utbk_aktual;
-            $id_prodi2 = $item->pilihan2_utbk_aktual;
-            $total_nilai = $item->average_to;
+            foreach ($listNilai2 as $item) {
+                $id_prodi1 = $item->pilihan1_utbk;
+                $id_prodi2 = $item->pilihan2_utbk;
+                $total_nilai = $item->average_to;
 
-            if (!isset($userScores[$id_prodi1])) {
-                $userScores[$id_prodi1] = [];
+                if (!isset($userScores[$id_prodi1])) {
+                    $userScores[$id_prodi1] = [];
+                }
+                if (!isset($userScores[$id_prodi2])) {
+                    $userScores[$id_prodi2] = [];
+                }
+
+                $userScores[$id_prodi1][] = $total_nilai;
+                $userScores[$id_prodi2][] = $total_nilai;
             }
-            if (!isset($userScores[$id_prodi2])) {
-                $userScores[$id_prodi2] = [];
+
+            $processedProdi = [];
+
+            foreach ($rekomendasi as $check) {
+                $id_prodi = $check->id_prodi;
+
+                if (in_array($id_prodi, $processedProdi)) {
+                    continue;
+                }
+
+                $processedProdi[] = $id_prodi;
+
+                if (!isset($userScores[$id_prodi])) {
+                    $userScores[$id_prodi] = [];
+                }
+
+                $scores = $userScores[$id_prodi];
+                $scores[] = $nilai;
+
+                rsort($scores);
+
+                $peringkat = array_search($nilai, $scores) + 1;
+
+                if ($peringkat <= $check->daya_tampung && count($rekomendasiFinal) < 2) {
+                    $rekomendasiFinal[] = ['id_prodi' => $id_prodi, 'peringkat' => $peringkat];
+                }
+
+                if (count($rekomendasiFinal) >= 2) {
+                    break;
+                }
             }
 
-            $userScores[$id_prodi1][] = $total_nilai;
-            $userScores[$id_prodi2][] = $total_nilai;
+            if (empty($rekomendasiFinal) || count($rekomendasiFinal) == 1) {
+                // return response()->json(['error' => "Tidak ada rekomendasi yang cocok untuk kamu"], 422);
+                $rekomendasiFinal = null;
+            }
+            else
+            {
+                foreach ($rekomendasiFinal as $rek) {
+                    $prodiDetail = DB::table('t_prodi')
+                        ->where('t_prodi.id_prodi', $rek['id_prodi'])
+                        ->join('t_daya_tampung_prodi', 't_daya_tampung_prodi.id_prodi', '=', 't_prodi.id_prodi')
+                        ->leftJoin('t_siswa', function ($join) use ($rek) {
+                            $join->on('t_siswa.pilihan1_utbk', '=', DB::raw($rek['id_prodi']))
+                                ->orOn('t_siswa.pilihan2_utbk', '=', DB::raw($rek['id_prodi']));
+                        })
+                        ->select('t_prodi.nama_prodi_ptn', DB::raw($rek['peringkat'] . ' as peringkat'), 't_daya_tampung_prodi.daya_tampung', DB::raw('count(t_siswa.username) as total_applicants'))
+                        ->groupBy('t_prodi.id_prodi', 't_prodi.nama_prodi_ptn', 't_daya_tampung_prodi.daya_tampung')
+                        ->first();
+    
+                    $prodiRekomendasi[] = $prodiDetail;
+                }
+            }
         }
-
-        $processedProdi = [];
-
-        foreach ($rekomendasi as $check) {
-            $id_prodi = $check->id_prodi;
-
-            if (in_array($id_prodi, $processedProdi)) {
-                continue;
-            }
-
-            $processedProdi[] = $id_prodi;
-
-            if (!isset($userScores[$id_prodi])) {
-                $userScores[$id_prodi] = [];
-            }
-
-            $scores = $userScores[$id_prodi];
-            $scores[] = $nilai;
-
-            rsort($scores);
-
-            $peringkat = array_search($nilai, $scores) + 1;
-
-
-            // $debugInfo[] = ['id_prodi' => $id_prodi, 'peringkat' => $peringkat];
-            // dd($debugInfo);
-
-            if ($peringkat <= $check->daya_tampung && count($rekomendasiFinal) < 2) {
-                $rekomendasiFinal[] = ['id_prodi' => $id_prodi, 'peringkat' => $peringkat];
-            }
-
-            if (count($rekomendasiFinal) >= 2) {
-                break;
-            }
-        }
-
-        // dd($rekomendasiFinal);   
-        $prodiRekomendasi = [];
-        foreach ($rekomendasiFinal as $rek) {
-            $prodiDetail = DB::table('t_prodi')
-                ->where('t_prodi.id_prodi', $rek['id_prodi'])
-                ->join('t_daya_tampung_prodi', 't_daya_tampung_prodi.id_prodi', '=', 't_prodi.id_prodi')
-                ->leftJoin('t_siswa', function ($join) use ($rek) {
-                    $join->on('t_siswa.pilihan1_utbk_aktual', '=', DB::raw($rek['id_prodi']))
-                        ->orOn('t_siswa.pilihan2_utbk_aktual', '=', DB::raw($rek['id_prodi']));
-                })
-                ->select('t_prodi.nama_prodi_ptn', DB::raw($rek['peringkat'] . ' as peringkat'), 't_daya_tampung_prodi.daya_tampung', DB::raw('count(t_siswa.username) as total_applicants'))
-                ->groupBy('t_prodi.id_prodi', 't_prodi.nama_prodi_ptn', 't_daya_tampung_prodi.daya_tampung')
-                ->first();
-
-            $prodiRekomendasi[] = $prodiDetail;
-        }
-
-
-        if (empty($rekomendasiFinal)) {
-            return response()->json(['error' => "Tidak ada rekomendasi yang cocok untuk kamu"], 422);
-        }
-
-        // dd($prodiRekomendasi);
 
         return view('app.siswa.hasilTryout.rekomendasi', ['rekomendasi' => $prodiRekomendasi, 'nilai' => $nilai]);
     }

@@ -6,9 +6,13 @@
 
 @section('content')
     <div class="content mt-5">
-        @if($nilai == null)
-        <div class="row justify-content-center">
-            <h5 class="text-danger">Belum ada data siswa</h5>
+        @if($rekomendasi == null)
+        <div class="row justify-content-center text-center">
+            <h5 class="text-danger alert alert-danger">Maaf Tidak Ada Rekomendasi yang Cocok Untukmu</h5>
+        </div>
+        @elseif($nilai == null)
+        <div class="row justify-content-center text-center">
+            <h5 class="text-danger alert alert-danger">Belum ada data siswa</h5>
         </div>
         <div class="row justify-content-center">
             <div class="col xs-4">

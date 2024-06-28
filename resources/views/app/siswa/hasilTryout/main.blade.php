@@ -29,7 +29,7 @@
             <!-- Traffic sources -->
             <div class="card" style="background-color: #3DA059;">
                 <div class="card-header d-flex align-items-center">
-                    <h5 class="text-white m-2">{{count($totalPendaftar)}} Siswa Pendaftar Saat Ini</h5>
+                    <h5 class="text-white m-2">{{$totalPendaftar}} Siswa Pendaftar Saat Ini</h5>
                 </div>
             </div>
             <!-- /traffic sources -->

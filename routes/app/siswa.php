@@ -46,5 +46,8 @@ Route::prefix('/siswa')->middleware(['auth', 'user'])->group(function () {
 
         Route::get('/prodi', [SimulasiController::class, 'index_prodi'])->name('siswa.simulasi.prodi');
         Route::post('/test_prodi', [SimulasiController::class, 'prediksi_prodi'])->name('siswa.simulasi.test_prodi');
+
+        //get rekomendasi
+        Route::get('/get-rekomendasi', [SimulasiController::class, 'rekomendasi'])->name('siswa.rekomendasi');
     });
 });

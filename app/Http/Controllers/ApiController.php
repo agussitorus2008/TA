@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Sekolah;
-use App\Models\Siswa;
+use App\Models\TSiswa;
 use App\Models\Prodi;
 use Illuminate\Support\Str;
 
@@ -65,7 +65,9 @@ class ApiController extends Controller
     public function search(Request $request)
     {
         $query = $request->input('query');
-        $siswaList = Siswa::where('first_name', 'like', "%$query%")->paginate(100);
+        $siswaList = TSiswa::where('first_name', 'like', "%$query%")
+        ->whereNotIn('active', [2023, 23, 0])
+        ->paginate(100);
 
         return response()->json(['siswaList' => $siswaList]);
     }
@@ -73,7 +75,7 @@ class ApiController extends Controller
     public function filter(Request $request)
     {
         $query = $request->input('active');
-        $siswaList = Siswa::where('active', $query)
+        $siswaList = TSiswa::where('active', $query)
             ->get();
 
         return response()->json(['siswaList' => $siswaList]);

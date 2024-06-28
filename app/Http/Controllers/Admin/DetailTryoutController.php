@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
-use App\Models\Siswa;
+use App\Models\TSiswa;
 use App\Models\Sekolah;
 use App\Models\Tryout;
-use App\Models\Nilaito;
+use App\Models\TNilaito;
 use App\Models\Nilai;
 use App\Models\Kelulusan;
-use App\Models\ViewNilaiFinalTerbaru;
+use App\Models\ViewNilaiFinal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -19,12 +19,12 @@ class DetailTryoutController extends Controller
 
     public function index()
     {
-        $siswaList = Siswa::paginate(10);
+        $siswaList = TSiswa::whereNotIn('active', [2023, 23, 0])->paginate(20);
 
         $statusList = [];
 
         foreach ($siswaList as $siswa) {
-            $nilaitoCount = Nilaito::where('username', $siswa->username)->count();
+            $nilaitoCount = TNilaito::where('username', $siswa->username)->count();
 
             if ($nilaitoCount > 0) {
                 $statusList[$siswa->username] = "Sudah Ada Nilai Tryout";
@@ -33,7 +33,7 @@ class DetailTryoutController extends Controller
             }
         }
 
-        $tahun = Siswa::select('active')
+        $tahun = TSiswa::select('active')
             ->whereNotNull('active')
             ->whereNotIn('active', [0, 23])
             ->distinct()
@@ -46,12 +46,12 @@ class DetailTryoutController extends Controller
         if (empty($username)) {
             return redirect()->route("admin.siswa.main")->with('error', 'Tidak ada data siswa');
         }
-        $siswa = Siswa::where('username', $username)->first();
+        $siswa = TSiswa::where('username', $username)->first();
         if (empty($siswa)) {
             $siswa = "Belum ada data siswa";
         }
 
-        $tryouts = Nilaito::where('username', $username)->get();
+        $tryouts = TNilaito::where('username', $username)->get();
 
         if (empty($tryouts)) {
             $tryouts = "Belum ada data Nilai Tryout";
@@ -66,15 +66,15 @@ class DetailTryoutController extends Controller
         $bobot_pbm = 20;
         $bobot_total = 155;
 
-        $nilaiRata = ViewNilaiFinalTerbaru::where('username', $username)->first();
+        $nilaiRata = ViewNilaiFinal::where('username', $username)->first();
 
         return view('app.admin.tryout.tryout', compact('tryouts', 'siswa', 'bobot_ppu', 'bobot_pu', 'bobot_pm', 'bobot_pk', 'bobot_lbi', 'bobot_lbe', 'bobot_pbm', 'nilaiRata', 'bobot_total'));
     }
 
     public function detail_tryout($username, $nama_tryout, $rata)
     {
-        $siswa = Siswa::where('username', $username)->first();
-        $tryout = Nilaito::where('nama_tryout', $nama_tryout)
+        $siswa = TSiswa::where('username', $username)->first();
+        $tryout = TNilaito::where('nama_tryout', $nama_tryout)
             ->where('username', $username)
             ->first();
 

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Siswa;
+use App\Models\TSiswa;
 use App\Models\Nilai;
 use App\Models\Nilaito;
 use App\Models\Sekolah;
@@ -19,23 +19,23 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $total_pendaftar = Siswa::where('active', now()->year)
+        $total_pendaftar = TSiswa::where('active', now()->year)
             ->count();
-        $rata = Nilai::join('nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 'nilai_to.username')
-            ->whereYear('nilai_to.tanggal', now()->year)
+        $rata = Nilai::join('t_nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 't_nilai_to.username')
+            ->whereYear('t_nilai_to.tanggal', now()->year)
             ->avg('mv_rekapitulasi_nilai_to.total_nilai');
-        $max = Nilai::join('nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 'nilai_to.username')
-            ->whereYear('nilai_to.tanggal', now()->year)
+        $max = Nilai::join('t_nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 't_nilai_to.username')
+            ->whereYear('t_nilai_to.tanggal', now()->year)
             ->max('mv_rekapitulasi_nilai_to.total_nilai');
 
         $sekolah = Sekolah::count();
 
         $currentYear = Carbon::now()->year;
 
-        $data = Nilai::join('nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 'nilai_to.username')
-            ->selectRaw('YEAR(nilai_to.tanggal) as year, AVG(mv_rekapitulasi_nilai_to.total_nilai) as average')
-            ->whereYear('nilai_to.tanggal', '>=', $currentYear) 
-            ->whereYear('nilai_to.tanggal', '<=', $currentYear + 1) 
+        $data = Nilai::join('t_nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 't_nilai_to.username')
+            ->selectRaw('YEAR(t_nilai_to.tanggal) as year, AVG(mv_rekapitulasi_nilai_to.total_nilai) as average')
+            ->whereYear('t_nilai_to.tanggal', '>=', $currentYear) 
+            ->whereYear('t_nilai_to.tanggal', '<=', $currentYear + 1) 
             ->groupBy('year')
             ->get();
 

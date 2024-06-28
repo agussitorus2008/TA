@@ -52,7 +52,7 @@
                     <ul class="nav-group-sub collapse">
                         <li class="nav-item"><a href="{{route('siswa.tryoutSaya.main')}}" class="nav-link">Tryout saya</a></li>
                         <li class="nav-item"><a href="{{route('siswa.hasilTryout.main')}}" class="nav-link">Hasil tryout</a></li>
-                        {{-- <li class="nav-item"><a href="{{route('siswa.hasilTryout.rekomendasi')}}" class="nav-link">Rekomendasi Program Studi dan PTN</a></li> --}}
+                        <li class="nav-item"><a href="{{route('siswa.hasilTryout.rekomendasi')}}" class="nav-link">Rekomendasi Program Studi dan PTN</a></li>
                     </ul>
                 </li>   
                 <li class="nav-item nav-item-submenu">

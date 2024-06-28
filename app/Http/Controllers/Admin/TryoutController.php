@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
-use App\Models\Siswa;
+use App\Models\TSiswa;
 use App\Models\Sekolah;
 use App\Models\Tryout;
-use App\Models\ViewNilaiFinalTerbaru;
-use App\Models\Nilaito;
+use App\Models\TNilaito;
 use App\Models\Nilai;
 use App\Models\Kelulusan;
 use Illuminate\Http\Request;
@@ -18,28 +17,29 @@ class TryoutController extends Controller
 {
     public function add($username)
     {
-        $siswa = Siswa::where('username', $username)->first();
-        $nama_tryout = Nilaito::where('username', $username)->count();
+        $siswa = TSiswa::where('username', $username)->first();
+        $nama_tryout = TNilaito::where('username', $username)->count();
         return view("app.admin.siswa.add", compact('siswa', 'nama_tryout'));
     }
 
     public function Store(Request $request, $username)
     {
         $request->validate([
-            'nama_tryout' => 'unique:nilai_to,nama_tryout,NULL,id,username,' . $username
+            'hitungan_tryout' => 'unique:nilai_to,nama_tryout,NULL,id,username,' . $username
         ], [
-            'nama_tryout.unique' => 'Sudah ada nilai tryout',
+            'hitungan_tryout.unique' => 'Sudah ada nilai tryout',
         ]);
 
-        $siswa = Siswa::where('username', $username)->first();  
+        $siswa = TSiswa::where('username', $username)->first();  
 
         if (!$siswa) {
             return redirect()->back()->with('error', 'Siswa tidak ditemukan');
         }
 
         // Simpan nilai tryout baru
-        $tryout = new Nilaito;
+        $tryout = new TNilaito;
         $tryout->username = $username;
+        $tryout->id_to = 28;
         $tryout->nama_tryout = $request->nama_tryout;
         $tryout->tanggal = $request->tanggal;
         $tryout->ppu = $request->ppu;
@@ -53,7 +53,7 @@ class TryoutController extends Controller
         $tryout->save();
 
         $finalTo = new Nilai;
-        $finalTo->id_to = 50;
+        $finalTo->id_to = 28;
         $finalTo->id_nilai_to = $tryout->id;
         $finalTo->username = $username;
         $finalTo->first_name = $siswa->first_name;
@@ -114,7 +114,7 @@ class TryoutController extends Controller
        
     public function update(Request $request, $username, $nama_tryout)
     {
-        $tryout = Nilaito::where('nama_tryout', $nama_tryout)
+        $tryout = TNilaito::where('nama_tryout', $nama_tryout)
                  ->where('username', $username)
                  ->first();
 
@@ -184,13 +184,12 @@ class TryoutController extends Controller
 
     public function detail_tryout($username, $nama_tryout, $rata)
     {
-        $siswa = Siswa::where('username', $username)->first();
-        $tryout = Nilaito::where('nama_tryout', $nama_tryout)
+        $siswa = TSiswa::where('username', $username)->first();
+        $tryout = TNilaito::where('nama_tryout', $nama_tryout)
             ->where('username', $username)
             ->first();
 
         if($siswa){
-
 
         $bobot_ppu = 30;
         $bobot_pu = 20;
@@ -212,8 +211,8 @@ class TryoutController extends Controller
 
     public function edit($username, $nama_tryout)
     {
-        $siswa = Siswa::where('username', $username)->first();
-        $tryout = Nilaito::where('nama_tryout', $nama_tryout)
+        $siswa = TSiswa::where('username', $username)->first();
+        $tryout = TNilaito::where('nama_tryout', $nama_tryout)
             ->where('username', $username)
             ->first();
     
@@ -223,7 +222,7 @@ class TryoutController extends Controller
 
     public function destroy($username, $nama_tryout)
     {
-        $tryout = Nilaito::where('nama_tryout', $nama_tryout)
+        $tryout = TNilaito::where('nama_tryout', $nama_tryout)
                  ->where('username', $username)
                  ->first();
 

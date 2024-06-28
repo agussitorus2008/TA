@@ -5,14 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ViewNilaiFinal extends Model
+class Recommendation extends Model
 {
     use HasFactory;
 
-    protected $table  = "view_rekapitulasi_nilai_to";
+    protected $table = "rekomendasi";
 
     protected $fillable = [
-        'username',
-        'average_to'
+        'id',
+        'email',
+        'data'
     ];
 }

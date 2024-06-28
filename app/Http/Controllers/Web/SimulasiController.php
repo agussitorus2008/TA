@@ -7,12 +7,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Prodi;
 use App\Models\PTN;
 use App\Models\DayaTampung;
-use App\Models\Siswa;
-use App\Models\SiswaOld;
+use App\Models\TSiswa;
 use App\Models\Kelulusan;
-use App\Models\Nilaito;
-use App\Models\ViewNilaiFinalTerbaru;
+use App\Models\TNilaito;
+use App\Models\ViewNilaiFinal;
+use App\Models\Recommendation;
 use Illuminate\Support\Facades\DB;
+use App\Jobs\ProcessSimulasiProdi;
+use App\Jobs\ProcessSimulasiPTN;
 
 class SimulasiController extends Controller
 {
@@ -20,8 +22,8 @@ class SimulasiController extends Controller
     {
         $prodi = Prodi::where('active', 2024)->get();
 
-        $nilai = ViewNilaiFinalTerbaru::where('username', auth()->user()->email)->first();
-        $nilaiCount = Nilaito::where('username', auth()->user()->email)->count();
+        $nilai = ViewNilaiFinal::where('username', auth()->user()->email)->first();
+        $nilaiCount = TNilaito::where('username', auth()->user()->email)->count();
         if($nilai){
             $nilai = $nilai->average_to;
         }
@@ -31,8 +33,8 @@ class SimulasiController extends Controller
     public function index_ptn()
     {
         $ptn = PTN::where('active', 10)->get();
-        $nilai = ViewNilaiFinalTerbaru::where('username', auth()->user()->email)->first();
-        $nilaiCount = Nilaito::where('username', auth()->user()->email)->count();
+        $nilai = ViewNilaiFinal::where('username', auth()->user()->email)->first();
+        $nilaiCount = TNilaito::where('username', auth()->user()->email)->count();
         if($nilai){
             $nilai = $nilai->average_to;
         }
@@ -43,8 +45,8 @@ class SimulasiController extends Controller
     public function index_prodi()
     {
         $prodi = PTN::where('active', 10)->get();
-        $nilai = ViewNilaiFinalTerbaru::where('username', auth()->user()->email)->first();
-        $nilaiCount = Nilaito::where('username', auth()->user()->email)->count();
+        $nilai = ViewNilaiFinal::where('username', auth()->user()->email)->first();
+        $nilaiCount = TNilaito::where('username', auth()->user()->email)->count();
         if($nilai){
             $nilai = $nilai->average_to;
         }
@@ -52,10 +54,14 @@ class SimulasiController extends Controller
         return view('app.siswa.simulasi.prodi', compact('prodi', 'nilai', 'nilaiCount'));
     }
 
+    // simulasi ptn dan prodi
     public function prediksi(Request $request)
     {
+        set_time_limit(1800);
+
         try {
         $kategori = "";
+        $rekomendasiFinal = [];
 
         $prodi = $request->prodi;
         // dd($prodi);
@@ -66,14 +72,14 @@ class SimulasiController extends Controller
 
         $ratarataNilai = Kelulusan::where('id_prodi', $prodi)
             ->where('active', 2023)
-            ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 'kelulusan.username')
+            ->join('view_rekapitulasi_nilai_to', 'view_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
             ->pluck('average_to')
             ->toArray();
         
-        $listNilai = SiswaOld::join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 't_siswa.username')
+        $listNilai = TSiswa::join('view_rekapitulasi_nilai_to', 'view_rekapitulasi_nilai_to.username', '=', 't_siswa.username')
         ->where('t_siswa.pilihan1_utbk', $prodi)
         ->orWhere('t_siswa.pilihan2_utbk', $prodi)
-        ->pluck('view_rekapitulasi_nilai_to_sebelum.average_to')
+        ->pluck('view_rekapitulasi_nilai_to.average_to')
         ->toArray();
 
         if ($listNilai == null) {
@@ -81,7 +87,8 @@ class SimulasiController extends Controller
             return response()->json(['error' => $errorMessage], 422);
         }
 
-        $nilai = ViewNilaiFinalTerbaru::where('username', auth()->user()->email)->first()->average_to;
+        $nilai = ViewNilaiFinal::where('username', auth()->user()->email)->first()->average_to;
+        // $nilai = 36.45447143;
 
         if(empty($nilai)){
             $errorMessage = "Anda Belum memiliki data nilai";
@@ -104,28 +111,27 @@ class SimulasiController extends Controller
 
         $hasil = ($peringkat / count($listNilai));
 
-        $rekomendasi = DB::table('view_rekapitulasi_nilai_to_sebelum')
-            ->join('kelulusan', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 'kelulusan.username')
-            ->where('view_rekapitulasi_nilai_to_sebelum.average_to', '<=', $nilai)
+        $rekomendasi = DB::table('view_rekapitulasi_nilai_to')
+            ->join('kelulusan', 'view_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
+            ->where('view_rekapitulasi_nilai_to.average_to', '<=', $nilai)
             ->select('kelulusan.id_prodi')
-            ->orderByDesc('view_rekapitulasi_nilai_to_sebelum.average_to')
+            ->orderByDesc('view_rekapitulasi_nilai_to.average_to')
             ->get();
         
         $checkRekomendasi = DB::table('t_prodi')
             ->whereIn('t_prodi.id_prodi', $rekomendasi->pluck('id_prodi'))
             ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
-            ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 'kelulusan.username')
-            ->select('t_prodi.id_prodi', DB::raw('avg(view_rekapitulasi_nilai_to_sebelum.average_to) as average_total_nilai'))
+            ->join('view_rekapitulasi_nilai_to', 'view_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
+            ->select('t_prodi.id_prodi', DB::raw('avg(view_rekapitulasi_nilai_to.average_to) as average_total_nilai'))
             ->groupBy('t_prodi.id_prodi')
             ->get(); 
-
-        $rekomendasiFinal = [];
 
         foreach($checkRekomendasi as $check) {
             if($nilai >= $check->average_total_nilai) { 
                 $rekomendasiFinal[] = $check->id_prodi;
             }
         }
+
         
         if(empty($rekomendasiFinal)) { 
             $errorMessage = "Tidak ada rekomendasi yang cocok untuk kamu";
@@ -137,13 +143,13 @@ class SimulasiController extends Controller
         $prodiRekomendasi = Prodi::whereIn('t_prodi.id_prodi', $prodiIds)
             ->join('t_ptn', 't_prodi.id_ptn', '=', 't_ptn.id_ptn')
             ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
-            ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 'kelulusan.username')
+            ->join('view_rekapitulasi_nilai_to', 'view_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
             ->select(
                 't_prodi.id_prodi',
                 't_prodi.nama_prodi',
                 't_ptn.nama_ptn',
                 't_ptn.nama_singkat',
-                DB::raw('AVG(view_rekapitulasi_nilai_to_sebelum.average_to) as average_total_nilai')
+                DB::raw('AVG(view_rekapitulasi_nilai_to.average_to) as average_total_nilai')
             )
             ->groupBy(
                 't_prodi.id_prodi',
@@ -179,17 +185,147 @@ class SimulasiController extends Controller
     
     }
 
+
+    // simulasi ptn
+    public function prediksi_ptn(Request $request){
+        $idPTN = $request->ptn;
+        $userEmail = auth()->user()->email;
+
+        ProcessSimulasiPTN::dispatch($idPTN, $userEmail);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Job has been dispatched and is processing in the background.',
+        ]);
+    }
+
+    // simulasi prodi
+    public function prediksi_prodi(Request $request){
+        $namaProdi = $request->prodi;
+        $userEmail = auth()->user()->email;
+
+        ProcessSimulasiProdi::dispatch($namaProdi, $userEmail);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Job has been dispatched and is processing in the background.',
+        ]);
+    }
+
+    public function rekomendasi()
+    {
+        $userEmail = auth()->user()->email;
+        $recommendation = Recommendation::where('email', $userEmail)->latest()->first();
+
+        if ($recommendation) {
+            return response()->json([
+                'rekomendasi' => json_decode($recommendation->data),
+            ]);
+        }
+
+        return response()->json([
+            'error' => 'Recommendation not found.',
+        ], 404);
+    }
+
+
+
     // public function prediksi_ptn(Request $request)
     // {
+    //     set_time_limit(1800);
+        
     //     try {
-    //         // Ambil id PTN dari request
+    //         $rekomendasiFinal = [];
     //         $ptnId = $request->ptn;
 
-    //         $prodi = Prodi::where('id_ptn', $ptnId)
-    //             ->pluck('id_prodi');
+    //         // Fetch prodi IDs related to the given PTN ID
+    //         $prodiIds = Prodi::where('id_ptn', $ptnId)->pluck('id_prodi')->toArray();
 
-    //         $nilai = ViewNilaiFinalTerbaru::where('username', auth()->user()->email)->first()->average_to;
-    //         // $nilai = 50.29030000;
+    //         // Get the average score of the authenticated user
+    //         $nilai = ViewNilaiFinal::where('username', auth()->user()->email)->value('average_to');
+    //         // $nilai = 36.45447143;
+
+    //         // If the user has no score data, return an error
+    //         if (is_null($nilai)) {
+    //             return response()->json(['error' => 'Anda Belum memiliki data nilai'], 422);
+    //         }
+
+    //         // If the score is zero or negative, return an error
+    //         if ($nilai <= 0) {
+    //             return response()->json(['error' => 'Tidak ada rekomendasi yang cocok untuk kamu'], 422);
+    //         }
+
+    //         // Get kelulusan prodi IDs where user's score is higher or equal to the average score required
+    //         $kelulusan = DB::table('view_rekapitulasi_nilai_to')
+    //             ->join('kelulusan', 'view_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
+    //             ->whereIn('kelulusan.id_prodi', $prodiIds)
+    //             ->where('view_rekapitulasi_nilai_to.average_to', '<=', $nilai)
+    //             ->orderByDesc('view_rekapitulasi_nilai_to.average_to')
+    //             ->pluck('kelulusan.id_prodi')
+    //             ->toArray();
+    
+    //         if (empty($kelulusan)) {
+    //             return response()->json(['error' => 'Tidak ada rekomendasi yang cocok untuk kamu'], 422);
+    //         }
+
+    //         // Check recommendation by calculating average score for each prodi
+    //         $checkRekomendasi = DB::table('t_prodi')
+    //             ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
+    //             ->join('view_rekapitulasi_nilai_to', 'view_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
+    //             ->whereIn('t_prodi.id_prodi', $kelulusan)
+    //             ->select('t_prodi.id_prodi', DB::raw('AVG(view_rekapitulasi_nilai_to.average_to) as average_total_nilai'))
+    //             ->groupBy('t_prodi.id_prodi')
+    //             ->get();
+
+    //         foreach($checkRekomendasi as $check) {
+    //             if($nilai >= $check->average_total_nilai) { 
+    //                 $rekomendasiFinal[] = $check->id_prodi;
+    //             }
+    //         }
+
+    //         if (empty($rekomendasiFinal)) {
+    //             return response()->json(['error' => 'Tidak ada rekomendasi yang cocok untuk kamu'], 422);
+    //         }
+
+    //         $prodiRekomendasi = Prodi::whereIn('t_prodi.id_prodi', $rekomendasiFinal)
+    //             ->join('t_ptn', 't_prodi.id_ptn', '=', 't_ptn.id_ptn')
+    //             ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
+    //             ->join('view_rekapitulasi_nilai_to', 'view_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
+    //             ->select(
+    //                 't_prodi.id_prodi',
+    //                 't_prodi.nama_prodi',
+    //                 't_ptn.nama_ptn',
+    //                 't_ptn.nama_singkat',
+    //                 DB::raw('AVG(view_rekapitulasi_nilai_to.average_to) as average_total_nilai')
+    //             )
+    //             ->groupBy('t_prodi.id_prodi', 't_prodi.nama_prodi', 't_ptn.nama_ptn', 't_ptn.nama_singkat')
+    //             ->orderByDesc('average_total_nilai')
+    //             ->get();
+
+    //         return response()->json(['rekomendasi' => $prodiRekomendasi]);
+    //     } catch (\Exception $exception) {
+    //         return response()->json(['success' => false, 'error' => $exception->getMessage()], 500);
+    //     }
+    // }
+
+    // public function prediksi_prodi(Request $request)
+    // {
+    //     set_time_limit(1800);
+
+    //     try {
+    //         $rekomendasiFinal = [];
+    //         $namaProdi = $request->prodi;
+
+    //         // Ambil id_prodi berdasarkan nama_prodi
+    //         $prodiIds = Prodi::where('nama_prodi', 'like', "%$namaProdi%")->pluck('id_prodi')->toArray();
+
+    //         if (empty($prodiIds)) {
+    //             $errorMessage = "Nama Prodi tidak ada";
+    //             return response()->json(['error' => $errorMessage], 422);
+    //         }
+
+    //         $nilai = ViewNilaiFinal::where('username', auth()->user()->email)->value('average_to');
+    //         // $nilai = 36.45447143;
 
     //         if(empty($nilai)){
     //             $errorMessage = "Anda Belum memiliki data nilai";
@@ -201,300 +337,51 @@ class SimulasiController extends Controller
     //             return response()->json(['error' => $errorMessage], 422);
     //         }
 
-    //         // Cari kelulusan berdasarkan prodi dan nilai
-    //         $kelulusan = DB::table('view_rekapitulasi_nilai_to_sebelum2')
-    //             ->join('kelulusan', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 'kelulusan.username')
-    //             ->whereIn('kelulusan.id_prodi', $prodi)
-    //             ->where('view_rekapitulasi_nilai_to_sebelum2.average_to', '<=', $nilai)
-    //             ->select('kelulusan.id_prodi')
-    //             ->orderByDesc('view_rekapitulasi_nilai_to_sebelum2.average_to')
-    //             ->get();
-            
-    //             if($kelulusan->isEmpty()) {
-    //                 $errorMessage = "Tidak ada rekomendasi yang cocok untuk kamu";
-    //                 return response()->json(['error' => $errorMessage], 422);
-    //             }
+    //         // Ambil kelulusan berdasarkan prodi dan nilai
+    //         $kelulusan = DB::table('view_rekapitulasi_nilai_to')
+    //             ->join('kelulusan', 'view_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
+    //             ->whereIn('kelulusan.id_prodi', $prodiIds)
+    //             ->where('view_rekapitulasi_nilai_to.average_to', '<=', $nilai)
+    //             ->orderByDesc('view_rekapitulasi_nilai_to.average_to')
+    //             ->pluck('kelulusan.id_prodi')
+    //             ->toArray();
 
+    //         if (empty($kelulusan)) {
+    //             $errorMessage = "Tidak ada rekomendasi yang cocok untuk kamu";
+    //             return response()->json(['error' => $errorMessage], 422);
+    //         }
+
+    //         // Cek rekomendasi berdasarkan nilai
     //         $checkRekomendasi = DB::table('t_prodi')
-    //         ->whereIn('t_prodi.id_prodi', $kelulusan->pluck('id_prodi'))
-    //         ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
-    //         ->join('view_rekapitulasi_nilai_to_sebelum2', 'view_rekapitulasi_nilai_to_sebelum2.username', '=', 'kelulusan.username')
-    //         ->select('t_prodi.id_prodi', DB::raw('avg(view_rekapitulasi_nilai_to_sebelum2.average_to) as average_total_nilai'))
-    //         ->groupBy('t_prodi.id_prodi')
-    //         ->get(); 
-    
-    //         $rekomendasiFinal = [];
-    
+    //             ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
+    //             ->join('view_rekapitulasi_nilai_to', 'view_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
+    //             ->whereIn('t_prodi.id_prodi', $kelulusan)
+    //             ->select('t_prodi.id_prodi', DB::raw('avg(view_rekapitulasi_nilai_to.average_to) as average_total_nilai'))
+    //             ->groupBy('t_prodi.id_prodi')
+    //             ->get();
+
     //         foreach($checkRekomendasi as $check) {
     //             if($nilai >= $check->average_total_nilai) { 
     //                 $rekomendasiFinal[] = $check->id_prodi;
     //             }
     //         }
-            
-    //         if(empty($rekomendasiFinal)) { 
-    //             $errorMessage = "Tidak ada rekomendasi yang cocok untuk kamu";
-    //             return response()->json(['error' => $errorMessage], 422);
-    //         }
-    
-    //         $prodiIds = $rekomendasiFinal; 
 
-    //         // Ambil rekomendasi prodi berdasarkan kelulusan
-    //         $prodiRekomendasi = Prodi::whereIn('t_prodi.id_prodi', $prodiIds)
-    //         ->join('t_ptn', 't_prodi.id_ptn', '=', 't_ptn.id_ptn')
-    //         ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
-    //         ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 'kelulusan.username')
-    //         ->select(
-    //             't_prodi.id_prodi',
-    //             't_prodi.nama_prodi',
-    //             't_ptn.nama_ptn',
-    //             't_ptn.nama_singkat',
-    //             DB::raw('AVG(view_rekapitulasi_nilai_to_sebelum2.average_to) as average_total_nilai')
-    //         )
-    //         ->groupBy(
-    //             't_prodi.id_prodi',
-    //             't_prodi.nama_prodi',
-    //             't_ptn.nama_ptn',
-    //             't_ptn.nama_singkat'
-    //         )
-    //         ->orderByDesc('average_total_nilai');
-
-
-    //         return response()->json([
-    //             'rekomendasi' => $prodiRekomendasi,
-    //         ]);
-    //     } catch (\Exception $exception) {
-    //         return response()->json(['success' => false, 'error' => $exception->getMessage()], 500);
-    //     }
-    // }
-
-    public function prediksi_ptn(Request $request)
-    {
-        try {
-            $ptnId = $request->ptn;
-
-            $prodiIds = Prodi::where('id_ptn', $ptnId)
-                ->pluck('id_prodi')
-                ->toArray();
-
-            $nilai = ViewNilaiFinalTerbaru::where('username', auth()->user()->email)->value('average_to');
-            // $nilai = 41.29030000;
-
-            if (is_null($nilai)) {
-                return response()->json(['error' => 'Anda Belum memiliki data nilai'], 422);
-            }
-
-            if ($nilai <= 0) {
-                return response()->json(['error' => 'Tidak ada rekomendasi yang cocok untuk kamu'], 422);
-            }
-
-            $kelulusan = DB::table('view_rekapitulasi_nilai_to_sebelum')
-                ->join('kelulusan', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 'kelulusan.username')
-                ->whereIn('kelulusan.id_prodi', $prodiIds)
-                ->where('view_rekapitulasi_nilai_to_sebelum.average_to', '<=', $nilai)
-                ->select('kelulusan.id_prodi')
-                ->orderByDesc('view_rekapitulasi_nilai_to_sebelum.average_to')
-                ->distinct()
-                ->pluck('kelulusan.id_prodi')
-                ->toArray();
-
-            if (empty($kelulusan)) {
-                return response()->json(['error' => 'Tidak ada rekomendasi yang cocok untuk kamu'], 422);
-            }
-
-            $checkRekomendasi = DB::table('t_prodi')
-                ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
-                ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 'kelulusan.username')
-                ->whereIn('t_prodi.id_prodi', $kelulusan)
-                ->select('t_prodi.id_prodi', DB::raw('AVG(view_rekapitulasi_nilai_to_sebelum.average_to) as average_total_nilai'))
-                ->groupBy('t_prodi.id_prodi')
-                ->get();
-
-            $rekomendasiFinal = $checkRekomendasi->filter(function($check) use ($nilai) {
-                return $nilai >= $check->average_total_nilai;
-            })->pluck('id_prodi')->toArray();
-
-            if (empty($rekomendasiFinal)) {
-                return response()->json(['error' => 'Tidak ada rekomendasi yang cocok untuk kamu'], 422);
-            }
-
-            $prodiRekomendasi = Prodi::whereIn('t_prodi.id_prodi', $rekomendasiFinal)
-                ->join('t_ptn', 't_prodi.id_ptn', '=', 't_ptn.id_ptn')
-                ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
-                ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 'kelulusan.username')
-                ->select(
-                    't_prodi.id_prodi',
-                    't_prodi.nama_prodi',
-                    't_ptn.nama_ptn',
-                    't_ptn.nama_singkat',
-                    DB::raw('AVG(view_rekapitulasi_nilai_to_sebelum.average_to) as average_total_nilai')
-                )
-                ->groupBy('t_prodi.id_prodi', 't_prodi.nama_prodi', 't_ptn.nama_ptn', 't_ptn.nama_singkat')
-                ->orderByDesc('average_total_nilai')
-                ->paginate(10);
-
-            return response()->json(['rekomendasi' => $prodiRekomendasi]);
-        } catch (\Exception $exception) {
-            return response()->json(['success' => false, 'error' => $exception->getMessage()], 500);
-        }
-    }
-
-
-
-    public function prediksi_prodi(Request $request)
-    {
-        try {
-            $namaProdi = $request->prodi;
-
-            $prodiIds = Prodi::where('nama_prodi', 'like', "%$namaProdi%")->pluck('id_prodi');
-
-            if ($prodiIds->isEmpty()) {
-                $errorMessage = "Nama Prodi tidak ada";
-                return response()->json(['error' => $errorMessage], 422);
-            }
-
-            $nilai = ViewNilaiFinalTerbaru::where('username', auth()->user()->email)->first()->average_to;
-
-            if(empty($nilai)){
-                $errorMessage = "Anda Belum memiliki data nilai";
-                return response()->json(['error' => $errorMessage], 422);
-            }
-
-            if ($nilai <= 0) {
-                $errorMessage = "Tidak ada rekomendasi yang cocok untuk kamu";
-                return response()->json(['error' => $errorMessage], 422);
-            }
-
-            $kelulusan = DB::table('view_rekapitulasi_nilai_to_sebelum')
-                ->join('kelulusan', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 'kelulusan.username')
-                ->whereIn('kelulusan.id_prodi', $prodiIds)
-                ->where('view_rekapitulasi_nilai_to_sebelum.average_to', '<=', $nilai)
-                ->select('kelulusan.id_prodi')
-                ->orderByDesc('view_rekapitulasi_nilai_to_sebelum.average_to')
-                ->get();
-
-            if ($kelulusan->isEmpty()) {
-                $errorMessage = "Tidak ada rekomendasi yang cocok untuk kamu";
-                return response()->json(['error' => $errorMessage], 422);
-            }
-
-            $checkRekomendasi = DB::table('t_prodi')
-            ->whereIn('t_prodi.id_prodi', $kelulusan->pluck('id_prodi'))
-            ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
-            ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 'kelulusan.username')
-            ->select('t_prodi.id_prodi', DB::raw('avg(view_rekapitulasi_nilai_to_sebelum.average_to) as average_total_nilai'))
-            ->groupBy('t_prodi.id_prodi')
-            ->get(); 
-    
-            $rekomendasiFinal = [];
-    
-            foreach($checkRekomendasi as $check) {
-                if($nilai >= $check->average_total_nilai) { 
-                    $rekomendasiFinal[] = $check->id_prodi;
-                }
-            }
-            
-            if(empty($rekomendasiFinal)) { 
-                $errorMessage = "Tidak ada rekomendasi yang cocok untuk kamu";
-                return response()->json(['error' => $errorMessage], 422);
-            }
-    
-            $ptnRekomendasi = $rekomendasiFinal; 
-
-            $prodiRekomendasi = Prodi::whereIn('t_prodi.id_prodi', $ptnRekomendasi)
-            ->join('t_ptn', 't_prodi.id_ptn', '=', 't_ptn.id_ptn')
-            ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
-            ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 'kelulusan.username')
-            ->select(
-                't_prodi.id_prodi',
-                't_prodi.nama_prodi',
-                't_ptn.nama_ptn',
-                't_ptn.nama_singkat',
-                DB::raw('AVG(view_rekapitulasi_nilai_to_sebelum.average_to) as average_total_nilai')
-            )
-            ->groupBy(
-                't_prodi.id_prodi',
-                't_prodi.nama_prodi',
-                't_ptn.nama_ptn',
-                't_ptn.nama_singkat'
-            )
-            ->orderByDesc('average_total_nilai');
-
-            return response()->json([
-                'rekomendasi' => $prodiRekomendasi,
-            ]);
-        } catch (\Exception $exception) {
-            return response()->json(['success' => false, 'error' => $exception->getMessage()], 500);
-        }
-    }
-    // public function prediksi_prodi(Request $request)
-    // {
-    //     try {
-    //         // Ambil nama prodi dari request
-    //         $namaProdi = $request->prodi;
-
-    //         // Cari ID Prodi berdasarkan nama prodi
-    //         $prodiIds = Prodi::where('nama_prodi', 'like', "%$namaProdi%")->pluck('id_prodi');
-
-    //         // Jika prodi tidak ditemukan, kembalikan pesan kesalahan
-    //         if ($prodiIds->isEmpty()) {
-    //             $errorMessage = "Nama Prodi tidak ada";
-    //             return response()->json(['error' => $errorMessage], 422);
-    //         }
-
-    //         // Ambil nilai user
-    //         $nilai = ViewNilaiFinalTerbaru::where('username', auth()->user()->email)->value('average_to');
-
-    //         if (is_null($nilai)) {
-    //             $errorMessage = "Anda Belum memiliki data nilai";
-    //             return response()->json(['error' => $errorMessage], 422);
-    //         }
-
-    //         if ($nilai <= 0) {
+    //         if(empty($rekomendasiFinal)) {
     //             $errorMessage = "Tidak ada rekomendasi yang cocok untuk kamu";
     //             return response()->json(['error' => $errorMessage], 422);
     //         }
 
-    //         // Cari kelulusan berdasarkan prodi dan nilai
-    //         $kelulusan = DB::table('view_rekapitulasi_nilai_to_sebelum')
-    //             ->join('kelulusan', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 'kelulusan.username')
-    //             ->whereIn('kelulusan.id_prodi', $prodiIds)
-    //             ->where('view_rekapitulasi_nilai_to_sebelum.average_to', '<=', $nilai)
-    //             ->select('kelulusan.id_prodi')
-    //             ->orderByDesc('view_rekapitulasi_nilai_to_sebelum.average_to')
-    //             ->pluck('kelulusan.id_prodi');
-
-    //         // Jika tidak ada kelulusan, kembalikan pesan kesalahan
-    //         if ($kelulusan->isEmpty()) {
-    //             $errorMessage = "Tidak ada rekomendasi yang cocok untuk kamu";
-    //             return response()->json(['error' => $errorMessage], 422);
-    //         }
-
-    //         $checkRekomendasi = DB::table('t_prodi')
-    //             ->whereIn('t_prodi.id_prodi', $kelulusan)
-    //             ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
-    //             ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 'kelulusan.username')
-    //             ->select('t_prodi.id_prodi', DB::raw('AVG(view_rekapitulasi_nilai_to_sebelum.average_to) as average_total_nilai'))
-    //             ->groupBy('t_prodi.id_prodi')
-    //             ->havingRaw('AVG(view_rekapitulasi_nilai_to_sebelum.average_to) <= ?', [$nilai])
-    //             ->pluck('t_prodi.id_prodi');
-
-    //         // Jika tidak ada rekomendasi, kembalikan pesan kesalahan
-    //         if ($checkRekomendasi->isEmpty()) {
-    //             $errorMessage = "Tidak ada rekomendasi yang cocok untuk kamu";
-    //             return response()->json(['error' => $errorMessage], 422);
-    //         }
-
-    //         // Ambil rekomendasi prodi berdasarkan kelulusan
-    //         $prodiRekomendasi = Prodi::whereIn('t_prodi.id_prodi', $checkRekomendasi)
+    //         // Ambil rekomendasi prodi berdasarkan id_prodi yang sudah difilter
+    //         $prodiRekomendasi = Prodi::whereIn('t_prodi.id_prodi', $rekomendasiFinal)
     //             ->join('t_ptn', 't_prodi.id_ptn', '=', 't_ptn.id_ptn')
     //             ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
-    //             ->join('view_rekapitulasi_nilai_to_sebelum', 'view_rekapitulasi_nilai_to_sebelum.username', '=', 'kelulusan.username')
+    //             ->join('view_rekapitulasi_nilai_to', 'view_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
     //             ->select(
     //                 't_prodi.id_prodi',
     //                 't_prodi.nama_prodi',
     //                 't_ptn.nama_ptn',
     //                 't_ptn.nama_singkat',
-    //                 DB::raw('AVG(view_rekapitulasi_nilai_to_sebelum.average_to) as average_total_nilai')
+    //                 DB::raw('AVG(view_rekapitulasi_nilai_to.average_to) as average_total_nilai')
     //             )
     //             ->groupBy(
     //                 't_prodi.id_prodi',

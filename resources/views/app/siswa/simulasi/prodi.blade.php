@@ -124,92 +124,28 @@
 </script>
 
 
-<!-- Add this script in your Blade view -->
-<script>
-$(document).ready(function() {
-    $('form').submit(function(event) {
-        event.preventDefault();
-
-        $('#loading-spinner').removeClass('d-none');
-        $.ajax({
-            type: 'POST',
-            url: $(this).attr('action'),
-            data: $(this).serialize(),
-            dataType: 'json',
-
-            success: function(response) {
-
-                $('#kategori').text(response.kategori);
-                
-                if (response.kategori == "Macet Total" || response.kategori == "Macet") {
-                    $('#kategori').css('color', 'red'); 
-                } else if (response.kategori == "Dipertimbangkan") {
-                    $('#kategori').css('color', 'orange'); 
-                } else {
-                    $('#kategori').css('color', 'green');
-                }
-
-                $('#peringkat').text(response.peringkat);
-                $('#total_pendaftar').text(response.total_pendaftar);
-                $('#nilai_saya').text(response.nilai_saya);
-                $('#nilai_rata').text(response.nilai_rata);
-
-                if (response.rekomendasi) {
-                    // Display the rekomendasi table or error message
-                    if (response.rekomendasi.data.length > 0) {
-                        // Display the table
-                        $('#rekomendasi-table tbody').empty();
-                        $.each(response.rekomendasi.data, function(index, item) {
-                            $('#rekomendasi-table tbody').append('<tr><td>' + (index + 1) + '</td><td>' + item.nama_prodi + '</td><td>' + item.nama_singkat + '</td><td>' + (item.average_total_nilai * 10).toLocaleString('en-US', { minimumFractionDigits: 2 }) + '</td></tr>');
-                        });
-                        $('#rekomendasi-message').hide();
-                        $('#rekomendasi-table').show();
-
-                        // Handle pagination links
-                        $('#pagination-links').html(response.rekomendasi.links);
-                    } else {
-                        // Display the error message
-                        $('#rekomendasi-message').text('Maaf sepertinya tidak ada prodi yang cocok untuk kamu').show();
-                        $('#rekomendasi-table').hide();
-                        $('#pagination-links').empty();
-                    }
-                }
-                $('#loading-spinner').addClass('d-none');
-            },
-            error: function(error) {
-                var errorMessage = error.responseJSON.error;
-                $('#rekomendasi-message').text(errorMessage).show();
-                $('#loading-spinner').addClass('d-none');
-            }
-        });
-    });
-});
-</script>
-
 {{-- <script>
     $(document).ready(function() {
         $('form').submit(function(event) {
             event.preventDefault();
-    
-            var formData = $(this).serialize();
-            console.log("Form data being sent:", formData);
+            $('#loading-spinner').removeClass('d-none');
     
             $.ajax({
                 type: 'POST',
                 url: $(this).attr('action'),
-                data: formData, 
+                data: $(this).serialize(),
                 dataType: 'json',
-    
                 success: function(response) {
-                    console.log("Server response:", response);
-    
+                    $('#loading-spinner').addClass('d-none');
                     if (response.rekomendasi) {
-                        // Display the rekomendasi table or error message
-                        if (response.rekomendasi.data.length > 0) {
-                            // Display the table
-                            $('#rekomendasi-table tbody').empty();
-                            $.each(response.rekomendasi.data, function(index, item) {
-                                $('#rekomendasi-table tbody').append('<tr><td>' + (index + 1) + '</td><td>' + item.nama_prodi + '</td><td>' + item.nama_ptn + ' - ' + item.nama_singkat + '</td><td>' + (item.average_total_nilai * 10).toLocaleString('en-US', { minimumFractionDigits: 2 }) + '</td></tr>');
+                        const rekomendasiData = response.rekomendasi;
+                        if (rekomendasiData.length > 0) {
+                            const tbody = $('#rekomendasi-table tbody');
+                            tbody.empty();
+                            $.each(rekomendasiData, function(index, item) {
+                                tbody.append(
+                                    '<tr><td>' + (index + 1) + '</td><td>' + item.nama_prodi + '</td><td>' + item.nama_singkat + '</td><td>' + (item.average_total_nilai * 10).toLocaleString('en-US', { minimumFractionDigits: 2 }) + '</td></tr>'
+                                );
                             });
                             $('#rekomendasi-message').hide();
                             $('#rekomendasi-table').show();
@@ -217,33 +153,98 @@ $(document).ready(function() {
                             // Handle pagination links
                             $('#pagination-links').html(response.rekomendasi.links);
                         } else {
-                            // Display the error message
-                            $('#rekomendasi-message')
-                                .text('Maaf sepertinya tidak ada prodi yang cocok untuk kamu')
-                                .addClass('alert alert-danger')
-                                .show();
-                            $('#rekomendasi-table').hide();
-                            $('#pagination-links').empty();
+                            displayErrorMessage('Maaf sepertinya tidak ada prodi yang cocok untuk kamu');
                         }
+                    } else {
+                        displayErrorMessage('Maaf sepertinya tidak ada prodi yang cocok untuk kamu');
                     }
                 },
-                error: function(xhr, status, error) {
-                    console.error("Error details:", {
-                        xhr: xhr,
-                        status: status,
-                        error: error
-                    });
-                    
-                    if (xhr.responseJSON && xhr.responseJSON.error) {
-                        var errorMessage = xhr.responseJSON.error;
-                        $('#rekomendasi-message').text(errorMessage).addClass('alert alert-danger').show();
-                    } else {
-                        $('#rekomendasi-message').text("Terjadi kesalahan pada server").addClass('alert alert-danger').show();
-                    }
+                error: function(error) {
+                    var errorMessage = error.responseJSON ? error.responseJSON.error : 'An error occurred';
+                    displayErrorMessage(errorMessage);
+                    $('#loading-spinner').addClass('d-none');
                 }
             });
         });
+    
+        function displayErrorMessage(message) {
+            $('#rekomendasi-message').text(message).show();
+            $('#rekomendasi-table').hide();
+            $('#pagination-links').empty();
+        }
     });
-    </script> --}}
+</script> --}}
+
+<script>
+    $(document).ready(function() {
+        $('form').submit(function(event) {
+            event.preventDefault();
+            $('#loading-spinner').removeClass('d-none');
+
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                dataType: 'json',
+                success: function(response) {
+                    $('#loading-spinner').addClass('d-none');
+                    if (response.success) {
+                        checkRecommendation();
+                    } else {
+                        displayErrorMessage('Failed to dispatch job.');
+                    }
+                },
+                error: function(error) {
+                    var errorMessage = error.responseJSON ? error.responseJSON.error : 'An error occurred';
+                    displayErrorMessage(errorMessage);
+                    $('#loading-spinner').addClass('d-none');
+                }
+            });
+        });
+
+        function checkRecommendation() {
+            $.ajax({
+                type: 'GET',
+                url: '/siswa/simulasi/get-rekomendasi',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.rekomendasi) {
+                        const rekomendasiData = response.rekomendasi;
+                        if (rekomendasiData.error) {
+                            displayErrorMessage(rekomendasiData.error);
+                        } else 
+                        if (rekomendasiData.length > 0) {
+                            const tbody = $('#rekomendasi-table tbody');
+                            tbody.empty();
+                            $.each(rekomendasiData, function(index, item) {
+                                tbody.append(
+                                    '<tr><td>' + (index + 1) + '</td><td>' + item.nama_prodi + '</td><td>' + item.nama_singkat + '</td><td>' + (item.average_total_nilai * 10).toLocaleString('en-US', { minimumFractionDigits: 2 }) + '</td></tr>'
+                                );
+                            });
+                            $('#rekomendasi-message').hide();
+                            $('#rekomendasi-table').show();
+
+                        } else {
+                            displayErrorMessage('Maaf sepertinya tidak ada prodi yang cocok untuk kamu');
+                        }
+                    } else {
+                        displayErrorMessage('Maaf sepertinya tidak ada prodi yang cocok untuk kamu');
+                    }
+                },
+                error: function(error) {
+                    setTimeout(checkRecommendation, 5000); // Retry after 5 seconds
+                }
+            });
+        }
+
+        function displayErrorMessage(message) {
+            $('#rekomendasi-message').addClass('alert alert-danger').text(message).show();
+            $('#rekomendasi-table').hide();
+        }
+    });
+</script>
+
+
+
 
 @endsection   
