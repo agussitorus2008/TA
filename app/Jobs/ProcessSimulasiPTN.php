@@ -77,23 +77,6 @@ class ProcessSimulasiPTN implements ShouldQueue
                 return;
             }
 
-            // Get kelulusan prodi IDs where user's score is higher or equal to the average score required
-            // $kelulusan = DB::table('view_rekapitulasi_nilai_to')
-            //     ->join('kelulusan', 'view_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
-            //     ->whereIn('kelulusan.id_prodi', $prodiIds)
-            //     ->where('view_rekapitulasi_nilai_to.average_to', '<=', $nilai)
-            //     ->orderByDesc('view_rekapitulasi_nilai_to.average_to')
-            //     ->pluck('kelulusan.id_prodi')
-            //     ->toArray();
-    
-            // if (empty($kelulusan)) {
-            //     $recomendation->update([
-            //         'data' => json_encode(['error' => "Tidak ada rekomendasi yang cocok untuk kamu"]),
-            //     ]);
-            //     return;
-            // }
-
-            // Check recommendation by calculating average score for each prodi
             $checkRekomendasi = DB::table('t_prodi')
                 ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
                 ->join('view_rekapitulasi_nilai_to', 'view_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')

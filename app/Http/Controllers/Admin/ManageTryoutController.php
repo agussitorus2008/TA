@@ -16,7 +16,7 @@ class ManageTryoutController extends Controller
         $currentMonth = Date::now()->month;
         $currentYear = Date::now()->year;
 
-        if ($currentMonth >= 6) {
+        if ($currentMonth >= 8) {
             $tahunSekarang = $currentYear + 1;
         } else {
             $tahunSekarang = $currentYear;
@@ -45,7 +45,7 @@ class ManageTryoutController extends Controller
         $currentMonth = Date::now()->month;
         $currentYear = Date::now()->year;
 
-        if ($currentMonth >= 6) {
+        if ($currentMonth >= 8) {
             $tahunSekarang = $currentYear + 1;
         } else {
             $tahunSekarang = $currentYear;
@@ -96,7 +96,7 @@ class ManageTryoutController extends Controller
         $currentMonth = Date::now()->month;
         $currentYear = Date::now()->year;
 
-        $expectedYear = ($currentMonth >= 6) ? $currentYear + 1 : $currentYear;
+        $expectedYear = ($currentMonth >= 8) ? $currentYear + 1 : $currentYear;
 
         if ($request->input('tahun') != $expectedYear) {
             return back()->withErrors(['tahun' => 'Tahun yang dimasukkan tidak valid berdasarkan bulan saat ini.'])->withInput();

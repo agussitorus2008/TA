@@ -37,7 +37,7 @@ class SiswaController extends Controller
         $currentMonth = Date::now()->month;
         $currentYear = Date::now()->year;
 
-        if ($currentMonth >= 6) {
+        if ($currentMonth >= 8) {
             $tahunSekarang = $currentYear + 1;
         } else {
             $tahunSekarang = $currentYear;
@@ -118,7 +118,7 @@ class SiswaController extends Controller
         
         $currentMonth = Date::now()->month;
         $currentYear = Date::now()->year;
-        $expectedYear = ($currentMonth >= 6) ? $currentYear + 1 : $currentYear;
+        $expectedYear = ($currentMonth >= 8) ? $currentYear + 1 : $currentYear;
 
         $siswa = new TSiswa();
         $siswa->username = $email;

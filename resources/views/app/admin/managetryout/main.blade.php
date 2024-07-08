@@ -86,7 +86,7 @@
             $('#active').on('change', function() {
                 var currentYear = new Date().getFullYear();
                 var currentMonth = new Date().getMonth() + 1;
-                var checkYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
+                var checkYear = currentMonth >= 8 ? currentYear + 1 : currentYear;
     
                 if ($('#active').val() != checkYear) {
                     $('#add').addClass('d-none');

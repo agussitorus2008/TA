@@ -86,11 +86,9 @@ class ApiController extends Controller
                 $statusList[$siswa->username] = "Belum Ada Nilai Tryout";
             }
 
-            // Add status to the siswa object (optional, if needed in frontend)
             $siswa->status = $statusList[$siswa->username];
         }
 
-        // Return response as JSON
         return response()->json(['siswaList' => $siswaList]);
     }
 
@@ -101,18 +99,15 @@ class ApiController extends Controller
         $siswaList = TSiswa::with('sekolah_siswa')->where('active', $query)->paginate(20);
         $statusList = [];
 
-        // Loop through each siswa in the paginated results
         foreach ($siswaList as $siswa) {
             $nilaitoCount = TNilaito::where('username', $siswa->username)->count();
 
-            // Determine status based on the count
             if ($nilaitoCount > 0) {
                 $statusList[$siswa->username] = "Sudah Ada Nilai Tryout";
             } else {
                 $statusList[$siswa->username] = "Belum Ada Nilai Tryout";
             }
 
-            // Add status to the siswa object (optional, if needed in frontend)
             $siswa->status = $statusList[$siswa->username];
         }
 
