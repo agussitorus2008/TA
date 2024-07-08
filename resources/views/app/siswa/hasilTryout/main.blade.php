@@ -9,16 +9,18 @@
     <div id="error-message" style="display: none;">
     </div>
 
-
 <div class="content">
-    @if($nilaito == null)
-        <div class="row justify-content-center">
-            <h5 class="text-danger">Belum ada data siswa</h5>
+    @if($errorMessage == 2)
+        <div class="row justify-content-center text-center">
+            <h5 class="text-danger alert alert-danger">Belum ada data Siswa</h5>
         </div>
-        <div class="row justify-content-center">
+        <div class="row justify-content-center text-center">
             <div class="col xs-4">
             <a href="{{route('siswa.profile.main')}}" class="btn btn-warning">Tambah Data</a>
         </div>
+    @elseif($errorMessage == 0)
+        <div class="row justify-content-center text-center">
+            <h5 class="text-danger alert alert-danger">Belum ada data Nilai</h5>
         </div>
     @else
     
@@ -54,7 +56,7 @@
                 <h6>{{$siswa->first_name}}</h6>
             </div>
             <div class="col-xl-4">
-                <h6>{{$siswa->asal_sekolah}}</h6>
+                <h6>{{$siswa->sekolah_siswa->sekolah}}</h6>
             </div>
             <div class="col-xl-4">
                 <h6>{{$siswa->kelompok_ujian}}</h6>
@@ -72,22 +74,6 @@
                         <h5 class="text-white m-2">{{$siswa->pilihan1->nama_prodi_ptn}} DAYA TAMPUNG: {{ $dayatampung1->daya_tampung }}</h5>
                     </div>
                 </div>
-            </div>
-            <div class="col-xl-6">
-                <h4>Pilihan 2</h4>
-                <div class="card" style="background-color: #0A407F;">
-                    <div class="card-header d-sm-flex align-items-center">
-                        <h5 class="text-white m-2">{{$siswa->pilihan2->nama_prodi_ptn}} DAYA TAMPUNG: {{ $dayatampung2->daya_tampung }}</h5>
-                    </div>
-                </div>
-            </div>
-            <hr>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="row justify-content-center text-center">
-            <div class="col-xl-6">
                 <a href="{{ route('siswa.hasilTryout.pilihan1', ['nama_prodi' => $siswa->pilihan1->nama_prodi_ptn]) }}" target="_blank" style="text-decoration: none; color: inherit;">
                     <p style="display: inline;">
                         @if(is_int($peringkat11))
@@ -99,19 +85,24 @@
                 </a>
                 <a href="{{ route('siswa.hasilTryout.pilihanTotal', ['nama_prodi' => $siswa->pilihan1->nama_prodi_ptn]) }}" target="_blank" style="text-decoration: none; color: inherit;"><p style="display: inline;">Peringkat <p style="color: #e32227;display: inline; font-weight:bold">{{ $peringkat1 }}</p> dari <p style="color: #3DA059;display: inline; font-weight:bold">{{$totalpendaftar1}}</p> Total Pendaftar</p></a>
             </div>
-
             <div class="col-xl-6">
+                <h4>Pilihan 2</h4>
+                <div class="card" style="background-color: #0A407F;">
+                    <div class="card-header d-sm-flex align-items-center">
+                        <h5 class="text-white m-2">{{$siswa->pilihan2->nama_prodi_ptn}} DAYA TAMPUNG: {{ $dayatampung2->daya_tampung }}</h5>
+                    </div>
+                </div>
                 <a href="{{ route('siswa.hasilTryout.pilihan1', ['nama_prodi' => $siswa->pilihan2->nama_prodi_ptn]) }}" target="_blank" style="text-decoration: none; color: inherit;">
                     <p style="display: inline;">
                         @if(is_int($peringkat22))
-                            Peringkat <p style="color: #e32227;display: inline; font-weight:bold">{{ $peringkat22 }}</p> dari <p style="color: #0A407F;display: inline; font-weight:bold">{{$totalpendaftar22}}</p> Pendaftar Pilihan 1
+                            Peringkat <p style="color: #e32227;display: inline; font-weight:bold">{{ $peringkat22 }}</p> dari <p style="color: #0A407F;display: inline; font-weight:bold">{{$totalpendaftar22}}</p> Pendaftar Pilihan 2
                         @else
                             {{ $peringkat22 }}
                         @endif
                     </p>
                 </a>
                 <a href="{{ route('siswa.hasilTryout.pilihanTotal', ['nama_prodi' => $siswa->pilihan2->nama_prodi_ptn]) }}" target="_blank" style="text-decoration: none; color: inherit;"><p style="display: inline;">Peringkat <p style="color: #e32227;display: inline; font-weight:bold">{{ $peringkat2 }}</p> dari <p style="color: #0A407F;display: inline; font-weight:bold">{{$totalpendaftar2}}</p> Total Pendaftar</p></a>
-            </div>            
+            </div>
             <hr>
         </div>
     </div>
@@ -135,10 +126,11 @@
                 </tr>
             </thead>
             <tbody>
+
                 @foreach($nilaito as $index => $nilai)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ \Carbon\Carbon::parse($nilai->tanggal)->format('d-m-y') }}</td>
+                    <td>{{ $nilai->tanggal }}</td>
                     <td>{{ $nilai->ppu_benar }}</td>
                     <td>{{ $nilai->pu_benar }}</td>
                     <td>{{ $nilai->pm_benar }}</td>

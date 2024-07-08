@@ -16,7 +16,7 @@
             <div class="card-body">
                 <div class="">
                     <h5>{{ $siswa->first_name }}</h5>
-                    <p style="font-size: 18px">{{ $siswa->asal_sekolah }}</p>
+                    <p style="font-size: 18px">{{ $siswa->sekolah_siswa->sekolah }}</p>
                 </div>
                 @if($nilaiRata == null)
                     <h5 class="alert alert-danger text-center">Belum Ada Data Nilai</h5>
@@ -35,18 +35,13 @@
                             </thead>
                             <tbody>
                                 @foreach ($tryouts as $index => $tryout)
-                                    <?php
-                                        $avg = ($bobot_ppu * $tryout->ppu) + ($bobot_pu * $tryout->pu) + ($bobot_pm * $tryout->pm) + ($bobot_pk * $tryout->pk) + ($bobot_lbi * $tryout->lbi) + ($bobot_lbe * $tryout->lbe) + ($bobot_pbm * $tryout->pbm);
-                                        $avg = ($tryout->pu + $tryout->ppu + $tryout->pm + $tryout->pk + $tryout->lbi + $tryout->lbe + $tryout->pbm)/$bobot_total*100;
-                                        $avg = number_format($avg, 2) * 10;
-                                    ?>
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
-                                        <td>Tryout {{ $tryout->nama_tryout }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($tryout->tanggal)->format('d-m-y') }}</td>
-                                        <td>{{ $avg }}</td>
+                                        <td>{{ $tryout->tryout->nama_to }}</td>
+                                        <td>{{ $tryout->tanggal ? $tryout->tanggal->format('d-m-Y') : 'Tidak Tersedia' }}</td>
+                                        <td>{{ number_format($nilai[$index]->total_nilai, 2) * 10 }}</td>
                                         <td>
-                                            <a href="{{ route('admin.siswa.detailtryout.detail', ['username' => $siswa->username, 'nama_tryout' => $tryout->nama_tryout, 'rata' => $avg]) }}" class="btn btn-primary">Detail</a>                            
+                                            <a href="{{ route('admin.siswa.detailtryout.detail', ['username' => $siswa->username, 'id_to' => $tryout->id_to, 'rata' => number_format($nilai[$index]->total_nilai, 2) * 10]) }}" class="btn btn-primary">Detail</a>                            
                                         </td>                                        
                                     </tr>
                                 @endforeach

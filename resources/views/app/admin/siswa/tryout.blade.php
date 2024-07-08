@@ -16,7 +16,7 @@
             <div class="card-body">
                 <div class="">
                     <h5>{{ $siswa->first_name }}</h5>
-                    <p style="font-size: 18px">{{ $siswa->asal_sekolah }}</p>
+                    <p style="font-size: 18px">{{ $siswa->sekolah_siswa->sekolah }}</p>
                 </div>
                 <div style="text-align: right;">
                     <a href="{{ route('admin.siswa.tryout.add', ['username' => $siswa->username]) }}" class="btn btn-primary mb-2">Tambah</a>
@@ -42,29 +42,25 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($tryouts as $index => $tryout)
-                                    <?php
-                                        $avg = ($tryout->ppu/$bobot_ppu * 100) + ($tryout->pu/$bobot_pu * 100) + ($tryout->pm/$bobot_pm*100) + ($tryout->pk/$bobot_pk*100) + ($tryout->lbi/$bobot_lbi*100) + ($tryout->lbe/$bobot_lbe*100) + ($tryout->pbm/$bobot_pbm*100);
-                                        $avg = ($tryout->pu + $tryout->ppu + $tryout->pm + $tryout->pk + $tryout->lbi + $tryout->lbe + $tryout->pbm)/$bobot_total*100;
-                                        $avg = number_format($avg, 2) * 10;
-                                    ?>
+                                @foreach ($tryouts as $index => $data)
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
-                                        <td>Tryout {{ $tryout->nama_tryout }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($tryout->tanggal)->format('d-m-y') }}</td>
-                                        <td>{{ $avg }}</td>
+                                        <td>{{ $data->nama_to }}</td>
+                                        <td>{{ $data->tanggal ? $data->tanggal->format('d-m-Y') : 'Tidak Tersedia' }}</td>
+                                        <td>{{ number_format($nilai[$index]->total_nilai, 2) * 10 }}</td> <!-- Sesuaikan total_nilai dengan kolom yang ingin ditampilkan -->
                                         <td>
-                                            <a href="{{ route('admin.siswa.tryout.detail', ['username' => $siswa->username, 'nama_tryout' => $tryout->nama_tryout, 'rata' => $avg]) }}" class="btn btn-primary">Detail</a>
-                                            <a href="{{ route('admin.siswa.tryout.edit', ['username' => $siswa->username, 'nama_tryout' => $tryout->nama_tryout]) }}" class="btn btn-warning">Ubah</a>
-                                            <form action="{{ route('admin.siswa.tryout.delete', ['username' => $siswa->username, 'nama_tryout' => $tryout->nama_tryout]) }}" method="POST" style="display: inline;">
+                                            <a href="{{ route('admin.siswa.tryout.detail', ['username' => $siswa->username, 'id_to' => $data->id_to, 'rata' => number_format($nilai[$index]->total_nilai, 2) * 10]) }}" class="btn btn-primary">Detail</a>
+                                            <a href="{{ route('admin.siswa.tryout.edit', ['username' => $siswa->username, 'id_to' => $data->id_to]) }}" class="btn btn-warning">Ubah</a>
+                                            <form action="{{ route('admin.siswa.tryout.delete', ['username' => $siswa->username, 'id_to' => $data->id_to]) }}" method="POST" style="display: inline;">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-danger">Hapus</button>
-                                            </form>                              
-                                        </td>                                        
+                                            </form>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
+                            
                         </table>
                         <h5>Nilai Rata - Rata: {{ $nilaiRata ? number_format($nilaiRata->average_to * 10, 2) : 0 }}</h5>
                         @endif

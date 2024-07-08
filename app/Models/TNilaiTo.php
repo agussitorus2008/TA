@@ -10,11 +10,13 @@ class TNilaiTo extends Model
     use HasFactory;
 
     protected $table = "t_nilai_to";
+    // protected $primaryKey = "username";
+    // protected $keyType = "string";
+    // public $incrementing = false; 
 
     protected $fillable = [
         'username',
         'id_to',
-        'nama_tryout',
         'tanggal',
         'pu',
         'ppu',
@@ -29,4 +31,14 @@ class TNilaiTo extends Model
     protected $dates = [
         'tanggal',
     ];
+
+    public function tryout()
+    {
+        return $this->belongsTo(TTo::class, 'id_to', 'id_to');
+    }
+
+    public function rekapitulasiNilai()
+    {
+        return $this->belongsTo(Nilai::class, 'username', 'username');
+    }
 }

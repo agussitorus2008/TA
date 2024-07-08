@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\TSiswa;
 use App\Models\Nilai;
-use App\Models\Nilaito;
+use App\Models\TNilaiTo;
 use App\Models\Sekolah;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Date;
 
 class DashboardController extends Controller
 {
@@ -19,23 +20,33 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $total_pendaftar = TSiswa::where('active', now()->year)
+        $currentMonth = Date::now()->month;
+        $currentYear = Date::now()->year;
+
+        if ($currentMonth >= 6) {
+            $tahunSekarang = $currentYear + 1;
+        } else {
+            $tahunSekarang = $currentYear;
+        }
+
+        $total_pendaftar = TSiswa::where('active', $tahunSekarang)
             ->count();
-        $rata = Nilai::join('t_nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 't_nilai_to.username')
-            ->whereYear('t_nilai_to.tanggal', now()->year)
-            ->avg('mv_rekapitulasi_nilai_to.total_nilai');
-        $max = Nilai::join('t_nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 't_nilai_to.username')
-            ->whereYear('t_nilai_to.tanggal', now()->year)
-            ->max('mv_rekapitulasi_nilai_to.total_nilai');
 
-        $sekolah = Sekolah::count();
+        $rata = TSiswa::join('view_rekapitulasi_nilai_to', 't_siswa.username', '=', 'view_rekapitulasi_nilai_to.username')
+            ->where('t_siswa.active', $tahunSekarang)
+            ->avg('view_rekapitulasi_nilai_to.average_to');
+            
+        $max = TSiswa::join('view_rekapitulasi_nilai_to', 't_siswa.username', '=', 'view_rekapitulasi_nilai_to.username')
+            ->where('t_siswa.active', $tahunSekarang)
+            ->max('view_rekapitulasi_nilai_to.average_to');
 
-        $currentYear = Carbon::now()->year;
+        $sekolah = TSiswa::where('active', $tahunSekarang)
+        ->distinct('asal_sekolah')
+        ->count();
 
-        $data = Nilai::join('t_nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 't_nilai_to.username')
-            ->selectRaw('YEAR(t_nilai_to.tanggal) as year, AVG(mv_rekapitulasi_nilai_to.total_nilai) as average')
-            ->whereYear('t_nilai_to.tanggal', '>=', $currentYear) 
-            ->whereYear('t_nilai_to.tanggal', '<=', $currentYear + 1) 
+        $data = TSiswa::join('view_rekapitulasi_nilai_to', 't_siswa.username', '=', 'view_rekapitulasi_nilai_to.username')
+            ->whereNotIn('t_siswa.active', [0, 23])
+            ->selectRaw('t_siswa.active as year, AVG(view_rekapitulasi_nilai_to.average_to) as average')
             ->groupBy('year')
             ->get();
 

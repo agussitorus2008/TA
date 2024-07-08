@@ -16,5 +16,4 @@ class PTN extends Model
         'nama_ptn',
         'nama_singkat',
     ];
-
 }

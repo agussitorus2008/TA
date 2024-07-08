@@ -15,8 +15,8 @@
             <div class="card-body">
                 <div class="ab">
                     <h6>Nama Siswa :{{ $siswa->first_name }}</h6>
-                    <p>Asal sekolah :{{ $siswa->asal_sekolah }}</p>
-                    <p>Nama Tryout :{{ $tryout->nama_tryout }}</p>
+                    <p>Asal sekolah :{{ $siswa->sekolah_siswa->sekolah }}</p>
+                    <p>Nama Tryout :{{ $tryout->tryout->nama_to }}</p>
                     <p>Tanggal Tryout :{{ \Carbon\Carbon::parse($tryout->tanggal)->format('d-m-y') }}</p>
                 </div>
                 <div class="d-flex justify-content-end mb-3">
@@ -28,6 +28,7 @@
                                     <th>No</th>
                                     <th>Jenis</th>
                                     <th>Jumlah Benar</th>
+                                    <th>Jumlah Soal</th>
                                     <th>Nilai</th>
                                 </tr>
                             </thead>
@@ -53,53 +54,55 @@
                                     <td>1</td>
                                     <td>PPU</td>
                                     <td>{{ $tryout->ppu }}</td>
-                                    {{-- <td>{{ $bobot_ppu }}</td> --}}
+                                    <td>{{ $bobot_ppu }}</td>
                                     <td>{{ $nilai_ppu }}</td>
                                 </tr>
                                 <tr>
                                     <td>2</td>
                                     <td>PU</td>
                                     <td>{{ $tryout->pu }}</td>
-                                    {{-- <td>{{ $bobot_pu }}</td> --}}
+                                    <td>{{ $bobot_pu }}</td>
                                     <td>{{ $nilai_pu }}</td>
                                 </tr>
                                 <tr>
                                     <td>3</td>
                                     <td>PM</td>
                                     <td>{{ $tryout->pm }}</td>
-                                    {{-- <td>{{ $bobot_pm }}</td> --}}
+                                    <td>{{ $bobot_pm }}</td>
                                     <td>{{ $nilai_pm }}</td>
                                 </tr>
                                 <tr>
                                     <td>4</td>
                                     <td>PK</td>
                                     <td>{{ $tryout->pk }}</td>
-                                    {{-- <td>{{ $bobot_pk }}</td> --}}
+                                    <td>{{ $bobot_pk }}</td>
                                     <td>{{ $nilai_pk }}</td>
                                 </tr>
                                 <tr>
                                     <td>5</td>
                                     <td>LBI</td>
                                     <td>{{ $tryout->lbi }}</td>
-                                    {{-- <td>{{ $bobot_lbi }}</td> --}}
+                                    <td>{{ $bobot_lbi }}</td>
                                     <td>{{ $nilai_lbi }}</td>
                                 </tr>
                                 <tr>
                                     <td>6</td>
                                     <td>LBE</td>
                                     <td>{{ $tryout->lbe }}</td>
-                                    {{-- <td>{{ $bobot_lbe }}</td> --}}
+                                    <td>{{ $bobot_lbe }}</td>
                                     <td>{{ $nilai_lbe }}</td>
                                 </tr>
                                 <tr>
                                     <td>7</td>
                                     <td>PBM</td>
                                     <td>{{ $tryout->pbm }}</td>
-                                    {{-- <td>{{ $bobot_pbm }}</td> --}}
+                                    <td>{{ $bobot_pbm }}</td>
                                     <td>{{ $nilai_pbm }}</td>
                                 </tr>
                                 <tr>
-                                    <td colspan=3>RATA-RATA</td>
+                                    <td colspan=2>TOTAL</td>
+                                    <td>{{ $total_benar->total_benar }}</td>
+                                    <td>{{ $bobot_total }}</td>
                                     <td>{{ $rata }}</td>
                                 </tr>
                             </tbody>

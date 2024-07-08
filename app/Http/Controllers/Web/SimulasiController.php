@@ -131,7 +131,6 @@ class SimulasiController extends Controller
                 $rekomendasiFinal[] = $check->id_prodi;
             }
         }
-
         
         if(empty($rekomendasiFinal)) { 
             $errorMessage = "Tidak ada rekomendasi yang cocok untuk kamu";

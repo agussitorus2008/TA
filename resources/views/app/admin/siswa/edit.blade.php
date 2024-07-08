@@ -14,13 +14,13 @@
     <div class="row m-3">
         <div class="col-xl-6">
             <h4>{{ $siswa->first_name }}</h4>
-            <p>{{$siswa->asal_sekolah}}</p>
+            <p>{{$siswa->sekolah_siswa->sekolah}}</p>
         </div>
         <div class="col-xl-6">
-        <form action="{{ route('admin.siswa.tryout.update', ['username' => $siswa->username, 'nama_tryout' => $tryout->nama_tryout]) }}" method="POST">
+        <form action="{{ route('admin.siswa.tryout.update', ['username' => $siswa->username, 'id_to' => $tryout->id_to]) }}" method="POST">
             @csrf
-            <input type="hidden" name="nama_tryout" value="{{ $tryout->nama_tryout }}">
-            <p>Tryout ke : {{ $tryout->nama_tryout }}</p>
+            <input type="hidden" name="id_to" value="{{ $tryout->id_to }}">
+            <p>Nama Tryout : {{ $tryout->tryout->nama_to }}</p>
             <p>Tanggal Tryout : <input type="date" name="tanggal" value="{{ $tryout->tanggal ? $tryout->tanggal->format('Y-m-d') : '' }}" required style="width: 200px; padding: .375rem .75rem; font-size: 1rem; line-height: 1.5; color: #495057; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; border-radius: .25rem; transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;"></p>
         </div>
         <hr>

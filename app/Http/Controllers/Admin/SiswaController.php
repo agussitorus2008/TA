@@ -8,18 +8,29 @@ use App\Models\Sekolah;
 use App\Models\Tryout;
 use App\Models\TNilaito;
 use App\Models\Nilai;
+use App\Models\TTo;
 use App\Models\TSiswa;
 use App\Models\ViewNilaiFinalTerbaru;
 use App\Models\ViewNilaiFinal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Date;
 
 class SiswaController extends Controller
 {
     public function index()
     {
-        $siswaList = TSiswa::whereNotIn('active', [2023, 23, 0])->paginate(20);
+        $currentMonth = Date::now()->month;
+        $currentYear = Date::now()->year;
+
+        if ($currentMonth >= 6) {
+            $tahunSekarang = $currentYear + 1;
+        } else {
+            $tahunSekarang = $currentYear;
+        }
+
+        $siswaList = TSiswa::where('active', $tahunSekarang)->paginate(10);
 
         $statusList = [];
 
@@ -37,9 +48,10 @@ class SiswaController extends Controller
             ->whereNotNull('active')
             ->whereNotIn('active', [0, 23])
             ->distinct()
+            ->orderBy('active', 'asc')
             ->pluck('active');
             
-        return view('app.admin.siswa.main', compact('siswaList', 'tahun', 'statusList'));
+        return view('app.admin.siswa.main', compact('siswaList', 'tahun', 'statusList', 'tahunSekarang'));
     }
 
     public function detail($username)
@@ -50,25 +62,21 @@ class SiswaController extends Controller
             $siswa = "Belum ada data siswa";
         }
 
-        $tryouts = TNilaito::where('username', $username)->get();
+        $tryouts = TNilaito::join('t_to', 't_to.id_to', '=', 't_nilai_to.id_to')
+            ->where('t_nilai_to.username', $username)
+            ->orderBy('t_to.id_to', 'asc')
+            ->get();
 
-        if (empty($tryouts)) {
-            $tryouts = "Belum ada data Nilai Tryout";
-        }
+        $nilai = Nilai::where('username', $username)
+        ->orderBy('id_to', 'asc')
+        ->get(); 
+
 
         $nilaiRata = ViewNilaiFinal::where('username', $username)->first();
 
-        $bobot_ppu = 30;
-        $bobot_pu = 20;
-        $bobot_pm = 20;
-        $bobot_pk = 15;
-        $bobot_lbi = 30;
-        $bobot_lbe = 20;
-        $bobot_pbm = 20;
-        $bobot_total = 155;
-
-        return view('app.admin.siswa.tryout', compact('tryouts', 'siswa', 'bobot_ppu', 'bobot_pu', 'bobot_pm', 'bobot_pk', 'bobot_lbi', 'bobot_lbe', 'bobot_pbm', 'nilaiRata', 'bobot_total'));
+        return view('app.admin.siswa.tryout', compact('tryouts', 'siswa', 'nilaiRata', 'nilai'));
     }
+
 
 
     public function showindex($id)

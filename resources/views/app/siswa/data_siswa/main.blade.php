@@ -32,7 +32,7 @@
                         <h5>ASAL SEKOLAH</h5>
                     </div>
                     <div class="col-md-8">
-                        <h5>: {{ $siswa->asal_sekolah }}</h5> <!-- Fill with school information -->
+                        <h5>: {{ $siswa->sekolah_siswa->sekolah }}</h5> <!-- Fill with school information -->
                     </div>
                 </div>
                 <div class="row">

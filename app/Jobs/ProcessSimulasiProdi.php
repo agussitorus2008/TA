@@ -28,6 +28,18 @@ class ProcessSimulasiProdi implements ShouldQueue
     {
         set_time_limit(1800);
 
+        // $validate = Validator::make(['prodi' => $this->namaProdi], [
+        //     'prodi' => 'required|string|min:5'
+        // ], [
+        //     'prodi.min' => 'Masukkan minimal 5 karakter untuk nama program studi.'
+        // ]);
+
+        // if($validate->fails()){
+        //     $recomendation->update([
+        //         'data' => json_encode(['error' => "Masukkan minimal 5 karakter"]),
+        //     ]);
+        //     return;
+        // }
         $recomendation = Recommendation::where('email', $this->userEmail)->first();
 
         if (empty($recomendation)) {
@@ -67,25 +79,10 @@ class ProcessSimulasiProdi implements ShouldQueue
                 return;
             }
 
-            $kelulusan = DB::table('view_rekapitulasi_nilai_to')
-                ->join('kelulusan', 'view_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
-                ->whereIn('kelulusan.id_prodi', $prodiIds)
-                ->where('view_rekapitulasi_nilai_to.average_to', '<=', $nilai)
-                ->orderByDesc('view_rekapitulasi_nilai_to.average_to')
-                ->pluck('kelulusan.id_prodi')
-                ->toArray();
-
-            if (empty($kelulusan)) {
-                $recomendation->update([
-                    'data' => json_encode(['error' => "Tidak ada rekomendasi yang cocok untuk kamu"]),
-                ]);
-                return;
-            }
-
             $checkRekomendasi = DB::table('t_prodi')
                 ->join('kelulusan', 'kelulusan.id_prodi', '=', 't_prodi.id_prodi')
                 ->join('view_rekapitulasi_nilai_to', 'view_rekapitulasi_nilai_to.username', '=', 'kelulusan.username')
-                ->whereIn('t_prodi.id_prodi', $kelulusan)
+                ->whereIn('t_prodi.id_prodi', $prodiIds)
                 ->select('t_prodi.id_prodi', DB::raw('avg(view_rekapitulasi_nilai_to.average_to) as average_total_nilai'))
                 ->groupBy('t_prodi.id_prodi')
                 ->get();

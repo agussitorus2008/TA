@@ -13,6 +13,7 @@ use App\Models\ViewNilaiFInal;
 use App\Models\Sekolah;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Date;
 
 
 class SiswaController extends Controller
@@ -20,32 +21,43 @@ class SiswaController extends Controller
     public function profile()
     {
         $user = Auth::user();
-        $siswa = TSiswa::where('username', $user->email)->first();
-        if($siswa){
-            $propinsi = Sekolah::where('sekolah', $siswa->asal_sekolah)->value('propinsi');
+        $siswa = TSiswa::with('sekolah_siswa')->where('username', $user->email)->first();
+        
+        $propinsi = "Tidak Diketahui";
+        if ($siswa && $siswa->sekolah_siswa) {
+            $propinsi = $siswa->sekolah_siswa->propinsi;
         }
-        if(empty($propinsi)){
-            $propinsi = "Tidak Diketahui";
-        }
+
         return view('app.siswa.profile.profile', compact('user', 'siswa', 'propinsi'));
     }
 
 
     public function index()
     {
-        $total_pendaftar = TSiswa::where('active', now()->year)
-            ->count();
-        $rata = Nilai::join('t_nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 't_nilai_to.username')
-            ->whereYear('t_nilai_to.tanggal', now()->year)
-            ->avg('mv_rekapitulasi_nilai_to.total_nilai');
-        $max = Nilai::join('t_nilai_to', 'mv_rekapitulasi_nilai_to.username', '=', 't_nilai_to.username')
-            ->whereYear('t_nilai_to.tanggal', now()->year)
-            ->max('mv_rekapitulasi_nilai_to.total_nilai');
+        $currentMonth = Date::now()->month;
+        $currentYear = Date::now()->year;
 
-        // $rata = ViewNilaiFInal::avg('average_to');
-        // $max = ViewNilaiFInal::max('average_to');
+        if ($currentMonth >= 6) {
+            $tahunSekarang = $currentYear + 1;
+        } else {
+            $tahunSekarang = $currentYear;
+        }
 
-        $sekolah = Sekolah::count();
+        $total_pendaftar = TSiswa::where('active', $tahunSekarang)->count();
+            
+        $rata = TSiswa::join('view_rekapitulasi_nilai_to', 't_siswa.username', '=', 'view_rekapitulasi_nilai_to.username')
+            ->where('t_siswa.active', $tahunSekarang)
+            ->avg('view_rekapitulasi_nilai_to.average_to');
+            
+        $max = TSiswa::join('view_rekapitulasi_nilai_to', 't_siswa.username', '=', 'view_rekapitulasi_nilai_to.username')
+            ->where('t_siswa.active', $tahunSekarang)
+            ->max('view_rekapitulasi_nilai_to.average_to');
+            
+        // $sekolah = Sekolah::count();
+        $sekolah = TSiswa::where('active', $tahunSekarang)
+        ->distinct('asal_sekolah')
+        ->count();
+
 
         return view('app.siswa.main', compact('total_pendaftar', 'rata', 'max', 'sekolah'));
     }
@@ -86,7 +98,9 @@ class SiswaController extends Controller
             ->first();
 
         $ptn = PTN::get();
-        return view('app.siswa.profile.edit', compact('user', 'prodi', 'sekolah', 'selectedProdi1', 'ptn', 'selectedProdi2', 'selectedProdi', 'selectedPTN1', 'selectedPTN2', 'prodi1', 'prodi2'));
+        $provinsi = Sekolah::where('id', '=', $selectedProdi->asal_sekolah)->select('propinsi')->first();
+
+        return view('app.siswa.profile.edit', compact('user', 'prodi', 'sekolah', 'selectedProdi1', 'ptn', 'selectedProdi2', 'selectedProdi', 'selectedPTN1', 'selectedPTN2', 'prodi1', 'prodi2', 'provinsi'));
     }
 
     public function add(Request $request, $email)
@@ -102,6 +116,10 @@ class SiswaController extends Controller
             'prodi_piihan2.different' => 'Pilihan 1 dan Pilihan 2 tidak boleh sama',
         ]);
         
+        $currentMonth = Date::now()->month;
+        $currentYear = Date::now()->year;
+        $expectedYear = ($currentMonth >= 6) ? $currentYear + 1 : $currentYear;
+
         $siswa = new TSiswa();
         $siswa->username = $email;
         $siswa->first_name = $request->nama;
@@ -110,7 +128,7 @@ class SiswaController extends Controller
         $siswa->pilihan1_utbk = $request->prodi_piihan1;
         $siswa->pilihan2_utbk = $request->prodi_piihan2;
         $siswa->telp1 = auth()->user()->no_handphone;
-        $siswa->active = Carbon::now()->year;
+        $siswa->active = $expectedYear;
     
         $siswa->save();
     
@@ -142,7 +160,6 @@ class SiswaController extends Controller
         $siswa->pilihan1_utbk = $request->prodi_piihan1;
         $siswa->pilihan2_utbk = $request->prodi_piihan2;
         $siswa->telp1 = auth()->user()->no_handphone;
-        $siswa->active = Carbon::now()->year;
 
         $siswa->save();
 

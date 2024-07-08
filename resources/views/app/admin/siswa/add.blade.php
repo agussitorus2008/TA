@@ -11,17 +11,38 @@
     }
 </style>
 <div class="container">
+    @if($nama_tryout == null)
+            <div class="row justify-content-center text-center mt-3">
+                <div class="col-auto">
+                    <h4 class="alert alert-danger">Tryout Selanjutnya Belum Tersedia</h4>
+                </div>
+            </div>
+    @else
     <div class="row m-3">
         <div class="col-xl-6">
             <h4>{{ $siswa->first_name }}</h4>
-            <p>{{$siswa->asal_sekolah}}</p>
+            <p>{{$siswa->sekolah_siswa->sekolah}}</p>
+            <p id="active">{{$siswa->active}}</p>
         </div>
         <div class="col-xl-6">
         <form action="{{ route('admin.siswa.tryout.add', ['username' => $siswa->username]) }}" method="POST">
             @csrf
-            <p>Tryout ke :</p><input type="number" class="form-control mb-2" name="nama_tryout" value="{{ $nama_tryout + 1 }}" style="width: 100px">
-            {{-- <p>Tryout ke : {{ $nama_tryout + 1 }}</p> --}}
-            <p>Tanggal Tryout : <input type="date" name="tanggal" required style="width: 200px; padding: .375rem .75rem; font-size: 1rem; line-height: 1.5; color: #495057; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; border-radius: .25rem; transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;"></p>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="nama_tryout">Nama Tryout :</label>
+                    <select name="nama_to" id="nama_to" class="form-control" readonly>
+                        @foreach($dataTryout as $data)
+                            <option value="{{ $data->nama_to }}" {{ $data->nama_to == $nama_tryout ? 'selected' : '' }}>
+                                {{ $data->nama_to }}
+                            </option>
+                        @endforeach
+                    </select>                    
+                </div>
+                <div class="form-group col-md-8">
+                    <label for="tanggal">Tanggal Tryout :</label>
+                    <input type="date" class="form-control mb-2" name="tanggal" id="tanggal" required style="width: 200px;" value="{{$tanggal_tryout}}">
+                </div>
+            </div>
         </div>
         <hr>
     </div>
@@ -71,5 +92,30 @@
             </div>
         </div>
     </form>
+    @endif
 </div>
+
+<script>
+    $(document).ready(function() {
+        $('#nama_to').on('change', function() {
+            var nama_to = $(this).val();
+            var active = $('#active').text(); 
+            $.ajax({
+                url: '/tryout/getTanggal',
+                method: 'GET',
+                data: { nama_to: nama_to, active: active },
+                success: function(response) {
+                    try {
+                        $('#tanggal').val(response.tanggal);
+                    } catch (error) {
+                        console.error('Error processing response:', error);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
 @endsection

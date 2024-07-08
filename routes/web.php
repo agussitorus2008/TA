@@ -45,6 +45,10 @@ Route::get('/get-prodi-from-ptn/{idPtn}', [ApiController::class, 'getProdiFromPT
 Route::get('/siswa/search', [ApiController::class, 'search']);
 Route::get('/siswa/filter', [ApiController::class, 'filter']);
 
+Route::get('/tryout/search', [ApiController::class, 'search_tryout']);
+Route::get('/tryout/filter', [ApiController::class, 'filter_tryout']);
+Route::get('/tryout/getTanggal', [ApiController::class, 'getTanggalTryout']);
+
 require_once __DIR__ . '/app/admin.php';
 
 require_once __DIR__ . '/app/siswa.php';

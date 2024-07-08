@@ -28,8 +28,9 @@
                     <input type="text" class="form-control form-control-lg" id="nama" name="nama" value="{{$user->nama}}" required>
                     <label for="nama" class="form-label mt-2">Asal Sekolah</label>
                     <select name="asal_sekolah" class="form-control" id="asal_sekolah">
+                        <option value="">Pilih Sekolah Anda</option> 
                         @foreach($sekolah as $p)
-                        <option value="{{ $p->sekolah }}">{{ $p->sekolah }}</option>
+                        <option value="{{ $p->id }}">{{ $p->sekolah }}</option>
                         @endforeach
                     </select>
                 </div>

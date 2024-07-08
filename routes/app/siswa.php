@@ -7,7 +7,7 @@ use App\Http\Controllers\Web\SimulasiController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\TryoutSiswaController;
 use App\Http\Controllers\Web\HasilTryoutSiswaController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Web\ProfileController;
 
 Route::prefix('/siswa')->middleware(['auth', 'user'])->group(function () {
     Route::get('/main', [SiswaController::class, 'index'])->name('siswa.main');

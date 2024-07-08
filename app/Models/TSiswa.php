@@ -25,7 +25,7 @@ class TSiswa extends Model
         'asal_sekolah',
         'kelompok_ujian',
         'pilihan1_utbk',
-        'pilihan2_utbk ',
+        'pilihan2_utbk',
     ];
 
     public function pilihan1()
@@ -38,8 +38,9 @@ class TSiswa extends Model
         return $this->belongsTo(Prodi::class, 'pilihan2_utbk', 'id_prodi');
     }
 
-    public function sekolah()
+    public function sekolah_siswa()
     {
-        return $this->belongsTo(Sekolah::class, 'asal_sekolah', 'id'); // Adjust relationship and key names accordingly
+        return $this->belongsTo(Sekolah::class, 'asal_sekolah', 'id');
     }
+
 }

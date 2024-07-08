@@ -6,7 +6,19 @@
 
 @section('content')
     <div class="content mt-5">
-        @if($rekomendasi == null)
+        @if($errorMessage == 2)
+        <div class="row justify-content-center text-center">
+            <h5 class="text-danger alert alert-danger">Belum ada data Siswa</h5>
+        </div>
+        <div class="row justify-content-center text-center">
+            <div class="col xs-4">
+            <a href="{{route('siswa.profile.main')}}" class="btn btn-warning">Tambah Data</a>
+        </div>
+        @elseif($errorMessage == 0)
+        <div class="row justify-content-center text-center">
+            <h5 class="text-danger alert alert-danger">Belum ada data Nilai</h5>
+        </div>
+        @elseif($rekomendasi == null)
         <div class="row justify-content-center text-center">
             <h5 class="text-danger alert alert-danger">Maaf Tidak Ada Rekomendasi yang Cocok Untukmu</h5>
         </div>
@@ -30,6 +42,11 @@
                             <h5 class="text-white m-2">{{ $rekomendasi[0]->nama_prodi_ptn }}  DAYA TAMPUNG: {{ $rekomendasi[0]->daya_tampung }}</h5>
                         </div>
                     </div>
+                    <a href="{{ route('siswa.hasilTryout.pilihanTotal', ['nama_prodi' => $rekomendasi[0]->nama_prodi_ptn]) }}" target="_blank" style="text-decoration: none; color: inherit;">
+                        <p style="display: inline;">
+                            Peringkat <p style="color: #e32227;display: inline; font-weight:bold">{{ $rekomendasi[0]->peringkat }}</p> dari <p style="color: #3DA059;display: inline; font-weight:bold">{{$rekomendasi[0]->total_applicants + 1}}</p> Pendaftar
+                        </p>
+                    </a>
                 </div>
                 <div class="col-xl-6">
                     <h4>Pilihan 2</h4>
@@ -38,30 +55,12 @@
                             <h5 class="text-white m-2">{{ $rekomendasi[1]->nama_prodi_ptn }} DAYA TAMPUNG: {{ $rekomendasi[1]->daya_tampung }}</h5>
                         </div>
                     </div>
-                </div>
-                <hr>
-            </div>
-        </div>
-        <div class="container">
-            <div class="row justify-content-center text-center">
-                <div class="col-xl-6">
-                    <a href="{{ route('siswa.hasilTryout.pilihanTotal', ['nama_prodi' => $rekomendasi[0]->nama_prodi_ptn]) }}" target="_blank" style="text-decoration: none; color: inherit;">
-                        <p style="display: inline;">
-                                Peringkat <p style="color: #e32227;display: inline; font-weight:bold">{{ $rekomendasi[0]->peringkat }}</p>
-
-                        </p>
-                    </a>
-                    </a>
-                </div>
-    
-                <div class="col-xl-6">
                     <a href="{{ route('siswa.hasilTryout.pilihanTotal', ['nama_prodi' => $rekomendasi[1]->nama_prodi_ptn]) }}" target="_blank" style="text-decoration: none; color: inherit;">
                         <p style="display: inline;">
-                                Peringkat <p style="color: #e32227;display: inline; font-weight:bold">{{ $rekomendasi[1]->peringkat }}</p>
+                            Peringkat <p style="color: #e32227;display: inline; font-weight:bold">{{ $rekomendasi[1]->peringkat }}</p> dari <p style="color: #0A407F;display: inline; font-weight:bold">{{$rekomendasi[1]->total_applicants + 1}}</p> Pendaftar
                         </p>
                     </a>
-                    </a>
-                </div>            
+                </div>
                 <hr>
             </div>
         </div>

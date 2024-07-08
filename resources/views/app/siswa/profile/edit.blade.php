@@ -29,7 +29,7 @@
                     <label for="nama" class="form-label mt-2">Asal Sekolah</label>
                     <select name="asal_sekolah" class="form-control" id="asal_sekolah"> 
                         @foreach($sekolah as $p)
-                        <option value="{{ $p->sekolah }}" {{ ($selectedProdi->asal_sekolah == $p->sekolah) ? 'selected' : '' }}>
+                        <option value="{{ $p->id }}" {{ ($selectedProdi->asal_sekolah == $p->id) ? 'selected' : '' }}>
                             {{ $p->sekolah }}
                         </option>     
                         @endforeach
@@ -43,7 +43,7 @@
                     </select>
 
                     <label for="nama" class="form-label mt-2">Provinsi Sekolah</label>
-                    <input type="text" name="provinsi_sekolah" class="form-control" id="provinsi_sekolah" readonly>
+                    <input type="text" name="provinsi_sekolah" class="form-control" id="provinsi_sekolah" value="{{ $selectedProdi->asal_sekolah ? $provinsi->propinsi : ''}}" readonly>
                 </div>
             </div>
 

@@ -63,26 +63,28 @@ class AuthController extends Controller
     public function doregister(Request $request)
     {
         $request->validate([
-            'nama' => 'required',
             'nama' => ['required', 'regex:/^[^\d]*$/'],
-            'no_handphone' => 'required|unique:users',
+            'no_handphone' => ['required', 'unique:users', 'max:12', 'min:11', 'regex:/^(08|62)[0-9]{9,10}$/'],
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
             'password_confirmation' => 'required|same:password',
         ], [
-            'nama.required' => 'Nama harus diisi.',
-            'nama.regex' => 'Nama tidak boleh mengandung angka.',
-            'no_handphone.required' => 'Nomor handphone harus diisi.',
-            'email.required' => 'Email harus diisi.',
-            'email.email' => 'Email tidak valid.',
-            'email.unique' => 'Email sudah terdaftar.',
-            'no_handphone.unique' => 'No Telepon sudah terdaftar.',
-            'password.required' => 'Password harus diisi.',
-            'password.min' => 'Password minimal 6 karakter.',
-            'password' => 'Password tidak sesuai.',
-            'password_confirmation.required' => 'Konfirmasi password harus diisi.',
-            'password_confirmation.same' => 'Konfirmasi password tidak sesuai.',
+            'nama.required' => 'Nama harus diisi',
+            'nama.regex' => 'Nama tidak boleh mengandung angka',
+            'no_handphone.required' => 'Nomor handphone harus diisi',
+            'no_handphone.min' => 'Nomor handphone minimal 11 digit',
+            'no_handphone.max' => 'Nomor handphone maksimal 12 digit',
+            'no_handphone.unique' => 'Nomor handphone sudah terdaftar',
+            'no_handphone.regex' => 'Nomor handphone harus dimulai dengan 08 atau 62',
+            'email.required' => 'Email harus diisi',
+            'email.email' => 'Email tidak valid',
+            'email.unique' => 'Email sudah terdaftar',
+            'password.required' => 'Password harus diisi',
+            'password.min' => 'Password minimal 6 karakter',
+            'password_confirmation.required' => 'Konfirmasi password harus diisi',
+            'password_confirmation.same' => 'Konfirmasi password tidak sesuai',
         ]);
+                
 
         $data = collect($request->all())->except('password_confirmation')->all();
         $data['password'] = Hash::make($request->input('password'));

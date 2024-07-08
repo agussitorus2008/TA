@@ -8,29 +8,95 @@ use App\Models\Sekolah;
 use App\Models\Tryout;
 use App\Models\TNilaito;
 use App\Models\Nilai;
+use App\Models\TTo;
 use App\Models\Kelulusan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Validation\Rule;
 
 class TryoutController extends Controller
 {
     public function add($username)
     {
         $siswa = TSiswa::where('username', $username)->first();
-        $nama_tryout = TNilaito::where('username', $username)->count();
-        return view("app.admin.siswa.add", compact('siswa', 'nama_tryout'));
+        $testTryout = TNilaito::where('username', $username)->latest()->first();
+
+        $tahunSekarang = $siswa->active;
+
+        $lastTryoutCount = TNilaiTo::where('active', $tahunSekarang)->where('username', $username)->count();
+
+        $dataTryout = TTo::where('active', $tahunSekarang)->get();
+
+        if ($lastTryoutCount == 0) {
+            $nama_tryout = 'Tryout-1';
+        } else {
+            $nama_tryout = 'Tryout-' . ($lastTryoutCount + 1);
+        }
+
+        $existingTryout = TTo::where('active', $tahunSekarang)
+                            ->where('nama_to', $nama_tryout)
+                            ->first();
+
+        $tanggal_tryout = null;
+
+        if (!$existingTryout) {
+            $nama_tryout = null;
+        }else{
+            $tanggal_tryout = $existingTryout->tanggal;
+        }
+
+        return view("app.admin.siswa.add", compact('siswa', 'nama_tryout', 'dataTryout', 'tanggal_tryout'));
     }
 
     public function Store(Request $request, $username)
     {
-        $request->validate([
-            'hitungan_tryout' => 'unique:nilai_to,nama_tryout,NULL,id,username,' . $username
-        ], [
-            'hitungan_tryout.unique' => 'Sudah ada nilai tryout',
-        ]);
-
         $siswa = TSiswa::where('username', $username)->first();  
+
+        $tahunSekarang = $siswa->active;
+
+        $latestTryout = TTo::where('active', $tahunSekarang)
+            ->where('nama_to', $request->input('nama_to'))
+            ->first();
+
+        $request->validate([
+            'nama_to' => [
+                'required',
+                function ($attribute, $value, $fail) use ($username, $latestTryout) {
+                    $exists = DB::table('t_nilai_to')
+                        ->join('t_to', 't_nilai_to.id_to', '=', 't_to.id_to')
+                        ->where('t_to.nama_to', $value)
+                        ->where('t_nilai_to.username', $username)
+                        ->where('t_nilai_to.id_to', '=', $latestTryout->id_to)
+                        ->exists();
+                    if ($exists) {
+                        $fail('Sudah ada nilai tryout dengan nama ' . $value . ' untuk pengguna ini.');
+                    }
+                }
+            ],
+            't_ppu' => 'integer',
+            't_pu' => 'integer',
+            't_pm' => 'integer',
+            't_pk' => 'integer',
+            't_lbi' => 'integer',
+            't_lbe' => 'integer',
+            't_pbm' => 'integer',
+            'total' => 'integer',
+            'tanggal' => 'date',
+            'tahun' => 'integer',
+        ], [
+            'nama_to.required' => 'Nama tryout harus diisi',
+            't_ppu.integer' => 'Masukkan angka yang valid untuk PPU',
+            't_pu.integer' => 'Masukkan angka yang valid untuk PU',
+            't_pm.integer' => 'Masukkan angka yang valid untuk PM',
+            't_pk.integer' => 'Masukkan angka yang valid untuk PK',
+            't_lbi.integer' => 'Masukkan angka yang valid untuk LBI',
+            't_lbe.integer' => 'Masukkan angka yang valid untuk LBE',
+            't_pbm.integer' => 'Masukkan angka yang valid untuk PBM',
+            'total.integer' => 'Masukkan angka yang valid untuk Total',
+            'tanggal.date' => 'Masukkan tanggal yang valid',
+            'tahun.integer' => 'Masukkan tahun yang valid',
+        ]);
 
         if (!$siswa) {
             return redirect()->back()->with('error', 'Siswa tidak ditemukan');
@@ -39,8 +105,7 @@ class TryoutController extends Controller
         // Simpan nilai tryout baru
         $tryout = new TNilaito;
         $tryout->username = $username;
-        $tryout->id_to = 28;
-        $tryout->nama_tryout = $request->nama_tryout;
+        $tryout->id_to = $latestTryout->id_to;
         $tryout->tanggal = $request->tanggal;
         $tryout->ppu = $request->ppu;
         $tryout->pu = $request->pu;
@@ -49,74 +114,60 @@ class TryoutController extends Controller
         $tryout->lbi = $request->lbi;
         $tryout->lbe = $request->lbe;
         $tryout->pbm = $request->pbm;
-
+        $tryout->active = $siswa->active;
         $tryout->save();
 
         $finalTo = new Nilai;
-        $finalTo->id_to = 28;
+        $finalTo->id_to = $latestTryout->id_to;
         $finalTo->id_nilai_to = $tryout->id;
         $finalTo->username = $username;
         $finalTo->first_name = $siswa->first_name;
         $finalTo->asal_sekolah = $siswa->asal_sekolah;
 
         $finalTo->pu_benar = $tryout->pu;
-        $finalTo->nilai_pu = $tryout->pu/30 * 100 ;
+        $finalTo->nilai_pu = $tryout->pu/$latestTryout->t_pu * 100 ;
 
         $finalTo->ppu_benar = $tryout->ppu;
-        $finalTo->nilai_ppu = $tryout->ppu/20 * 100;
+        $finalTo->nilai_ppu = $tryout->ppu/$latestTryout->t_ppu * 100;
 
         $finalTo->pm_benar = $tryout->pm;
-        $finalTo->nilai_pm = $tryout->pm/20 * 100;
+        $finalTo->nilai_pm = $tryout->pm/$latestTryout->t_pm * 100;
 
         $finalTo->pk_benar = $tryout->pk;
-        $finalTo->nilai_pk = $tryout->pk/15 * 100;
+        $finalTo->nilai_pk = $tryout->pk/$latestTryout->t_pk * 100;
 
         $finalTo->lbi_benar = $tryout->lbi;
-        $finalTo->nilai_lbi = $tryout->lbi/30 * 100;
+        $finalTo->nilai_lbi = $tryout->lbi/$latestTryout->t_lbi * 100;
 
         $finalTo->lbe_benar = $tryout->lbe;
-        $finalTo->nilai_lbe = $tryout->lbe/20 * 100;
+        $finalTo->nilai_lbe = $tryout->lbe/$latestTryout->t_lbe * 100;
 
         $finalTo->pbm_benar = $tryout->pbm;
-        $finalTo->nilai_pbm = $tryout->pbm/20 * 100;
+        $finalTo->nilai_pbm = $tryout->pbm/$latestTryout->t_pbm * 100;
 
         $finalTo->total_benar = $tryout->pu + $tryout->ppu + $tryout->pm + $tryout->pk + $tryout->lbi + $tryout->lbe + $tryout->pbm;
-        $finalTo->total_nilai = $finalTo->total_benar/155 * 100;
+        $finalTo->total_nilai = $finalTo->total_benar/$latestTryout->total * 100;
         $finalTo->save(); 
 
         $nilaiSiswa = Nilai::where('username', $username)->get();
 
-        // $total = 0;
-        // foreach($nilaiSiswa as $nilai){
-        //     $total += $nilai->total_nilai;
-        // }        
-
-        // // Calculate the average score
-        // if($nilaiSiswa->count() > 0) {
-        //     $total = $total / $nilaiSiswa->count();
-        // } else {
-        //     $total = 0;
-        // }
-
-        // $nilaiFinal = ViewNilaiFinal::where('username', $username)->first();
-        // if (!$nilaiFinal) {
-        //     $nilaiFinal = new ViewNilaiFinal;
-        //     $nilaiFinal->username = $username;
-        //     $nilaiFinal->pilihan1_utbk = $siswa->pilihan1_utbk_aktual;
-        //     $nilaiFinal->pilihan2_utbk = $siswa->pilihan2_utbk_aktual;
-        // }
-
-        // $nilaiFinal->average_to = $total;
-        // $nilaiFinal->save();
-
         return redirect()->route("admin.siswa.tryout", $username)->with('success', 'Nilai Tryout berhasil ditambahkan');
     }   
        
-    public function update(Request $request, $username, $nama_tryout)
+    public function update(Request $request, $username, $id_to)
     {
-        $tryout = TNilaito::where('nama_tryout', $nama_tryout)
+        $tryout = TNilaito::where('id_to', $id_to)
                  ->where('username', $username)
                  ->first();
+        
+        $siswa = TSiswa::where('username', $username)->first(); 
+        $tahunSekarang = $siswa->active;
+
+        $latestTryout = TTo::where('active', $tahunSekarang)
+            ->where('id_to', $id_to)
+            ->first();
+
+        // dd($latestTryout);
 
         if ($tryout) {
             $tryout->tanggal = $request->tanggal;
@@ -132,76 +183,67 @@ class TryoutController extends Controller
 
             if ($mvto) {
                 $mvto->pu_benar = $tryout->pu;
-                $mvto->nilai_pu = $tryout->pu/30 * 100 ;
+                $mvto->nilai_pu = $tryout->pu/$latestTryout->t_pu * 100 ;
         
                 $mvto->ppu_benar = $tryout->ppu;
-                $mvto->nilai_ppu = $tryout->ppu/20 * 100;
+                $mvto->nilai_ppu = $tryout->ppu/$latestTryout->t_ppu * 100;
         
                 $mvto->pm_benar = $tryout->pm;
-                $mvto->nilai_pm = $tryout->pm/20 * 100;
+                $mvto->nilai_pm = $tryout->pm/$latestTryout->t_pm * 100;
         
                 $mvto->pk_benar = $tryout->pk;
-                $mvto->nilai_pk = $tryout->pk/15 * 100;
+                $mvto->nilai_pk = $tryout->pk/$latestTryout->t_pk * 100;
         
                 $mvto->lbi_benar = $tryout->lbi;
-                $mvto->nilai_lbi = $tryout->lbi/30 * 100;
+                $mvto->nilai_lbi = $tryout->lbi/$latestTryout->t_lbi * 100;
         
                 $mvto->lbe_benar = $tryout->lbe;
-                $mvto->nilai_lbe = $tryout->lbe/20 * 100;
+                $mvto->nilai_lbe = $tryout->lbe/$latestTryout->t_lbe * 100;
         
                 $mvto->pbm_benar = $tryout->pbm;
-                $mvto->nilai_pbm = $tryout->pbm/20 * 100;
+                $mvto->nilai_pbm = $tryout->pbm/$latestTryout->t_pbm * 100;
         
                 $mvto->total_benar = $tryout->pu + $tryout->ppu + $tryout->pm + $tryout->pk + $tryout->lbi + $tryout->lbe + $tryout->pbm;
-                $mvto->total_nilai = $mvto->total_benar/155 * 100;
+                $mvto->total_nilai = $mvto->total_benar/$latestTryout->total * 100;
 
                 $mvto->save(); 
             }
 
             $tryout->save();
         }
-        // $nilaiSiswa = Nilaito::where('username', $username)->get();
-        // $finalTo = Nilai::where('username', $username)->first();
-
-        // $total = 0;
-        // foreach($nilaiSiswa as $nilai){
-        //     $total += ($nilai->ppu * $bobot_ppu + $nilai->pu * $bobot_pu + $nilai->pk * $bobot_pk + $nilai->lbi * $bobot_lbi + $nilai->lbe * $bobot_lbe + $nilai->pbm * $bobot_pbm + $nilai->pm * $bobot_pm) / 7;
-        // }        
-
-        // // Calculate the average score
-        // if($nilaiSiswa->count() > 0) {
-        //     $total = $total / $nilaiSiswa->count();
-        // } else {
-        //     $total = 0;
-        // }
-
-        // // Update the total_nilai
-        // $finalTo->total_nilai = $total;
-        // $finalTo->save();
-
         return redirect()->route("admin.siswa.tryout", $username)->with('success', 'Nilai Tryout berhasil diubah');   
     }
 
-    public function detail_tryout($username, $nama_tryout, $rata)
+    public function detail_tryout($username, $id_to, $rata)
     {
         $siswa = TSiswa::where('username', $username)->first();
-        $tryout = TNilaito::where('nama_tryout', $nama_tryout)
+
+        $tryout = TNilaito::where('id_to', $id_to)
             ->where('username', $username)
+            ->first(); 
+        
+        $total_benar = Nilai::where('id_to', $id_to)
+        ->where('username', $username)
+        ->first();
+
+        $tahunSekarang = $siswa->active;
+
+        $datatryout = TTo::where('active', $tahunSekarang)
+            ->where('id_to', $id_to)
             ->first();
 
         if($siswa){
 
-        $bobot_ppu = 30;
-        $bobot_pu = 20;
-        $bobot_pm = 20;
-        $bobot_pk = 15;
-        $bobot_lbi = 30;
-        $bobot_lbe = 20;
-        $bobot_pbm = 20;
-        $bobot_total = 155;
-    
-    
-        return view("app.admin.siswa.tryoutdetail", compact('siswa', 'tryout', 'bobot_ppu', 'bobot_pu', 'bobot_pm', 'bobot_pk', 'bobot_lbi', 'bobot_lbe', 'bobot_pbm', 'rata'));
+        $bobot_ppu = $datatryout->t_ppu;
+        $bobot_pu = $datatryout->t_pu;
+        $bobot_pm = $datatryout->t_pm;
+        $bobot_pk = $datatryout->t_pk;
+        $bobot_lbi = $datatryout->t_lbi;
+        $bobot_lbe = $datatryout->t_lbe;
+        $bobot_pbm = $datatryout->t_pbm;
+        $bobot_total = $datatryout->total;
+
+        return view("app.admin.siswa.tryoutdetail", compact('siswa', 'tryout', 'bobot_ppu', 'bobot_pu', 'bobot_pm', 'bobot_pk', 'bobot_lbi', 'bobot_lbe', 'bobot_pbm', 'rata', 'bobot_total', 'total_benar'));
         }
 
         else{
@@ -209,10 +251,10 @@ class TryoutController extends Controller
         }
     }
 
-    public function edit($username, $nama_tryout)
+    public function edit($username, $id_to)
     {
         $siswa = TSiswa::where('username', $username)->first();
-        $tryout = TNilaito::where('nama_tryout', $nama_tryout)
+        $tryout = TNilaito::where('id_to', $id_to)
             ->where('username', $username)
             ->first();
     
@@ -220,9 +262,9 @@ class TryoutController extends Controller
     }
 
 
-    public function destroy($username, $nama_tryout)
+    public function destroy($username, $id_to)
     {
-        $tryout = TNilaito::where('nama_tryout', $nama_tryout)
+        $tryout = TNilaito::where('id_to', $id_to)
                  ->where('username', $username)
                  ->first();
 
@@ -234,45 +276,7 @@ class TryoutController extends Controller
             }
 
             $tryout->delete();
-        }
-        
-
-        // $bobot = Nilai::whereNotNull('nilai_ppu')
-        // ->whereNotNull('nilai_pu')
-        // ->whereNotNull('nilai_pm')
-        // ->whereNotNull('nilai_pk')
-        // ->whereNotNull('nilai_lbi')
-        // ->whereNotNull('nilai_lbe')
-        // ->whereNotNull('nilai_pbm')
-        // ->first();
-
-        // $bobot_ppu = $bobot->nilai_ppu / $bobot->ppu_benar;
-        // $bobot_pu = $bobot->nilai_pu / $bobot->pu_benar;
-        // $bobot_pm = $bobot->nilai_pm / $bobot->pm_benar;
-        // $bobot_pk = $bobot->nilai_pk / $bobot->pk_benar;
-        // $bobot_lbi = $bobot->nilai_lbi / $bobot->lbi_benar;
-        // $bobot_lbe = $bobot->nilai_lbe / $bobot->lbe_benar;
-        // $bobot_pbm = $bobot->nilai_pbm / $bobot->pbm_benar;
-
-        // $nilaiSiswa = Nilaito::where('username', $username)->get();
-        // $finalTo = Nilai::where('username', $username)->first();
-
-        // $total = 0;
-        // foreach($nilaiSiswa as $nilai){
-        //     $total += ($nilai->ppu * $bobot_ppu + $nilai->pu * $bobot_pu + $nilai->pk * $bobot_pk + $nilai->lbi * $bobot_lbi + $nilai->lbe * $bobot_lbe + $nilai->pbm * $bobot_pbm + $nilai->pm * $bobot_pm) / 7;
-        // }        
-
-        // // Calculate the average score
-        // if($nilaiSiswa->count() > 0) {
-        //     $total = $total / $nilaiSiswa->count();
-        // } else {
-        //     $total = 0;
-        // }
-
-        // // Update the total_nilai
-        // $finalTo->total_nilai = $total;
-        // $finalTo->save();
-          
+        } 
         return redirect()->route("admin.siswa.tryout", $username)->with('success', 'Nilai Tryout berhasil dihapus');    
     }
 }

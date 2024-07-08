@@ -50,6 +50,12 @@
                         <span>Tryout</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{route('admin.managetryout.main')}}" class="nav-link">
+                        <i class="ph-article"></i>
+                        <span>Manage Tryout</span>
+                    </a>
+                </li>
             </ul>
         </div>
         <!-- /main navigation -->
